@@ -1,0 +1,22 @@
+{
+    "testnet": {
+        "nodeUrl": "http://testnet:8888"
+    },
+    "credentials": {
+        "contract": {
+            "account": "aggtest",
+            "private_key": "<aggtest private key>",
+            "permission": "aggtest@active"
+        },
+        "alice": {
+            "account": "aliceprvider",
+            "private_key": "<aliceprvider private key>",
+            "permission": "aliceprvider@active"
+        },
+        "bob": {
+            "account": "scriptwriter",
+            "private_key": "<scriptwriter private key>",
+            "permission": "scriptwriter@active"
+        }
+    }
+}

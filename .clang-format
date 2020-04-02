@@ -1,0 +1,14 @@
+
+BasedOnStyle: LLVM
+IndentWidth: 3
+ColumnLimit: 160
+PointerAlignment: Left
+AlwaysBreakTemplateDeclarations: true
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+BreakConstructorInitializers: BeforeComma
+NamespaceIndentation: All
+FixNamespaceComments: false
+AccessModifierOffset: -3
+MaxEmptyLinesToKeep: 2
+AllowShortFunctionsOnASingleLine: false
