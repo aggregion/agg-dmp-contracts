@@ -4,3 +4,5 @@ data/*
 **/*package-lock.json
 
 test/config.json
+test/localnet.json
+test/testnet.json

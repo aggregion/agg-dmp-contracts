@@ -3,6 +3,7 @@ const AggregionBlockchain = require('../js/AggregionBlockchain.js');
 const AggregionContract = require('../js/AggregionContract.js');
 const AggregionUtility = require('../js/AggregionUtility.js');
 const TestsConfig = require('../js/TestsConfig.js');
+const DelayMaker = require('../js/DelayMaker.js');
 
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised');
@@ -11,7 +12,8 @@ var assert = chai.assert;
 var should = chai.should()
 
 
-describe('Aggregion', () => {
+describe('Aggregion', function () {
+
 
     const config = new TestsConfig(__dirname + '/config.json')
     const cred = config.credentials;
@@ -27,9 +29,16 @@ describe('Aggregion', () => {
     let alice = cred.alice;
     let bob = cred.bob;
 
+    let delayMaker = new DelayMaker(500);
+    this.timeout(0);
+
     beforeEach(async function () {
-        this.timeout(0);
         await contract.eraseAllData(cred.contract.permission);
+        await delayMaker.init();
+    });
+
+    afterEach(async function () {
+        await delayMaker.finalize();
     });
 
     describe('#providers', function () {
