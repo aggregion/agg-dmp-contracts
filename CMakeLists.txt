@@ -6,13 +6,6 @@ if(EOSIO_CDT_ROOT STREQUAL "" OR NOT EOSIO_CDT_ROOT)
    find_package(eosio.cdt)
 endif()
 
-if(NOT DEFINED ENV{AGGREGION_ACCOUNT})
-    message(FATAL_ERROR "AGGREGION_ACCOUNT environment variable is not set.")
-endif()
-if(NOT DEFINED ENV{NODE_URL})
-    message(FATAL_ERROR "NODE_URL environment variable is not set.")
-endif()
-
 ExternalProject_Add(
    Aggregion_project
    SOURCE_DIR ${CMAKE_SOURCE_DIR}/contract

@@ -1,9 +1,18 @@
 #!/bin/sh
 
-ACCOUNT_KEY="$AGGREGION_ACCOUNT@active"
+if [ -z "$NODE_URL" ]
+then
+      echo "\$NODE_URL is not defined"
+      exit 1
+fi
 
-echo NODE: $NODE_URL
-echo ACCOUNT: $AGGREGION_ACCOUNT
-echo ACCOUNT_KEY: $ACCOUNT_KEY
+if [ -z "$AGGREGION_ACCOUNT" ]
+then
+      echo "\$AGGREGION_ACCOUNT is not defined"
+      exit 1
+fi
 
-cleos -u $NODE_URL set contract $AGGREGION_ACCOUNT Aggregion/ -p $ACCOUNT_KEY
+PERMISSION="$AGGREGION_ACCOUNT@active"
+
+set -x
+cleos -u $NODE_URL set contract $AGGREGION_ACCOUNT Aggregion/ -p $PERMISSION
