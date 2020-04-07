@@ -6,34 +6,33 @@ const { TextEncoder, TextDecoder } = require('util');
 
 class AggregionBlockchain {
 
-    constructor(nodeUrl, contractAccount, privateKeys) {
-        this.contractAccount = contractAccount;
+    constructor(nodeUrl, privateKeys) {
         this.signatureProvider = new JsSignatureProvider(privateKeys);
         this.rpc = new JsonRpc(nodeUrl, { fetch });
         this.api = new Api({ rpc: this.rpc, signatureProvider: this.signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
     }
 
-    async getScopes() {
-        return await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: this.contractAccount });
+    async getScopes(contractAccount) {
+        return await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: contractAccount });
     }
 
-    async getTableScope(tableName, scopeName) {
+    async getTableScope(contractAccount, tableName, scopeName) {
         return await this.rpc.get_table_rows({
-            code: this.contractAccount,
+            code: contractAccount,
             scope: scopeName,
             table: tableName,
             limit: '-1'
         });
     }
 
-    async pushAction(contractName, actionName, requestObject, permission) {
+    async pushAction(contractAccount, actionName, requestObject, permission) {
         let [actorName, permissionLevel] = permission.split('@');
         requestObject.vmtype = 0;
         requestObject.vmversion = 0;
         return await this.api.transact({
             actions: [
                 {
-                    account: contractName,
+                    account: contractAccount,
                     name: actionName,
                     authorization: [
                         {

@@ -186,7 +186,7 @@ class AggregionContract {
      * @param {permission} permission (must be contract account permission) 
      */
     async eraseAllData(permission) {
-        const scopes = await this.bc.getScopes();
+        const scopes = await this.bc.getScopes(this.contractName);
         for (const item of scopes.rows) {
             let request = {};
             request.scope = item.scope;

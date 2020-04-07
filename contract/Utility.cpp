@@ -2,11 +2,6 @@
 
 namespace dmp {
 
-   void Aggregion::wtf() {
-      require_auth(Names::Contract);
-   }
-
-
    template<typename TARGET>
    void clear_table(name owner, uint64_t scope) {
       TARGET table{owner, scope};

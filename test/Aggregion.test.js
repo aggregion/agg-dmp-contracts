@@ -23,8 +23,8 @@ describe('Aggregion', function () {
         cred.bob.private_key,
     ];
 
-    let bc = new AggregionBlockchain(config.testnet.nodeUrl, cred.contract.account, keys);
-    let util = new AggregionUtility(bc);
+    let bc = new AggregionBlockchain(config.testnet.nodeUrl, keys);
+    let util = new AggregionUtility(cred.contract.account, bc);
     let contract = new AggregionContract(cred.contract.account, bc);
     let alice = cred.alice;
     let bob = cred.bob;

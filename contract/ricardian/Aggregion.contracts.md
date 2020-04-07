@@ -87,13 +87,6 @@ summary:
 icon:
 
 
-<h1 class="contract">wtf</h1>
----
-spec-version: 0.0.1
-title: Debug method
-summary: Internal use only.
-icon:
-
 <h1 class="contract">erasescope</h1>
 ---
 spec-version: 0.0.1

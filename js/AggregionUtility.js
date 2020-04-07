@@ -7,19 +7,20 @@ class AggregionUtility {
     /**
      * @param {AggregionBlockchain} blockchain
     */
-    constructor(blockchain) {
+    constructor(contractAccount, blockchain) {
+        this.contractAccount = contractAccount;
         this.bc = blockchain;
     }
 
     async getTable(tableName) {
         // 1. Find all scopes of table
-        let scopes = await this.bc.getScopes();
+        let scopes = await this.bc.getScopes(this.contractAccount);
         let filtered = scopes.rows.filter(s => s.table == tableName);
 
         // 2. Fetch rows for each scope
         let rows = [];
         for (const item of filtered) {
-            let data = await this.bc.getTableScope(tableName, item.scope);
+            let data = await this.bc.getTableScope(this.contractAccount, tableName, item.scope);
             let scoped = data.rows.map(r => { r.scope = item.scope; return r; });
             rows.push(...scoped);
         };

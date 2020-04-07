@@ -117,9 +117,6 @@ namespace dmp {
       [[eosio::action]] void approve(name provider, name owner, name script, name version);
       [[eosio::action]] void deny(name provider, name owner, name script, name version);
 
-
-      // Debug actions.
-      [[eosio::action]] void wtf();
       [[eosio::action]] void erasescope(name scope);
 
    private:
