@@ -38,7 +38,11 @@ describe('Aggregion', function () {
     });
 
     afterEach(async function () {
-        await delayMaker.finalize();
+        await delayMaker.doAdjustedSleep();
+    });
+
+    after(async function () {
+        await contract.eraseAllData(cred.contract.permission);
     });
 
     describe('#providers', function () {

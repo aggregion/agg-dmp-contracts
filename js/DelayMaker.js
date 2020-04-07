@@ -8,7 +8,7 @@ class DelayMaker {
         this.hrstart = process.hrtime();
     }
 
-    async finalize() {
+    async doAdjustedSleep() {
 
         const sleep = (milliseconds) => {
             return new Promise(resolve => setTimeout(resolve, milliseconds))
