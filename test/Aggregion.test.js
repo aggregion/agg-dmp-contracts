@@ -171,6 +171,12 @@ describe('Aggregion', function () {
             }
         });
 
+        it('should remove script if it does not approved', async () => {
+            await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
+            await contract.delscript(bob.account, 'script1', 'v1', bob.permission);
+            let script = await util.getScript(bob.account, 'script1', 'v1');
+            assert.isUndefined(script);
+        });
 
         it('should fail if script version already exists', async () => {
             await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
@@ -212,6 +218,16 @@ describe('Aggregion', function () {
                 .should.be.rejected;
             await contract.deny(alice.account, bob.account, 'script1', 'v1', alice.permission);
             await contract.updscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
+        });
+
+        it('should not remove script if it is approved', async () => {
+            await contract.regprov(alice.account, 'Alice provider', alice.permission);
+            await contract.addscript(bob.account, 'script1', 'v1', 'Description', 'Hash', 'Url', bob.permission);
+            await contract.approve(alice.account, bob.account, 'script1', 'v1', alice.permission);
+            await contract.delscript(bob.account, 'script1', 'v1', bob.permission)
+                .should.be.rejected;
+            await contract.deny(alice.account, bob.account, 'script1', 'v1', alice.permission);
+            await contract.delscript(bob.account, 'script1', 'v1', bob.permission);
         });
     });
 });

@@ -148,6 +148,21 @@ class AggregionContract {
     }
 
     /**
+     * Remove script.
+     * @param {EosioName} user 
+     * @param {EosioName} script 
+     * @param {EosioName} version 
+     * @param {permission} permission 
+     */
+    async delscript(user, script, version, permission) {
+        let request = {};
+        request.owner = user;
+        request.script = script;
+        request.version = version;
+        return await this.bc.pushAction(this.contractName, "delscript", request, permission);
+    }
+
+    /**
      * Approve execution of user script.
      * @param {EosioName} provider 
      * @param {EosioName} script_owner 
