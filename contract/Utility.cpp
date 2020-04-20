@@ -20,6 +20,7 @@ namespace dmp {
       clear_table<scripts_table_t>(get_self(), scope.value);
       clear_table<services_table_t>(get_self(), scope.value);
       clear_table<providers_table_t>(get_self(), scope.value);
+      clear_table<logreq_table_t>(get_self(), scope.value);
       print("Data was removed");
    }
 

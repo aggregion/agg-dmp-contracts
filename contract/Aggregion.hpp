@@ -1,3 +1,4 @@
+#include <eosio/crypto.hpp>
 #include <eosio/eosio.hpp>
 #include <libc/bits/stdint.h>
 
@@ -15,6 +16,8 @@ namespace dmp {
       static constexpr const name ScriptsTable{"scripts"};
       static constexpr const name ScriptsIndex{"approvesidx"};
       static constexpr const name ApprovesTable{"approves"};
+      static constexpr const name RequestLogsTable{"reqlogs"};
+      static constexpr const name RequestLogsIndex{"reqlogsidx"};
    };
 
 
@@ -87,11 +90,41 @@ namespace dmp {
             return script_id;
          }
       };
+
+
+      /// @brief
+      /// Logs requests.
+      /// Scope: Default.
+      struct [[eosio::table, eosio::contract("Aggregion")]] RequestLogs {
+         uint64_t id;
+         name sender;
+         name receiver;
+         int date;
+         std::string request;
+
+         auto primary_key() const {
+            return id;
+         }
+
+         static auto makeKey(name sender, name receiver, int date, std::string const& request) {
+            std::string value;
+            value.append(sender.to_string());
+            value.append(receiver.to_string());
+            value.append(std::to_string(date));
+            value.append(request);
+
+            return sha256(value.data(), value.size());
+         }
+
+         auto secondary_key() const {
+            return makeKey(sender, receiver, date, request);
+         }
+      };
    };
 
 
    /// @brief
-   /// Aggregion smart contracts.
+   /// Aggregion smart contract.
    struct [[eosio::contract]] Aggregion : contract {
 
       using contract::contract;
@@ -101,6 +134,8 @@ namespace dmp {
       using scripts_table_t = eosio::multi_index<Names::ScriptsTable, Tables::Scripts, scripts_index_t>;
       using approves_table_t = eosio::multi_index<Names::ApprovesTable, Tables::Approves>;
 
+      using logreq_index_t = indexed_by<Names::RequestLogsIndex, const_mem_fun<Tables::RequestLogs, checksum256, &Tables::RequestLogs::secondary_key>>;
+      using logreq_table_t = eosio::multi_index<Names::RequestLogsTable, Tables::RequestLogs, logreq_index_t>;
 
       [[eosio::action]] void regprov(name provider, std::string description);
       [[eosio::action]] void updprov(name provider, std::string description);
@@ -116,6 +151,8 @@ namespace dmp {
 
       [[eosio::action]] void approve(name provider, name owner, name script, name version);
       [[eosio::action]] void deny(name provider, name owner, name script, name version);
+
+      [[eosio::action]] void requestlog(name sender, name receiver, int date, std::string request);
 
       [[eosio::action]] void erasescope(name scope);
 

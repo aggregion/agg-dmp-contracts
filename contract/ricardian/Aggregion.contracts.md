@@ -87,6 +87,16 @@ summary:
 icon:
 
 
+
+<h1 class="contract">requestlog</h1>
+---
+spec-version: 0.0.1
+title: Queue new log request.
+summary:
+icon:
+
+
+
 <h1 class="contract">erasescope</h1>
 ---
 spec-version: 0.0.1

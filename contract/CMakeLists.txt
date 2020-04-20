@@ -9,6 +9,7 @@ add_contract(Aggregion Aggregion
     Services.cpp
     Scripts.cpp
     Approves.cpp
+    RequestLogs.cpp
     Utility.cpp)
 
 target_compile_options( Aggregion PUBLIC -R${CMAKE_SOURCE_DIR}/ricardian )

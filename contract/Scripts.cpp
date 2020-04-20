@@ -17,7 +17,7 @@ namespace dmp {
    void Aggregion::addscript(name owner, name script, name version, std::string description, std::string hash, std::string url) {
       require_auth(owner);
 
-      check(get_script_id(owner, script, version) == 0, "404. Script version already exist!");
+      check(get_script_id(owner, script, version) == 0, "403. Script version already exist!");
 
       scripts_table_t scripts{get_self(), owner.value};
       scripts.emplace(get_self(), [&](Tables::Scripts& row) {
