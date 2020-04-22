@@ -6,8 +6,20 @@ class TestsConfig {
         let rawdata = fs.readFileSync(path);
         let config = JSON.parse(rawdata);
 
+        this.node = config.node;
+        this.blockchain = config.blockchain;
+        this.contract = config.contract;
         this.credentials = config.credentials;
-        this.testnet = config.testnet;
+    }
+
+    getNodeUrl() {
+        return "http://" + this.node.endpoint;
+    }
+
+    getSignatureProvider() {
+        const pub = this.blockchain.eosio_root_key.public;
+        const prv = this.blockchain.eosio_root_key.private;
+        return pub + '=KEY:' + prv;
     }
 };
 

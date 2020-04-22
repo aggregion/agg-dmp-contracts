@@ -2,18 +2,17 @@
 const AggregionBlockchain = require('../js/AggregionBlockchain.js');
 const AggregionContract = require('../js/AggregionContract.js');
 const AggregionUtility = require('../js/AggregionUtility.js');
+const AggregionNode = require('../js/AggregionNode.js');
 const TestsConfig = require('../js/TestsConfig.js');
-const DelayMaker = require('../js/DelayMaker.js');
 
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 var assert = chai.assert;
-var should = chai.should()
+var should = chai.should();
 
 
 describe('Aggregion', function () {
-
 
     const config = new TestsConfig(__dirname + '/config.json')
     const cred = config.credentials;
@@ -21,28 +20,28 @@ describe('Aggregion', function () {
         cred.contract.private_key,
         cred.alice.private_key,
         cred.bob.private_key,
+        config.blockchain.eosio_root_key.private,
     ];
 
-    let bc = new AggregionBlockchain(config.testnet.nodeUrl, keys);
+    let bc = new AggregionBlockchain(config.getNodeUrl(), keys);
     let util = new AggregionUtility(cred.contract.account, bc);
     let contract = new AggregionContract(cred.contract.account, bc);
+    let node = new AggregionNode(config.getSignatureProvider(), config.node.endpoint, config.node.workdir);
     let alice = cred.alice;
     let bob = cred.bob;
 
-    let delayMaker = new DelayMaker(500);
     this.timeout(0);
 
     beforeEach(async function () {
-        await contract.eraseAllData(cred.contract.permission);
-        await delayMaker.init();
+        await node.start();
+        await bc.newaccount('eosio', cred.contract.account, cred.contract.public_key, cred.contract.public_key, 'eosio@active');
+        await bc.deploy(cred.contract.account, config.contract.wasm, config.contract.abi, cred.contract.permission);
+        await bc.newaccount('eosio', alice.account, alice.public_key, alice.public_key, 'eosio@active');
+        await bc.newaccount('eosio', bob.account, bob.public_key, bob.public_key, 'eosio@active');
     });
 
     afterEach(async function () {
-        await delayMaker.doAdjustedSleep();
-    });
-
-    after(async function () {
-        await contract.eraseAllData(cred.contract.permission);
+        await node.stop();
     });
 
     describe('#providers', function () {
