@@ -1,5 +1,7 @@
+const check = require('check-types');
 
 const AggregionBlockchain = require('./AggregionBlockchain.js');
+
 
 class AggregionContract {
 
@@ -19,6 +21,7 @@ class AggregionContract {
      * @param {permission} permission  (Example: testaccount@active)
      */
     async regprov(name, description, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = name;
         request.description = description;
@@ -32,6 +35,7 @@ class AggregionContract {
      * @param {permission} permission
      */
     async updprov(name, description, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = name;
         request.description = description;
@@ -44,6 +48,7 @@ class AggregionContract {
      * @param {permission} permission 
      */
     async unregprov(name, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = name;
         return await this.bc.pushAction(this.contractName, "unregprov", request, permission);
@@ -60,6 +65,7 @@ class AggregionContract {
      * @param {permission} permission 
      */
     async addsvc(provider, service, description, protocol, type, endpoint, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = provider;
         request.service = service;
@@ -81,6 +87,7 @@ class AggregionContract {
      * @param {permission} permission 
      */
     async updsvc(provider, service, description, protocol, type, endpoint, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = provider;
         request.service = service;
@@ -98,6 +105,7 @@ class AggregionContract {
      * @param {permission} permission 
      */
     async delsvc(provider, service, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = provider;
         request.service = service;
@@ -116,6 +124,7 @@ class AggregionContract {
      * @param {permission} permission 
      */
     async addscript(user, script, version, description, hash, url, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.owner = user;
         request.script = script;
@@ -137,6 +146,7 @@ class AggregionContract {
      * @param {permission} permission 
      */
     async updscript(user, script, version, description, hash, url, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.owner = user;
         request.script = script;
@@ -155,6 +165,7 @@ class AggregionContract {
      * @param {permission} permission 
      */
     async delscript(user, script, version, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.owner = user;
         request.script = script;
@@ -170,7 +181,8 @@ class AggregionContract {
      * @param {EosioName} version 
      * @param {permission} permission 
      */
-    async approve(provider, script_owner, script, version,  permission) {
+    async approve(provider, script_owner, script, version, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = provider;
         request.owner = script_owner;
@@ -187,13 +199,24 @@ class AggregionContract {
      * @param {EosioName} version 
      * @param {permission} permission 
      */
-    async deny(provider, script_owner, script, version,  permission) {
+    async deny(provider, script_owner, script, version, permission) {
+        check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = provider;
         request.owner = script_owner;
         request.script = script;
         request.version = version;
         return await this.bc.pushAction(this.contractName, "deny", request, permission);
+    }
+
+    async requestlog(sender, receiver, date, requestBody, permission) {
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.sender = sender;
+        request.receiver = receiver;
+        request.date = date;
+        request.request = requestBody;
+        return await this.bc.pushAction(this.contractName, "requestlog", request, permission);
     }
 
     /**

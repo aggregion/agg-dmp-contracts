@@ -17,6 +17,7 @@ namespace dmp {
       auto id = logreq.available_primary_key();
       logreq.emplace(get_self(), [&](auto& row) {
          row.id = id;
+         row.sender = sender;
          row.receiver = receiver;
          row.date = date;
          row.request = request;

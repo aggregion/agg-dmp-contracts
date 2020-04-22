@@ -4,6 +4,7 @@
   "dependencies": {
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "check-types": "^11.1.2",
     "eosjs": "^20.0.3",
     "mocha": "^7.1.1",
     "node-fetch": "^2.6.0",

@@ -43,6 +43,10 @@ class AggregionUtility {
         return await this.getTable('approves');
     }
 
+    async getRequestLogs() {
+        return await this.getTable('reqlogs');
+    }
+
     async getProviderByName(name) {
         let providers = await this.getTable('providers');
         let theone = providers.filter(p => p.provider == name);
