@@ -40,29 +40,27 @@ Prerequisites
 
 1. `nodejs` (https://nodejs.org/) in system path.
 1. `nodeos` in system path.
-1. public and private keys for `eosio` account.
+1. public and private keys for `eosio` (root) account.
 1. accessible contract wasm and abi files.
 
-Write config file and put it in `test` directory'.
-
-Use `config.example.json` as template:
+Write config file and put it in `test` directory. Config file content example:
 
 ```javascript
 {
     "node": {
         "endpoint": "127.0.0.1:8888",
-        "workdir": "/tmp/aggtests"
+        "workdir": "/tmp/aggregion_tests_blockchain_data"
     },
     "blockchain": {
         "eosio_root_key": {
-            "public": "EOS....",
-            "private": "5K...."
+            "public": "<eosio public key>",
+            "private": "<eosio private key>"
         }
     },
     "contract": {
         "account" : "aggregion",
-        "wasm": "/home/user/Aggregion/Aggregion.wasm",
-        "abi": "/home/user/Aggregion/Aggregion.abi"
+        "wasm": "/home/user/aggregion-dmp-contracts/build/Aggregion/Aggregion.wasm",
+        "abi": "/home/user/aggregion-dmp-contracts/build/Aggregion/Aggregion.abi"
     }
 }
 
