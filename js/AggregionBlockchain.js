@@ -1,6 +1,6 @@
 const fs = require('fs');
 const fetch = require('node-fetch');
-const { Api, JsonRpc } = require('eosjs');
+const { Api, JsonRpc, Numeric } = require('eosjs');
 const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');
 const { TextEncoder, TextDecoder } = require('util');
 const Serialize = require('eosjs/dist/eosjs-serialize');
@@ -47,6 +47,14 @@ class AggregionBlockchain {
             publicKey: ecc.privateToPublic(privateKey)
         };
     }
+
+    async addPrivateKey(privateKey) {
+        const legacyPublicKey = ecc.PrivateKey.fromString(privateKey).toPublic();
+        const publicKey = Numeric.convertLegacyPublicKey(legacyPublicKey.toString());
+        this.signatureProvider.keys.set(publicKey, privateKey);
+        this.signatureProvider.availableKeys.push(publicKey);
+    }
+
 
     async getScopes(contractAccount) {
         return await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: contractAccount });
