@@ -209,14 +209,14 @@ class AggregionContract {
         return await this.bc.pushAction(this.contractName, "deny", request, permission);
     }
 
-    async requestlog(sender, receiver, date, requestBody, permission) {
+    async sendreq(sender, receiver, date, body, permission) {
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.sender = sender;
         request.receiver = receiver;
         request.date = date;
-        request.request = requestBody;
-        return await this.bc.pushAction(this.contractName, "requestlog", request, permission);
+        request.request = body;
+        return await this.bc.pushAction(this.contractName, "sendreq", request, permission);
     }
 
     /**

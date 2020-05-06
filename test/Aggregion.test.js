@@ -261,32 +261,32 @@ describe('Aggregion', function () {
         });
     });
 
-    describe('#requestlogs', function () {
-        it('should write one item to requestlog table', async () => {
+    describe('#requestslog', function () {
+        it('should write one item to requests log table', async () => {
             const alice = await makeAccount(bc, 'alice');
             const bob = await makeAccount(bc, 'bob');
-            await contract.requestlog(alice.account, bob.account, 82034, "my request", alice.permission);
-            let rows = await util.getRequestLogs();
+            await contract.sendreq(alice.account, bob.account, 82034, "my request", alice.permission);
+            let rows = await util.getRequestsLog();
             let item = rows.pop();
             assert.equal('alice', item.sender);
             assert.equal('bob', item.receiver);
             assert.equal('82034', item.date);
             assert.equal('my request', item.request);
         });
-        it('should write several items to requestlog table', async () => {
+        it('should write several items to requests log table', async () => {
             const alice = await makeAccount(bc, 'alice');
             const bob = await makeAccount(bc, 'bob');
-            await contract.requestlog(alice.account, bob.account, 82034, "my request 1", alice.permission);
-            await contract.requestlog(alice.account, bob.account, 82035, "my request 2", alice.permission);
-            await contract.requestlog(bob.account, alice.account, 82035, "my request 2", bob.permission);
-            let rows = await util.getRequestLogs();
+            await contract.sendreq(alice.account, bob.account, 82034, "my request 1", alice.permission);
+            await contract.sendreq(alice.account, bob.account, 82035, "my request 2", alice.permission);
+            await contract.sendreq(bob.account, alice.account, 82035, "my request 2", bob.permission);
+            let rows = await util.getRequestsLog();
             assert.equal(3, rows.length);
         });
-        it('should not write duplicates to requestlog table', async () => {
+        it('should not write duplicates to requests log table', async () => {
             const alice = await makeAccount(bc, 'alice');
             const bob = await makeAccount(bc, 'bob');
-            await contract.requestlog(alice.account, bob.account, 82034, "my request 1", alice.permission);
-            await contract.requestlog(alice.account, bob.account, 82034, "my request 1", alice.permission)
+            await contract.sendreq(alice.account, bob.account, 82034, "my request 1", alice.permission);
+            await contract.sendreq(alice.account, bob.account, 82034, "my request 1", alice.permission)
                 .should.be.rejected;
         });
     });

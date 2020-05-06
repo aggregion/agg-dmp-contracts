@@ -43,8 +43,8 @@ class AggregionUtility {
         return await this.getTable('approves');
     }
 
-    async getRequestLogs() {
-        return await this.getTable('reqlogs');
+    async getRequestsLog() {
+        return await this.getTable('reqslog');
     }
 
     async getProviderByName(name) {

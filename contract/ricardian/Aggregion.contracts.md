@@ -88,10 +88,10 @@ icon:
 
 
 
-<h1 class="contract">requestlog</h1>
+<h1 class="contract">sendreq</h1>
 ---
 spec-version: 0.0.1
-title: Queue new log request.
+title: Queue new request from 'sender'.
 summary:
 icon:
 
