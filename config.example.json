@@ -1,22 +1,17 @@
 {
-    "testnet": {
-        "nodeUrl": "http://testnet:8888"
+    "node": {
+        "endpoint": "127.0.0.1:8888",
+        "workdir": "/tmp/aggtests"
     },
-    "credentials": {
-        "contract": {
-            "account": "aggtest",
-            "private_key": "<aggtest private key>",
-            "permission": "aggtest@active"
-        },
-        "alice": {
-            "account": "aliceprvider",
-            "private_key": "<aliceprvider private key>",
-            "permission": "aliceprvider@active"
-        },
-        "bob": {
-            "account": "scriptwriter",
-            "private_key": "<scriptwriter private key>",
-            "permission": "scriptwriter@active"
+    "blockchain": {
+        "eosio_root_key": {
+            "public": "EOS....",
+            "private": "5K...."
         }
+    },
+    "contract": {
+        "account" : "aggregion",
+        "wasm": "/home/user/Aggregion/Aggregion.wasm",
+        "abi": "/home/user/Aggregion/Aggregion.abi"
     }
 }
