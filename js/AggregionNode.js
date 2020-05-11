@@ -31,6 +31,7 @@ class AggregionNode {
         args.push('--delete-all-blocks');
         args.push('--producer-name', 'eosio');
         args.push('--abi-serializer-max-time-ms', '1000');
+        args.push('--max-transaction-time', '500');
 
         this.args = args;
         this.log = fs.createWriteStream(workdir + "/node.log", { flags: 'w', autoClose: true });

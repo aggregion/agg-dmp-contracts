@@ -7,4 +7,5 @@ test/config.json
 test/localnet.json
 test/testnet.json
 debugsession.js
+init-test-node.sh
 .vscode/launch.json

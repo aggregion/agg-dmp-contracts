@@ -33,7 +33,9 @@ class AggregionBlockchainUtility {
 
 class AggregionBlockchain {
 
-    constructor(nodeUrl, privateKeys) {
+
+    constructor(nodeUrl, privateKeys, maxTransactionAttempt = 4) {
+        this.maxTransactionAttempt = maxTransactionAttempt;
         this.signatureProvider = new JsSignatureProvider(privateKeys);
         this.rpc = new JsonRpc(nodeUrl, { fetch });
         this.api = new Api({ rpc: this.rpc, signatureProvider: this.signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
@@ -71,6 +73,7 @@ class AggregionBlockchain {
 
     async pushAction(contractAccount, actionName, requestObject, permission) {
         let [actorName, permissionLevel] = permission.split('@');
+        let attempt = 0;
         while (true) {
             try {
                 await this.api.transact({
@@ -85,7 +88,8 @@ class AggregionBlockchain {
             }
             catch (exc) {
                 const deadline = exc.message.match("deadline.*exceeded");
-                if (deadline) {
+                if (attempt < this.maxTransactionAttempt && deadline) {
+                    attempt++;
                     continue;
                 }
                 throw exc;
