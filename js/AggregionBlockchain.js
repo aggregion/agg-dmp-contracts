@@ -67,7 +67,7 @@ class AggregionBlockchain {
             code: contractAccount,
             scope: scopeName,
             table: tableName,
-            limit: '-1'
+            limit: '-1',
         });
     }
 

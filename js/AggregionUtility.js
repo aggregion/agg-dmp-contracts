@@ -47,6 +47,15 @@ class AggregionUtility {
         return await this.getTable('reqslog');
     }
 
+    async getMarketCatalog() {
+        return await this.getTable('mcat');
+    }
+
+    async getMarketCatalogItemById(id) {
+        let items = await this.getMarketCatalog();
+        return items.filter(s => s.id == id)[0];
+    }
+
     async getProviderByName(name) {
         let providers = await this.getTable('providers');
         let theone = providers.filter(p => p.provider == name);
@@ -72,7 +81,7 @@ class AggregionUtility {
         let scriptObject = await this.getScript(owner, script, version);
         let approves = await this.getApproves();
         let approvalState = approves.filter(s => s.scope == provider && s.script_id == scriptObject.id)[0];
-        return typeof approvalState != 'undefined' &&  approvalState.approved == 1;
+        return typeof approvalState != 'undefined' && approvalState.approved == 1;
     }
 };
 

@@ -44,8 +44,8 @@ class AggregionContract {
 
     /**
      * Unregister existing provider.
-     * @param {EosioName} name 
-     * @param {permission} permission 
+     * @param {EosioName} name
+     * @param {permission} permission
      */
     async unregprov(name, permission) {
         check.assert.assigned(permission, 'permission is required');
@@ -57,12 +57,12 @@ class AggregionContract {
     /**
      * Create new provider service.
      * @param {EosioName} provider
-     * @param {EosioName} service 
-     * @param {string} description 
-     * @param {string} protocol 
-     * @param {string} type 
-     * @param {string} endpoint 
-     * @param {permission} permission 
+     * @param {EosioName} service
+     * @param {string} description
+     * @param {string} protocol
+     * @param {string} type
+     * @param {string} endpoint
+     * @param {permission} permission
      */
     async addsvc(provider, service, description, protocol, type, endpoint, permission) {
         check.assert.assigned(permission, 'permission is required');
@@ -78,13 +78,13 @@ class AggregionContract {
 
     /**
      * Update service info.
-     * @param {EosioName} provider 
-     * @param {EosioName} service 
-     * @param {string} description 
-     * @param {string} protocol 
-     * @param {string} type 
-     * @param {string} endpoint 
-     * @param {permission} permission 
+     * @param {EosioName} provider
+     * @param {EosioName} service
+     * @param {string} description
+     * @param {string} protocol
+     * @param {string} type
+     * @param {string} endpoint
+     * @param {permission} permission
      */
     async updsvc(provider, service, description, protocol, type, endpoint, permission) {
         check.assert.assigned(permission, 'permission is required');
@@ -100,9 +100,9 @@ class AggregionContract {
 
     /**
      * Remove provider service.
-     * @param {EosioName} provider 
-     * @param {EosioName} service 
-     * @param {permission} permission 
+     * @param {EosioName} provider
+     * @param {EosioName} service
+     * @param {permission} permission
      */
     async delsvc(provider, service, permission) {
         check.assert.assigned(permission, 'permission is required');
@@ -115,13 +115,13 @@ class AggregionContract {
 
     /**
      * Create new user script.
-     * @param {EosioName} user 
-     * @param {EosioName} script 
-     * @param {EosioName} version 
-     * @param {string} description 
-     * @param {string} hash 
-     * @param {string} url 
-     * @param {permission} permission 
+     * @param {EosioName} user
+     * @param {EosioName} script
+     * @param {EosioName} version
+     * @param {string} description
+     * @param {string} hash
+     * @param {string} url
+     * @param {permission} permission
      */
     async addscript(user, script, version, description, hash, url, permission) {
         check.assert.assigned(permission, 'permission is required');
@@ -137,13 +137,13 @@ class AggregionContract {
 
     /**
      * Update script info.
-     * @param {EosioName} user 
-     * @param {EosioName} script 
-     * @param {EosioName} version 
-     * @param {string} description 
-     * @param {string} hash 
-     * @param {string} url 
-     * @param {permission} permission 
+     * @param {EosioName} user
+     * @param {EosioName} script
+     * @param {EosioName} version
+     * @param {string} description
+     * @param {string} hash
+     * @param {string} url
+     * @param {permission} permission
      */
     async updscript(user, script, version, description, hash, url, permission) {
         check.assert.assigned(permission, 'permission is required');
@@ -159,10 +159,10 @@ class AggregionContract {
 
     /**
      * Remove script.
-     * @param {EosioName} user 
-     * @param {EosioName} script 
-     * @param {EosioName} version 
-     * @param {permission} permission 
+     * @param {EosioName} user
+     * @param {EosioName} script
+     * @param {EosioName} version
+     * @param {permission} permission
      */
     async delscript(user, script, version, permission) {
         check.assert.assigned(permission, 'permission is required');
@@ -175,11 +175,11 @@ class AggregionContract {
 
     /**
      * Approve execution of user script.
-     * @param {EosioName} provider 
-     * @param {EosioName} script_owner 
-     * @param {EosioName} script 
-     * @param {EosioName} version 
-     * @param {permission} permission 
+     * @param {EosioName} provider
+     * @param {EosioName} script_owner
+     * @param {EosioName} script
+     * @param {EosioName} version
+     * @param {permission} permission
      */
     async approve(provider, script_owner, script, version, permission) {
         check.assert.assigned(permission, 'permission is required');
@@ -193,11 +193,11 @@ class AggregionContract {
 
     /**
      * Deny execution of user script.
-     * @param {EosioName} provider 
-     * @param {EosioName} script_owner 
-     * @param {EosioName} script 
-     * @param {EosioName} version 
-     * @param {permission} permission 
+     * @param {EosioName} provider
+     * @param {EosioName} script_owner
+     * @param {EosioName} script
+     * @param {EosioName} version
+     * @param {permission} permission
      */
     async deny(provider, script_owner, script, version, permission) {
         check.assert.assigned(permission, 'permission is required');
@@ -209,6 +209,14 @@ class AggregionContract {
         return await this.bc.pushAction(this.contractName, "deny", request, permission);
     }
 
+    /**
+     * Log request.
+     * @param {String} sender
+     * @param {String} receiver
+     * @param {int} date
+     * @param {string} body
+     * @param {permission} permission
+     */
     async sendreq(sender, receiver, date, body, permission) {
         check.assert.assigned(permission, 'permission is required');
         let request = {};
@@ -220,8 +228,42 @@ class AggregionContract {
     }
 
     /**
+     * Insert new entry to Market catalog.
+     * @param {String} id Entry ID may be null (auto assigned), must be unique
+     * @param {String} parent_id Parent Entry ID (may be null)
+     * @param {String} yid Source ID
+     * @param {String} ypid Source parent ID
+     * @param {String} ylvl Source level
+     * @param {String} name
+     * @param {permission} permission
+     */
+    async mcatinsert(id, parent_id, yid, ypid, ylvl, name, permission) {
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.id = id;
+        request.parent_id = parent_id;
+        request.yid = yid;
+        request.ypid = ypid;
+        request.ylvl = ylvl;
+        request.name = name;
+        return await this.bc.pushAction(this.contractName, "mcatinsert", request, permission);
+    }
+
+    /**
+     * Remove entry from Market catalog.
+     * @param {String} id
+     * @param {permission} permission
+     */
+    async mcatremove(id, permission) {
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.id = id;
+        return await this.bc.pushAction(this.contractName, "mcatremove", request, permission);
+    }
+
+    /**
      * Erase scope-binded data from all tables.
-     * @param {permission} permission (must be contract account permission) 
+     * @param {permission} permission (must be contract account permission)
      */
     async eraseAllData(permission) {
         const scopes = await this.bc.getScopes(this.contractName);

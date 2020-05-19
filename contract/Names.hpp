@@ -20,5 +20,7 @@ namespace dmp {
 
       static constexpr const name RequestsLogTable{"reqslog"};
       static constexpr const name RequestsLogIndex{"reqslogidx"};
+
+      static constexpr const name MarketCatalogTable{"mcat"};
    };
 }

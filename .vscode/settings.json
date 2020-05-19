@@ -61,6 +61,21 @@
         "__split_buffer": "cpp",
         "__tuple": "cpp",
         "queue": "cpp",
-        "__locale": "cpp"
+        "__locale": "cpp",
+        "__mutex_base": "cpp",
+        "__string": "cpp",
+        "__threading_support": "cpp",
+        "chrono": "cpp",
+        "complex": "cpp",
+        "condition_variable": "cpp",
+        "ios": "cpp",
+        "iostream": "cpp",
+        "mutex": "cpp",
+        "numeric": "cpp",
+        "ratio": "cpp",
+        "strstream": "cpp",
+        "typeindex": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp"
     }
 }

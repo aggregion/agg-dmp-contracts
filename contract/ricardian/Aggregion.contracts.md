@@ -97,6 +97,30 @@ icon:
 
 
 
+<h1 class="contract">mcatinsert</h1>
+---
+spec-version: 0.0.1
+title: Add new market catalog entry.
+summary:
+icon:
+
+<h1 class="contract">mcatremove</h1>
+---
+spec-version: 0.0.1
+title: Remove market catalog entry.
+summary:
+icon:
+
+<h1 class="contract">dropmcat</h1>
+---
+spec-version: 0.0.1
+title: Remove all market catalog entries.
+summary:
+icon:
+
+
+
+
 <h1 class="contract">erasescope</h1>
 ---
 spec-version: 0.0.1
