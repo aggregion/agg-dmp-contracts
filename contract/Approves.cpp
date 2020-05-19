@@ -12,7 +12,7 @@ namespace dmp {
       scripts_table_t scripts{get_self(), owner.value};
       auto script_id = get_script_id(owner, script, version);
 
-      // Search for approve item (create one if it not found).
+      // Search for approve item (create one if it is not found).
       // Update 'approve' flag with given value.
       // And carefuly modify script approves counter
       // (because we can't update script if provider approve it).
@@ -76,10 +76,8 @@ namespace dmp {
          if (item == approves.end())
             break;
 
-         // If we script was approved we must update (decrement)
+         // If we script was approved we must decrement
          // corresponding script counter.
-         // 1) Find the script item referenced by this approve item.
-         // 2) Decrement counter.
          if (item->approved) {
             scripts_table_t scripts{get_self(), item->script_owner.value};
             auto script_item = scripts.require_find(item->script_id, "500. Approve has invalid reference to script item!");

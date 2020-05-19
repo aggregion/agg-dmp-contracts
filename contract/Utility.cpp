@@ -20,7 +20,6 @@ namespace dmp {
       clear_table<scripts_table_t>(get_self(), scope.value);
       clear_table<services_table_t>(get_self(), scope.value);
       clear_table<providers_table_t>(get_self(), scope.value);
-      clear_table<reqlog_table_t>(get_self(), scope.value);
       print("All of contract data was wiped out!");
    }
 

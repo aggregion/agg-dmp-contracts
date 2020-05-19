@@ -236,7 +236,7 @@ describe('Aggregion', function () {
             let approved = await util.isScriptApproved(alice.account, bob.account, 'script1', 'v1');
             assert.isFalse(approved);
         });
-        it('should not update script if it approved', async () => {
+        it('should not update script if it is approved', async () => {
             const alice = await makeAccount(bc, 'alice');
             const bob = await makeAccount(bc, 'bob');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
