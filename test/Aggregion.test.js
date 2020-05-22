@@ -144,7 +144,7 @@ describe('Aggregion', function () {
             const alice = await makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
-            await contract.delsvc(alice.account, 'svc1', alice.permission);
+            await contract.remsvc(alice.account, 'svc1', alice.permission);
             let svc = await util.getService(alice.account, 'svc1');
             assert.isUndefined(svc);
         });
@@ -194,7 +194,7 @@ describe('Aggregion', function () {
         it('should remove script if it does not approved', async () => {
             const bob = await makeAccount(bc, 'bob');
             await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
-            await contract.delscript(bob.account, 'script1', 'v1', bob.permission);
+            await contract.remscript(bob.account, 'script1', 'v1', bob.permission);
             let script = await util.getScript(bob.account, 'script1', 'v1');
             assert.isUndefined(script);
         });
@@ -255,10 +255,10 @@ describe('Aggregion', function () {
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addscript(bob.account, 'script1', 'v1', 'Description', 'Hash', 'Url', bob.permission);
             await contract.approve(alice.account, bob.account, 'script1', 'v1', alice.permission);
-            await contract.delscript(bob.account, 'script1', 'v1', bob.permission)
+            await contract.remscript(bob.account, 'script1', 'v1', bob.permission)
                 .should.be.rejected;
             await contract.deny(alice.account, bob.account, 'script1', 'v1', alice.permission);
-            await contract.delscript(bob.account, 'script1', 'v1', bob.permission);
+            await contract.remscript(bob.account, 'script1', 'v1', bob.permission);
         });
     });
 
@@ -320,6 +320,7 @@ describe('Aggregion', function () {
         it('should accept null as ypid', async () => {
             await contract.mcatinsert(null, null, 11, null, 33, 'abc', aggregion.permission);
             let item = await util.getMarketCatalogItemById(1);
+            assert.equal(1, item.id);
             assert.equal(0, item.ypid);
         });
         it('should add child items', async () => {

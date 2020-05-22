@@ -40,7 +40,7 @@ title: Update service
 summary: This action will update service descriptive fields.
 icon:
 
-<h1 class="contract">delsvc</h1>
+<h1 class="contract">remsvc</h1>
 ---
 spec-version: 0.0.1
 title: Remove service
@@ -63,7 +63,7 @@ title: Update script description, hash and url
 summary: Script must not be approved.
 icon:
 
-<h1 class="contract">delscript</h1>
+<h1 class="contract">remscript</h1>
 ---
 spec-version: 0.0.1
 title: Remove script.

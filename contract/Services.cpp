@@ -49,7 +49,7 @@ namespace dmp {
 
    /// @brief
    /// Remove provider service.
-   void Aggregion::delsvc(name provider, name service) {
+   void Aggregion::remsvc(name provider, name service) {
       require_auth(provider);
 
       providers_table_t providers{get_self(), Names::DefaultScope};

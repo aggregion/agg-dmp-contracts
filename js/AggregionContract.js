@@ -104,12 +104,12 @@ class AggregionContract {
      * @param {EosioName} service
      * @param {permission} permission
      */
-    async delsvc(provider, service, permission) {
+    async remsvc(provider, service, permission) {
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = provider;
         request.service = service;
-        return await this.bc.pushAction(this.contractName, "delsvc", request, permission);
+        return await this.bc.pushAction(this.contractName, "remsvc", request, permission);
     }
 
 
@@ -164,13 +164,13 @@ class AggregionContract {
      * @param {EosioName} version
      * @param {permission} permission
      */
-    async delscript(user, script, version, permission) {
+    async remscript(user, script, version, permission) {
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.owner = user;
         request.script = script;
         request.version = version;
-        return await this.bc.pushAction(this.contractName, "delscript", request, permission);
+        return await this.bc.pushAction(this.contractName, "remscript", request, permission);
     }
 
     /**

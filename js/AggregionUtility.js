@@ -12,7 +12,7 @@ class AggregionUtility {
         this.bc = blockchain;
     }
 
-    async getTable(tableName) {
+    async getTable(tableName, id = null) {
         // 1. Find all scopes of table
         let scopes = await this.bc.getScopes(this.contractAccount);
         let filtered = scopes.rows.filter(s => s.table == tableName);
@@ -20,7 +20,7 @@ class AggregionUtility {
         // 2. Fetch rows for each scope
         let rows = [];
         for (const item of filtered) {
-            let data = await this.bc.getTableScope(this.contractAccount, tableName, item.scope);
+            let data = await this.bc.getTableScope(this.contractAccount, tableName, item.scope, id);
             let scoped = data.rows.map(r => { r.scope = item.scope; return r; });
             rows.push(...scoped);
         };
@@ -52,8 +52,8 @@ class AggregionUtility {
     }
 
     async getMarketCatalogItemById(id) {
-        let items = await this.getMarketCatalog();
-        return items.filter(s => s.id == id)[0];
+        const rows =  await this.getTable('mcat', id);
+        return rows[0];
     }
 
     async getProviderByName(name) {

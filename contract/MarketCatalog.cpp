@@ -11,8 +11,7 @@ namespace dmp {
    /// @param ypid   Reference item parent id
    /// @param ylvl   Reference item level
    /// @param name   Entry name
-   void MarketCatalog::mcatinsert(std::optional<uint64_t> id, std::optional<uint64_t> parent_id, int yid, std::optional<int> ypid, int ylvl,
-                                    std::string name) {
+   void MarketCatalog::mcatinsert(std::optional<uint64_t> id, std::optional<uint64_t> parent_id, int yid, std::optional<int> ypid, int ylvl, std::string name) {
       require_auth(Names::Contract);
 
       mcat_table_t mc{get_self(), Names::DefaultScope};
@@ -56,19 +55,5 @@ namespace dmp {
       mc.erase(it);
 
       print("Market catalog (id=", id, ") was erased");
-   }
-
-
-   /// @brief
-   /// Remove all market catalog entries.
-   void MarketCatalog::dropmcat() {
-      require_auth(Names::Contract);
-      mcat_table_t mc{get_self(), Names::DefaultScope};
-      while (true) {
-         auto it = mc.begin();
-         if (it == mc.end())
-            break;
-         mc.erase(it);
-      }
    }
 }

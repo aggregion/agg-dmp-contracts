@@ -84,6 +84,7 @@ namespace dmp {
    struct [[eosio::contract("Aggregion")]] Aggregion : contract {
 
       using contract::contract;
+
       using providers_table_t = eosio::multi_index<Names::ProvidersTable, Tables::Provider>;
       using services_table_t = eosio::multi_index<Names::ServicesTable, Tables::Service>;
       using scripts_index_t = indexed_by<Names::ScriptsIndex, const_mem_fun<Tables::Scripts, uint128_t, &Tables::Scripts::secondary_key>>;
@@ -96,16 +97,14 @@ namespace dmp {
 
       [[eosio::action]] void addsvc(name provider, name service, std::string description, std::string protocol, std::string type, std::string endpoint);
       [[eosio::action]] void updsvc(name provider, name service, std::string description, std::string protocol, std::string type, std::string endpoint);
-      [[eosio::action]] void delsvc(name provider, name service);
+      [[eosio::action]] void remsvc(name provider, name service);
 
       [[eosio::action]] void addscript(name owner, name script, name version, std::string description, std::string hash, std::string url);
       [[eosio::action]] void updscript(name owner, name script, name version, std::string description, std::string hash, std::string url);
-      [[eosio::action]] void delscript(name owner, name script, name version);
+      [[eosio::action]] void remscript(name owner, name script, name version);
 
       [[eosio::action]] void approve(name provider, name owner, name script, name version);
       [[eosio::action]] void deny(name provider, name owner, name script, name version);
-
-      [[eosio::action]] void erasescope(name scope);
 
    private:
       bool provider_has_services(name provider);

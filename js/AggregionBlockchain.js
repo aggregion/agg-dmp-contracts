@@ -62,13 +62,27 @@ class AggregionBlockchain {
         return await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: contractAccount });
     }
 
-    async getTableScope(contractAccount, tableName, scopeName) {
-        return await this.rpc.get_table_rows({
-            code: contractAccount,
-            scope: scopeName,
-            table: tableName,
-            limit: '-1',
-        });
+    async getTableScope(contractAccount, tableName, scopeName, id = null) {
+        let result = {
+            rows: []
+        };
+        let lowerBound = id;
+        let upperBound = id;
+        while (true) {
+            const part = await this.rpc.get_table_rows({
+                code: contractAccount,
+                scope: scopeName,
+                table: tableName,
+                lower_bound: lowerBound,
+                upper_bound: upperBound,
+                limit: '-1'
+            });
+            result.rows.push(...part.rows);
+            lowerBound = part.next_key;
+            if (!part.more)
+                break;
+        }
+        return result;
     }
 
     async pushAction(contractAccount, actionName, requestObject, permission) {

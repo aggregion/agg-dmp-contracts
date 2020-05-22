@@ -55,7 +55,7 @@ namespace dmp {
 
    /// @brief
    /// Remove script if it is not approved.
-   void Aggregion::delscript(name owner, name script, name version) {
+   void Aggregion::remscript(name owner, name script, name version) {
       require_auth(owner);
 
       auto id = get_script_id(owner, script, version);

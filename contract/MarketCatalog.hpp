@@ -38,6 +38,5 @@ namespace dmp {
       [[eosio::action]] void mcatinsert(std::optional<uint64_t> id, std::optional<uint64_t> parent_id, int yid, std::optional<int> ypid, int ylvl,
                                         std::string name);
       [[eosio::action]] void mcatremove(uint64_t id);
-      [[eosio::action]] void dropmcat();
    };
 }
