@@ -292,68 +292,77 @@ describe('Aggregion', function () {
         });
     });
 
-    describe('#marketcatalog', function () {
-        it('should add one entry and assign auto generated id', async () => {
-            await contract.mcatinsert(null, null, 11, 22, 33, 'abc', aggregion.permission);
-            let rows = await util.getMarketCatalog();
+    describe('#categories', function () {
+        it('should add root category and assign auto generated id', async () => {
+            await contract.catinsert(null, null, 'abc', aggregion.permission);
+            let rows = await util.getCategories();
             let item = rows.pop();
             assert.equal(1, item.id);
             assert.equal(0, item.parent_id);
-            assert.equal(11, item.yid);
-            assert.equal(22, item.ypid);
-            assert.equal(33, item.ylvl);
             assert.equal(0, item.childs_count);
             assert.equal('abc', item.name);
         });
-        it('should add one entry to catalog', async () => {
-            await contract.mcatinsert(126, null, 11, 22, 33, 'abc', aggregion.permission);
-            let rows = await util.getMarketCatalog();
+        it('should not accept zero id value', async () => {
+            await contract.catinsert(0, null, 'abc', aggregion.permission)
+                .should.be.rejected;
+        });
+        it('should add root category with specified id', async () => {
+            await contract.catinsert(126, null, 'abc', aggregion.permission);
+            let rows = await util.getCategories();
             let item = rows.pop();
             assert.equal(126, item.id);
             assert.equal(0, item.parent_id);
-            assert.equal(11, item.yid);
-            assert.equal(22, item.ypid);
-            assert.equal(33, item.ylvl);
             assert.equal(0, item.childs_count);
             assert.equal('abc', item.name);
         });
-        it('should accept null as ypid', async () => {
-            await contract.mcatinsert(null, null, 11, null, 33, 'abc', aggregion.permission);
-            let item = await util.getMarketCatalogItemById(1);
-            assert.equal(1, item.id);
-            assert.equal(0, item.ypid);
-        });
-        it('should add child items', async () => {
-            await contract.mcatinsert(null, null, 11, null, 22, 'abc', aggregion.permission);
-            await contract.mcatinsert(null, 1, 11, 22, 33, 'def', aggregion.permission);
-            let first = await util.getMarketCatalogItemById(1);
+        it('should add subcategory', async () => {
+            await contract.catinsert(1250, null, 'abc', aggregion.permission);
+            await contract.catinsert(1260, 1250, 'def', aggregion.permission);
+            let first = await util.getCategoryById(1250);
             assert.equal(0, first.parent_id);
-            let second = await util.getMarketCatalogItemById(2);
-            assert.equal(1, second.parent_id);
+            let second = await util.getCategoryById(1260);
+            assert.equal(1250, second.parent_id);
         });
-        it('should erase entry', async () => {
-            await contract.mcatinsert(224, null, 11, 22, 33, 'abc', aggregion.permission);
-            await contract.mcatremove(224, aggregion.permission);
-            let rows = await util.getMarketCatalog();
+        it('should remove category', async () => {
+            await contract.catinsert(224, null, 'abc', aggregion.permission);
+            await contract.catremove(224, aggregion.permission);
+            let rows = await util.getCategories();
             assert.equal(0, rows.length);
         });
-        it('should not remove entry if it has child entries', async () => {
-            await contract.mcatinsert(125, null, 11, 22, 33, 'abc', aggregion.permission);
-            await contract.mcatinsert(126, 125, 11, 22, 33, 'def', aggregion.permission);
-            await contract.mcatremove(125, aggregion.permission)
+        it('should not remove category if it has subcategories', async () => {
+            await contract.catinsert(1250, null, 'abc', aggregion.permission);
+            await contract.catinsert(1260, 1250, 'def', aggregion.permission);
+            await contract.catremove(1250, aggregion.permission)
                 .should.be.rejected;
+        });
+        it('should remove category after its subcategories was removed', async () => {
+            await contract.catinsert(1250, null, 'abc', aggregion.permission);
+            await contract.catinsert(1260, 1250, 'def', aggregion.permission);
+            await contract.catremove(1260, aggregion.permission);
+            await contract.catremove(1250, aggregion.permission);
+            let rows = await util.getCategories();
+            assert.equal(0, rows.length);
         });
         it('should deny insert for non-root accounts', async () => {
             const alice = await makeAccount(bc, 'alice');
-            await contract.mcatinsert(null, 11, 22, 33, 'abc', alice.permission)
+            await contract.catinsert(null, 'abc', alice.permission)
                 .should.be.rejected;
         });
-        it('should deny remmove for non-root accounts', async () => {
-            await contract.mcatinsert(125, null, 11, 22, 33, 'abc', aggregion.permission);
+        it('should deny remove for non-root accounts', async () => {
+            await contract.catinsert(125, null, 'abc', aggregion.permission);
             const alice = await makeAccount(bc, 'alice');
-            await contract.mcatremove(125, alice.permission)
+            await contract.catremove(125, alice.permission)
                 .should.be.rejected;
         });
-
+        it('should find subcategories', async () => {
+            await contract.catinsert(1250, null, '111', aggregion.permission);
+            await contract.catinsert(1260, 1250, '222', aggregion.permission);
+            await contract.catinsert(1261, 1250, '333', aggregion.permission);
+            await contract.catinsert(1262, 1250, '444', aggregion.permission);
+            await contract.catinsert(1270, null, '555', aggregion.permission);
+            let rows = await util.getSubcategories(1250);
+            assert.equal(3, rows.length);
+        });
     });
+
 });

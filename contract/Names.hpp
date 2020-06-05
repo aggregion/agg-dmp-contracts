@@ -21,6 +21,7 @@ namespace dmp {
       static constexpr const name RequestsLogTable{"reqslog"};
       static constexpr const name RequestsLogIndex{"reqslogidx"};
 
-      static constexpr const name MarketCatalogTable{"mcat"};
+      static constexpr const name CategoriesTable{"categories"};
+      static constexpr const name CategoriesByParIdx{"catbypar"};
    };
 }

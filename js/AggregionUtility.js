@@ -13,14 +13,21 @@ class AggregionUtility {
     }
 
     async getTable(tableName, id = null) {
-        // 1. Find all scopes of table
-        let scopes = await this.bc.getScopes(this.contractAccount);
-        let filtered = scopes.rows.filter(s => s.table == tableName);
-
-        // 2. Fetch rows for each scope
+        let scopes = await this.bc.getScopes(this.contractAccount, tableName);
         let rows = [];
-        for (const item of filtered) {
-            let data = await this.bc.getTableScope(this.contractAccount, tableName, item.scope, id);
+        for (const item of scopes.rows) {
+            let data = await this.bc.getTableRows(this.contractAccount, tableName, item.scope, id);
+            let scoped = data.rows.map(r => { r.scope = item.scope; return r; });
+            rows.push(...scoped);
+        };
+        return rows;
+    }
+
+    async getTableBySecondaryKey(tableName, keyValue) {
+        let scopes = await this.bc.getScopes(this.contractAccount, tableName);
+        let rows = [];
+        for (const item of scopes.rows) {
+            let data = await this.bc.getTableRowsBySecondaryKey(this.contractAccount, tableName, item.scope, keyValue, keyValue);
             let scoped = data.rows.map(r => { r.scope = item.scope; return r; });
             rows.push(...scoped);
         };
@@ -47,13 +54,17 @@ class AggregionUtility {
         return await this.getTable('reqslog');
     }
 
-    async getMarketCatalog() {
-        return await this.getTable('mcat');
+    async getCategories() {
+        return await this.getTable('categories');
     }
 
-    async getMarketCatalogItemById(id) {
-        const rows =  await this.getTable('mcat', id);
+    async getCategoryById(id) {
+        const rows =  await this.getTable('categories', id);
         return rows[0];
+    }
+
+    async getSubcategories(parentId) {
+        return await this.getTableBySecondaryKey('categories', parentId);
     }
 
     async getProviderByName(name) {

@@ -228,51 +228,33 @@ class AggregionContract {
     }
 
     /**
-     * Insert new entry to Market catalog.
+     * Insert new entry to categories catalog.
      * @param {String} id Entry ID may be null (auto assigned), must be unique
      * @param {String} parent_id Parent Entry ID (may be null)
-     * @param {String} yid Source ID
-     * @param {String} ypid Source parent ID
-     * @param {String} ylvl Source level
      * @param {String} name
      * @param {permission} permission
      */
-    async mcatinsert(id, parent_id, yid, ypid, ylvl, name, permission) {
+    async catinsert(id, parent_id, name, permission) {
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.id = id;
         request.parent_id = parent_id;
-        request.yid = yid;
-        request.ypid = ypid;
-        request.ylvl = ylvl;
         request.name = name;
-        return await this.bc.pushAction(this.contractName, "mcatinsert", request, permission);
+        return await this.bc.pushAction(this.contractName, "catinsert", request, permission);
     }
 
     /**
-     * Remove entry from Market catalog.
+     * Remove entry from categories catalog.
      * @param {String} id
      * @param {permission} permission
      */
-    async mcatremove(id, permission) {
+    async catremove(id, permission) {
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.id = id;
-        return await this.bc.pushAction(this.contractName, "mcatremove", request, permission);
+        return await this.bc.pushAction(this.contractName, "catremove", request, permission);
     }
 
-    /**
-     * Erase scope-binded data from all tables.
-     * @param {permission} permission (must be contract account permission)
-     */
-    async eraseAllData(permission) {
-        const scopes = await this.bc.getScopes(this.contractName);
-        for (const item of scopes.rows) {
-            let request = {};
-            request.scope = item.scope;
-            await this.bc.pushAction(this.contractName, "erasescope", request, permission)
-        }
-    }
 };
 
 module.exports = AggregionContract;

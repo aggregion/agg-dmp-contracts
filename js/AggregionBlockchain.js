@@ -58,16 +58,16 @@ class AggregionBlockchain {
     }
 
 
-    async getScopes(contractAccount) {
-        return await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: contractAccount });
+    async getScopes(contractAccount, tableName = null) {
+        return await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: contractAccount, table: tableName });
     }
 
-    async getTableScope(contractAccount, tableName, scopeName, id = null) {
+    async getTableRows(contractAccount, tableName, scopeName, primaryKeyValue = null) {
         let result = {
             rows: []
         };
-        let lowerBound = id;
-        let upperBound = id;
+        let lowerBound = primaryKeyValue;
+        let upperBound = primaryKeyValue;
         while (true) {
             const part = await this.rpc.get_table_rows({
                 code: contractAccount,
@@ -75,6 +75,32 @@ class AggregionBlockchain {
                 table: tableName,
                 lower_bound: lowerBound,
                 upper_bound: upperBound,
+                limit: '-1'
+            });
+            result.rows.push(...part.rows);
+            lowerBound = part.next_key;
+            if (!part.more)
+                break;
+        }
+        return result;
+    }
+
+    async getTableRowsBySecondaryKey(contractAccount, tableName, scopeName, fromKey, toKey) {
+        let result = {
+            rows: []
+        };
+        let lowerBound = fromKey;
+        let upperBound = toKey;
+        while (true) {
+            const part = await this.rpc.fetch('/v1/chain/get_table_rows', {
+                code: contractAccount,
+                scope: scopeName,
+                table: tableName,
+                index_position: "secondary",
+                key_type: "i64",
+                lower_bound: lowerBound,
+                upper_bound: upperBound,
+                json: true,
                 limit: '-1'
             });
             result.rows.push(...part.rows);

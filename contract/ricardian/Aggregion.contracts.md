@@ -97,27 +97,19 @@ icon:
 
 
 
-<h1 class="contract">mcatinsert</h1>
+<h1 class="contract">catinsert</h1>
 ---
 spec-version: 0.0.1
-title: Add new market catalog entry.
+title: Add new categories catalog entry.
 summary:
 icon:
 
-<h1 class="contract">mcatremove</h1>
+<h1 class="contract">catremove</h1>
 ---
 spec-version: 0.0.1
-title: Remove market catalog entry.
+title: Remove categories catalog entry.
 summary:
 icon:
-
-<h1 class="contract">dropmcat</h1>
----
-spec-version: 0.0.1
-title: Remove all market catalog entries.
-summary:
-icon:
-
 
 
 
