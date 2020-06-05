@@ -363,6 +363,30 @@ describe('Aggregion', function () {
             let rows = await util.getSubcategories(1250);
             assert.equal(3, rows.length);
         });
+
+        it('should build path for category at full depth', async () => {
+            await contract.catinsert(1111, null, '111', aggregion.permission);
+            await contract.catinsert(2222, 1111, '222', aggregion.permission);
+            await contract.catinsert(3333, 2222, '333', aggregion.permission);
+            await contract.catinsert(4444, 3333, '444', aggregion.permission);
+            await contract.catinsert(5555, 4444, '555', aggregion.permission);
+            {
+                let path = await util.getCategoryPath(5555);
+                assert.equal("111", path.a0);
+                assert.equal("222", path.a1);
+                assert.equal("333", path.a2);
+                assert.equal("444", path.a3);
+                assert.equal("555", path.a4);
+            }
+            {
+                let path = await util.getCategoryPath(3333);
+                assert.equal("111", path.a0);
+                assert.equal("222", path.a1);
+                assert.equal("333", path.a2);
+                assert.equal(null, path.a3);
+                assert.equal(null, path.a4);
+            }
+        });
     });
 
 });
