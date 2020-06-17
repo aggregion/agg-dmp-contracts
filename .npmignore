@@ -1,0 +1,7 @@
+.vscode
+scripts
+.gitignore
+.git
+contract
+CMakeLists.txt
+.clang-format
