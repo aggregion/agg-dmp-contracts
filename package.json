@@ -33,6 +33,7 @@
   "dependencies": {
     "check-types": "^11.1.2",
     "eosjs": "^20.0.3",
+    "http-proxy-agent": "^4.0.1",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {

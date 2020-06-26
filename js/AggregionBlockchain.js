@@ -1,5 +1,5 @@
 const fs = require('fs');
-const fetch = require('node-fetch');
+const { proxyFetch } = require('./Fetch');
 const { Api, JsonRpc, Numeric } = require('eosjs');
 const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');
 const { TextEncoder, TextDecoder } = require('util');
@@ -37,7 +37,7 @@ class AggregionBlockchain {
     constructor(nodeUrl, privateKeys, maxTransactionAttempt = 4) {
         this.maxTransactionAttempt = maxTransactionAttempt;
         this.signatureProvider = new JsSignatureProvider(privateKeys);
-        this.rpc = new JsonRpc(nodeUrl, { fetch });
+        this.rpc = new JsonRpc(nodeUrl, { fetch: proxyFetch() });
         this.api = new Api({ rpc: this.rpc, signatureProvider: this.signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
         this.utility = new AggregionBlockchainUtility(this.api);
     }
