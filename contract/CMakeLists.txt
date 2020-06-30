@@ -5,11 +5,17 @@ set(EOSIO_WASM_OLD_BEHAVIOR "Off")
 find_package(eosio.cdt)
 
 add_contract(Aggregion Aggregion
-    Providers.cpp
-    Services.cpp
-    Scripts.cpp
     Approves.cpp
+    Brands.cpp
+    Categories.cpp
+    Cities.cpp
+    CityTypes.cpp
+    Providers.cpp
+    Regions.cpp
     RequestsLog.cpp
-    Categories.cpp)
+    Scripts.cpp
+    Services.cpp
+    VendorBrands.cpp
+    Vendors.cpp)
 
 target_compile_options(Aggregion PUBLIC -R${CMAKE_SOURCE_DIR}/ricardian)

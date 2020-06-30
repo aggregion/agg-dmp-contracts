@@ -1,3 +1,5 @@
+#pragma once
+
 #include <eosio/crypto.hpp>
 #include <eosio/eosio.hpp>
 #include <libc/bits/stdint.h>
@@ -23,5 +25,15 @@ namespace dmp {
 
       static constexpr const name CategoriesTable{"categories"};
       static constexpr const name CategoriesByParIdx{"catbypar"};
+
+      static constexpr const name VendorsTable{"vendors"};
+      static constexpr const name BrandsTable{"brands"};
+      static constexpr const name VendorBrandsTable{"vendorbrands"};
+      static constexpr const name VendorBrandsIdx{"vendbrndidx"};
+
+      static constexpr const name RegionsTable{"regions"};
+      static constexpr const name CityTypesTable{"citytypes"};
+      static constexpr const name CitiesTable{"cities"};
+      static constexpr const name CitiesByRegionTable{"citiesbyreg"};
    };
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Names.hpp"
 #include <eosio/crypto.hpp>
 #include <eosio/eosio.hpp>

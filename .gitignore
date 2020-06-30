@@ -4,8 +4,6 @@ data/*
 **/*package-lock.json
 
 test/config.json
-test/localnet.json
-test/testnet.json
+research
 research/*
-init-test-node.sh
 .vscode/launch.json

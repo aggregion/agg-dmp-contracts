@@ -1,11 +1,11 @@
+#pragma once
+
 #include "Names.hpp"
 #include <eosio/crypto.hpp>
 #include <eosio/eosio.hpp>
 #include <libc/bits/stdint.h>
 
 namespace dmp {
-
-   using namespace eosio;
 
    struct Tables {
 

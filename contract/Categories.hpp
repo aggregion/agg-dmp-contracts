@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Names.hpp"
 #include <eosio/crypto.hpp>
 #include <eosio/eosio.hpp>
@@ -5,8 +7,6 @@
 #include <optional>
 
 namespace dmp {
-
-   using namespace eosio;
 
    struct Tables {
 
@@ -38,6 +38,6 @@ namespace dmp {
       using contract::contract;
 
       [[eosio::action]] void catinsert(std::optional<uint64_t> id, std::optional<uint64_t> parent_id, std::string name);
-      [[eosio::action]] void catremove(uint64_t id);
+      [[eosio::action]] void catremove(uint64_t category_id);
    };
 }

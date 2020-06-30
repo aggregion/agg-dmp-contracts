@@ -9,8 +9,8 @@ namespace dmp {
       require_auth(sender);
 
       reqlog_table_t logreq{get_self(), Names::DefaultScope};
-      auto key = Tables::RequestsLog::makeKey(sender, receiver, date, request);
       auto idx = logreq.get_index<Names::RequestsLogIndex>();
+      auto key = Tables::RequestsLog::makeKey(sender, receiver, date, request);
       auto lrit = idx.find(key);
       check(lrit == idx.end(), "403. Specified request is already exists!");
 

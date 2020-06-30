@@ -116,6 +116,30 @@ class AggregionUtility {
         let approvalState = approves.filter(s => s.scope == provider && s.script_id == scriptObject.id)[0];
         return typeof approvalState != 'undefined' && approvalState.approved == 1;
     }
+
+    async getVendors() {
+        return await this.getTable('vendors');
+    }
+
+    async getBrands() {
+        return await this.getTable('brands');
+    }
+
+    async getRegions() {
+        return await this.getTable('regions');
+    }
+
+    async getCityTypes() {
+        return await this.getTable('citytypes');
+    }
+
+    async getCities() {
+        return await this.getTable('cities');
+    }
+
+    async getRegionCities(region_id) {
+        return await this.getTableBySecondaryKey('cities', region_id);
+    }
 };
 
 module.exports = AggregionUtility;
