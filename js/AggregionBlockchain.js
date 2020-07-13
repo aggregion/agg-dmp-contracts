@@ -5,6 +5,7 @@ const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');
 const { TextEncoder, TextDecoder } = require('util');
 const Serialize = require('eosjs/dist/eosjs-serialize');
 const ecc = require('eosjs-ecc')
+const check = require('check-types');
 
 class AggregionBlockchainUtility {
 
@@ -35,6 +36,7 @@ class AggregionBlockchain {
 
 
     constructor(nodeUrl, privateKeys, maxTransactionAttempt = 4) {
+        check.assert.nonEmptyString(nodeUrl, 'node url must be specified');
         this.maxTransactionAttempt = maxTransactionAttempt;
         this.signatureProvider = new JsSignatureProvider(privateKeys);
         this.rpc = new JsonRpc(nodeUrl, { fetch: proxyFetch() });
