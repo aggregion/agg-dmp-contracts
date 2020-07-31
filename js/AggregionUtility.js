@@ -90,9 +90,9 @@ class AggregionUtility {
     }
 
     async getProviderByName(name) {
-        let providers = await this.getTable('providers');
-        let theone = providers.filter(p => p.provider == name);
-        return theone[0];
+        let data = await this.bc.getTableRows(this.contractAccount, 'providers', 'default', name);
+        let scoped = data.rows.map(r => { r.scope = name; return r; });
+        return scoped[0];
     }
 
     async isProviderExist(name) {
