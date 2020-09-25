@@ -35,8 +35,9 @@ class AggregionBlockchainUtility {
 class AggregionBlockchain {
 
 
-    constructor(nodeUrl, privateKeys, maxTransactionAttempt = 4) {
+    constructor(nodeUrl, privateKeys, debug = false, maxTransactionAttempt = 4) {
         check.assert.nonEmptyString(nodeUrl, 'node url must be specified');
+        this.debug = debug;
         this.maxTransactionAttempt = maxTransactionAttempt;
         this.signatureProvider = new JsSignatureProvider(privateKeys);
         this.rpc = new JsonRpc(nodeUrl, { fetch: proxyFetch() });
@@ -118,7 +119,7 @@ class AggregionBlockchain {
         let attempt = 0;
         while (true) {
             try {
-                await this.api.transact({
+                const txinfo = await this.api.transact({
                     actions: [{
                         account: contractAccount,
                         name: actionName,
@@ -126,6 +127,13 @@ class AggregionBlockchain {
                         data: requestObject,
                     }]
                 }, { blocksBehind: 1, expireSeconds: 30 });
+                if (this.debug) {
+                    txinfo.processed.action_traces.forEach(trace => {
+                        if (trace.console) {
+                            console.error(trace.console);
+                        }
+                    });
+                }
                 break;
             }
             catch (exc) {

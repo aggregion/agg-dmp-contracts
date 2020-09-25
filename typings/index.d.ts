@@ -149,6 +149,20 @@ export declare class AggregionContract {
     catremove(id: string, permission: any): Promise<void>;
 }
 
+export declare class DmpusersContract {
+    /**
+     * @param {EosioName} contractName
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractName: string, blockchain: AggregionBlockchain);
+
+    upsertorg(name: any, email: string, description: string, permission: any): Promise<void>;
+    removeorg(name: any, permission: any): Promise<void>;
+
+    upsertuser(orgname: any, name: any, encrypted_info: string, permission: any): Promise<void>;
+    removeuser(orgname: any, name: any, permission: any): Promise<void>;
+}
+
 /// <reference types="node" />
 export declare class AggregionNode {
     constructor(signatureProvider: any, endpoint: any, workdir: any);
@@ -156,13 +170,20 @@ export declare class AggregionNode {
     stop(): Promise<void>;
 }
 
-export declare class AggregionUtility {
+export declare class TablesUtility {
     /**
      * @param {AggregionBlockchain} blockchain
     */
     constructor(contractAccount: any, blockchain: AggregionBlockchain);
     getTable(tableName: any, id?: any): Promise<any[]>;
     getTableBySecondaryKey(tableName: any, keyValue: any): Promise<any[]>;
+}
+
+export declare class AggregionUtility {
+    /**
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractAccount: any, blockchain: AggregionBlockchain);
     getProviders(): Promise<any[]>;
     getServices(): Promise<any[]>;
     getScripts(): Promise<any[]>;
@@ -179,10 +200,21 @@ export declare class AggregionUtility {
         a4: any;
     }>;
     getProviderByName(name: any): Promise<any>;
-    isProviderExist(name: any): Promise<boolean>;
+    isProviderExists(name: any): Promise<boolean>;
     getService(provider: any, service: any): Promise<any>;
     getScript(owner: any, script: any, version: any): Promise<any>;
     isScriptApproved(provider: any, owner: any, script: any, version: any): Promise<boolean>;
+}
+
+export declare class DmpusersUtility {
+    /**
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractAccount: any, blockchain: AggregionBlockchain);
+    getOrganization(name: any): Promise<any>;
+    isOrganizationExists(name: any): Promise<boolean>;
+    getUser(name: any): Promise<any>;
+    isUserExists(name: any): Promise<boolean>;
 }
 
 export { }

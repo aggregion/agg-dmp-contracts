@@ -1,8 +1,8 @@
 
 const AggregionBlockchain = require('../js/AggregionBlockchain.js');
 const AggregionContract = require('../js/AggregionContract.js');
-const AggregionUtility = require('../js/AggregionUtility.js');
 const AggregionNode = require('../js/AggregionNode.js');
+const AggregionUtility = require('../js/AggregionUtility.js');
 const TestsConfig = require('../js/TestsConfig.js');
 
 const chai = require('chai')
@@ -40,19 +40,20 @@ async function makeAccount(blockchain, name) {
 describe('Aggregion', function () {
 
     const config = new TestsConfig(__dirname + '/config.json')
+    const contractConfig = config.contracts.aggregion;
 
     let node = new AggregionNode(config.getSignatureProvider(), config.node.endpoint, config.node.workdir);
     let bc = new AggregionBlockchain(config.getNodeUrl(), [config.blockchain.eosio_root_key.private]);
-    let util = new AggregionUtility(config.contract.account, bc);
-    let contract = new AggregionContract(config.contract.account, bc);
+    let contract = new AggregionContract(contractConfig.account, bc);
+    let util = new AggregionUtility(contractConfig.account, bc);
     let aggregion = null;
 
     this.timeout(0);
 
     beforeEach(async function () {
         await node.start();
-        aggregion = await makeAccount(bc, config.contract.account);
-        await bc.deploy(aggregion.account, config.contract.wasm, config.contract.abi, aggregion.permission);
+        aggregion = await makeAccount(bc, contractConfig.account);
+        await bc.deploy(aggregion.account, contractConfig.wasm, contractConfig.abi, aggregion.permission);
     });
 
     afterEach(async function () {
@@ -63,7 +64,7 @@ describe('Aggregion', function () {
         it('should register new unique provider', async () => {
             const alice = await makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
-            (await util.isProviderExist(alice.account))
+            (await util.isProviderExists(alice.account))
                 .should.be.true;
         });
 
@@ -93,7 +94,7 @@ describe('Aggregion', function () {
             {
                 await contract.regprov(alice.account, 'Alice provider', alice.permission);
                 await contract.unregprov(alice.account, alice.permission);
-                (await util.isProviderExist(alice.account))
+                (await util.isProviderExists(alice.account))
                     .should.be.false;
             }
         });

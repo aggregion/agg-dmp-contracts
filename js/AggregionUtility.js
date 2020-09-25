@@ -1,5 +1,7 @@
 
+const check = require('check-types');
 const AggregionBlockchain = require('./AggregionBlockchain.js');
+const TablesUtility = require('./TablesUtility.js');
 
 
 class AggregionUtility {
@@ -10,67 +12,46 @@ class AggregionUtility {
     constructor(contractAccount, blockchain) {
         this.contractAccount = contractAccount;
         this.bc = blockchain;
-    }
-
-    async getTable(tableName, id = null) {
-        let scopes = await this.bc.getScopes(this.contractAccount, tableName);
-        let rows = [];
-        for (const item of scopes.rows) {
-            let data = await this.bc.getTableRows(this.contractAccount, tableName, item.scope, id);
-            let scoped = data.rows.map(r => { r.scope = item.scope; return r; });
-            rows.push(...scoped);
-        };
-        return rows;
-    }
-
-    async getTableBySecondaryKey(tableName, keyValue) {
-        let scopes = await this.bc.getScopes(this.contractAccount, tableName);
-        let rows = [];
-        for (const item of scopes.rows) {
-            let data = await this.bc.getTableRowsBySecondaryKey(this.contractAccount, tableName, item.scope, keyValue, keyValue);
-            let scoped = data.rows.map(r => { r.scope = item.scope; return r; });
-            rows.push(...scoped);
-        };
-        return rows;
+        this.tables = new TablesUtility(contractAccount, blockchain);
     }
 
     async getProviders() {
-        return await this.getTable('providers');
+        return await this.tables.getTable('providers');
     }
 
     async getServices() {
-        return await this.getTable('services');
+        return await this.tables.getTable('services');
     }
 
     async getScripts() {
-        return await this.getTable('scripts');
+        return await this.tables.getTable('scripts');
     }
 
     async getApproves() {
-        return await this.getTable('approves');
+        return await this.tables.getTable('approves');
     }
 
     async getRequestsLog() {
-        return await this.getTable('reqslog');
+        return await this.tables.getTable('reqslog');
     }
 
     async getCategories() {
-        return await this.getTable('categories');
+        return await this.tables.getTable('categories');
     }
 
     async getCategoryById(id) {
-        const rows = await this.getTable('categories', id);
+        const rows = await this.tables.getTable('categories', id);
         return rows[0];
     }
 
     async getSubcategories(parentId) {
-        return await this.getTableBySecondaryKey('categories', parentId);
+        return await this.tables.getTableBySecondaryKey('categories', parentId);
     }
 
     async getCategoryPath(id) {
         let path = [null, null, null, null, null];
         while (true) {
-            const rows = await this.getTable('categories', id);
+            const rows = await this.tables.getTable('categories', id);
             const category = rows[0];
             path.push(category.name);
             if (category.parent_id) {
@@ -95,7 +76,7 @@ class AggregionUtility {
         return scoped[0];
     }
 
-    async isProviderExist(name) {
+    async isProviderExists(name) {
         let p = await this.getProviderByName(name);
         return typeof p != 'undefined';
     }
@@ -118,27 +99,27 @@ class AggregionUtility {
     }
 
     async getVendors() {
-        return await this.getTable('vendors');
+        return await this.tables.getTable('vendors');
     }
 
     async getBrands() {
-        return await this.getTable('brands');
+        return await this.tables.getTable('brands');
     }
 
     async getRegions() {
-        return await this.getTable('regions');
+        return await this.tables.getTable('regions');
     }
 
     async getCityTypes() {
-        return await this.getTable('citytypes');
+        return await this.tables.getTable('citytypes');
     }
 
     async getCities() {
-        return await this.getTable('cities');
+        return await this.tables.getTable('cities');
     }
 
     async getRegionCities(region_id) {
-        return await this.getTableBySecondaryKey('cities', region_id);
+        return await this.tables.getTableBySecondaryKey('cities', region_id);
     }
 };
 

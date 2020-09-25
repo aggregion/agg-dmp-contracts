@@ -8,7 +8,7 @@ class TestsConfig {
 
         this.node = config.node;
         this.blockchain = config.blockchain;
-        this.contract = config.contract;
+        this.contracts = config.contracts;
     }
 
     getNodeUrl() {
