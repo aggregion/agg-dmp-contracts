@@ -43,7 +43,7 @@ describe('Aggregion', function () {
     const contractConfig = config.contracts.aggregion;
 
     let node = new AggregionNode(config.getSignatureProvider(), config.node.endpoint, config.node.workdir);
-    let bc = new AggregionBlockchain(config.getNodeUrl(), [config.blockchain.eosio_root_key.private]);
+    let bc = new AggregionBlockchain(config.getNodeUrl(), [config.blockchain.eosio_root_key.private], config.debug);
     let contract = new AggregionContract(contractConfig.account, bc);
     let util = new AggregionUtility(contractConfig.account, bc);
     let aggregion = null;

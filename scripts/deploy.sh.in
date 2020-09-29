@@ -7,5 +7,5 @@ then
 fi
 
 set -x
-cleos -u $NODE_URL set contract aggregion Aggregion/ -p aggregion@active
-cleos -u $NODE_URL set contract dmpusers Dmpusers/ -p dmpusers@active
+cleos -u $NODE_URL set contract aggregion aggregion/ Aggregion.wasm Aggregion.abi -p aggregion@active
+cleos -u $NODE_URL set contract dmpusers dmpusers/ Dmpusers.wasm Dmpusers.abi -p dmpusers@active

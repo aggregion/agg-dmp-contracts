@@ -6,9 +6,7 @@ class TestsConfig {
         let rawdata = fs.readFileSync(path);
         let config = JSON.parse(rawdata);
 
-        this.node = config.node;
-        this.blockchain = config.blockchain;
-        this.contracts = config.contracts;
+        Object.assign(this, config);
     }
 
     getNodeUrl() {

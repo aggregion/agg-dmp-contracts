@@ -4,7 +4,7 @@ IndentWidth: 3
 ColumnLimit: 160
 PointerAlignment: Left
 AlwaysBreakTemplateDeclarations: true
-AlignConsecutiveAssignments: false
+AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: false
 BreakConstructorInitializers: BeforeComma
 NamespaceIndentation: All
@@ -12,3 +12,7 @@ FixNamespaceComments: false
 AccessModifierOffset: -3
 MaxEmptyLinesToKeep: 2
 AllowShortFunctionsOnASingleLine: false
+AlignAfterOpenBracket: Align
+BinPackParameters: false
+BinPackArguments: false
+AllowAllParametersOfDeclarationOnNextLine: false

@@ -16,7 +16,14 @@ title: Remove organization
 summary: Remove organization.
 icon:
 
-<h1 class="contract">upsertuser</h1>
+<h1 class="contract">registeruser</h1>
+---
+spec-version: 0.0.1
+title: Add/Update user
+summary: Add or update user.
+icon:
+
+<h1 class="contract">updateuser</h1>
 ---
 spec-version: 0.0.1
 title: Add/Update user

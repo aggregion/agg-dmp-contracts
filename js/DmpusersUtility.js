@@ -1,7 +1,6 @@
 
 const AggregionBlockchain = require('./AggregionBlockchain.js');
 const TablesUtility = require('./TablesUtility.js');
-const check = require('check-types');
 
 
 class AggregionUtility {
@@ -17,21 +16,23 @@ class AggregionUtility {
     }
 
     async getOrganization(name) {
-        return await this.tables.getTableByPrimaryKey('org', name);
+        const rows = await this.tables.getTableByPrimaryKey('org', name);
+        return rows[0];
     }
 
     async isOrganizationExists(name) {
         let o = await this.getOrganization(name);
-        return o.length == 1;
+        return typeof o != 'undefined';
     };
 
     async getUser(name) {
-        return await this.tables.getTableByPrimaryKey('users', name);
+        const rows = await this.tables.getTableByPrimaryKey('users', name);
+        return rows[0];
     }
 
     async isUserExists(name) {
-        let o = await this.getUser(name);
-        return o.length == 1;
+        let u = await this.getUser(name);
+        return typeof u != 'undefined';
     };
 };
 

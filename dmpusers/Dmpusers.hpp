@@ -7,6 +7,13 @@
 
 namespace dmp {
 
+   struct EncryptionData {
+      std::string encrypted_info;
+      std::string encrypted_master_key;
+      std::string salt;
+      std::string hash_params;
+   };
+
    struct Tables {
 
       /// @brief
@@ -27,12 +34,12 @@ namespace dmp {
       /// Users table.
       /// Scope: Default.
       struct [[eosio::table, eosio::contract("Dmpusers")]] Users {
-         eosio::name name;
-         eosio::name org;
-         std::string encrypted_info;
+         eosio::name id;
+         eosio::name orgname;
+         EncryptionData data;
 
          auto primary_key() const {
-            return name.value;
+            return id.value;
          }
       };
    };
@@ -42,17 +49,24 @@ namespace dmp {
    /// Aggregion DMP organizations and users smart contract.
    struct [[eosio::contract("Dmpusers")]] Dmpusers : contract {
 
+      enum class UpsertCheck {
+         UserMustNotExists,
+         UserMustExists,
+      };
+
       using contract::contract;
 
       using users_table_t = eosio::multi_index<Names::UsersTable, Tables::Users>;
-      using org_table_t = eosio::multi_index<Names::OrganizationsTable, Tables::Organizations>;
+      using org_table_t   = eosio::multi_index<Names::OrganizationsTable, Tables::Organizations>;
 
       [[eosio::action]] void upsertorg(eosio::name name, std::string email, std::string description);
       [[eosio::action]] void removeorg(eosio::name name);
 
-      [[eosio::action]] void upsertuser(eosio::name orgname, eosio::name name, std::string encrypted_info);
-      [[eosio::action]] void removeuser(eosio::name orgname, eosio::name name);
+      [[eosio::action]] void registeruser(eosio::name orgname, eosio::name user, EncryptionData data);
+      [[eosio::action]] void updateuser(eosio::name orgname, eosio::name user, EncryptionData data);
+      [[eosio::action]] void removeuser(eosio::name orgname, eosio::name user);
 
    private:
+      void upsertuser(UpsertCheck upsertCheck, eosio::name orgname, eosio::name user, const EncryptionData& data);
    };
 }

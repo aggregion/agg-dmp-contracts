@@ -137,6 +137,9 @@ class AggregionBlockchain {
                 break;
             }
             catch (exc) {
+                if (this.debug) {
+                    console.error(exc.message);
+                }
                 const deadline = exc.message.match("deadline.*exceeded");
                 if (attempt < this.maxTransactionAttempt && deadline) {
                     attempt++;

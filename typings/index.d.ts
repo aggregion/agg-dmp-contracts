@@ -149,6 +149,13 @@ export declare class AggregionContract {
     catremove(id: string, permission: any): Promise<void>;
 }
 
+export type EncryptedData = {
+    encrypted_info: string;
+    encrypted_master_key: string;
+    salt: string;
+    has_params: string;
+};
+
 export declare class DmpusersContract {
     /**
      * @param {EosioName} contractName
@@ -159,7 +166,8 @@ export declare class DmpusersContract {
     upsertorg(name: any, email: string, description: string, permission: any): Promise<void>;
     removeorg(name: any, permission: any): Promise<void>;
 
-    upsertuser(orgname: any, name: any, encrypted_info: string, permission: any): Promise<void>;
+    registeruser(orgname: any, name: any, data: EncryptedData, permission: any): Promise<void>;
+    updateuser(orgname: any, name: any, data: EncryptedData, permission: any): Promise<void>;
     removeuser(orgname: any, name: any, permission: any): Promise<void>;
 }
 

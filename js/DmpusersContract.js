@@ -2,6 +2,15 @@ const check = require('check-types');
 
 const AggregionBlockchain = require('./AggregionBlockchain.js');
 
+class EncryptedData {
+    constructor() {
+        this.encrypted_info = "";
+        this.encrypted_master_key = "";
+        this.hash_params = "";
+        this.salt = "";
+    }
+};
+module.exports = EncryptedData;
 
 class DmpusersContract {
 
@@ -48,35 +57,59 @@ class DmpusersContract {
      * Add user to organization.
      * @param {EosioName} orgname
      * @param {EosioName} name
-     * @param {String} encrypted_info
+     * @param {EncryptedData} data
      * @param {permission} permission
      */
-    async upsertuser(orgname, name, encrypted_info, permission) {
+    async registeruser(orgname, user, data, permission) {
         check.assert.assigned(orgname, 'orgname is required');
-        check.assert.assigned(name, 'name is required');
-        check.assert.assigned(encrypted_info, 'encrypted_info is required');
+        check.assert.assigned(user, 'user is required');
+        check.assert.assigned(data.encrypted_info, 'data.encrypted_info is required');
+        check.assert.assigned(data.encrypted_master_key, 'data.encrypted_master_key is required');
+        check.assert.assigned(data.salt, 'data.salt is required');
+        check.assert.assigned(data.hash_params, 'data.hash_params is required');
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.orgname = orgname;
-        request.name = name;
-        request.encrypted_info = encrypted_info;
-        return await this.bc.pushAction(this.contractName, "upsertuser", request, permission);
+        request.user = user;
+        request.data = data;
+        return await this.bc.pushAction(this.contractName, "registeruser", request, permission);
+    }
+
+    /**
+     * Update user in organization.
+     * @param {EosioName} orgname
+     * @param {EosioName} name
+     * @param {EncryptedData} data
+     * @param {permission} permission
+     */
+    async updateuser(orgname, user, data, permission) {
+        check.assert.assigned(orgname, 'orgname is required');
+        check.assert.assigned(user, 'user is required');
+        check.assert.assigned(data.encrypted_info, 'data.encrypted_info is required');
+        check.assert.assigned(data.encrypted_master_key, 'data.encrypted_master_key is required');
+        check.assert.assigned(data.salt, 'data.salt is required');
+        check.assert.assigned(data.hash_params, 'data.hash_params is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.orgname = orgname;
+        request.user = user;
+        request.data = data;
+        return await this.bc.pushAction(this.contractName, "updateuser", request, permission);
     }
 
     /**
      * Remove user from organization.
      * @param {EosioName} orgname
      * @param {EosioName} user
-     * @param {String} encrypted_info
      * @param {permission} permission
      */
-    async removeuser(orgname, name, permission) {
+    async removeuser(orgname, user, permission) {
         check.assert.assigned(orgname, 'orgname is required');
-        check.assert.assigned(name, 'name is required');
+        check.assert.assigned(user, 'user is required');
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.orgname = orgname;
-        request.name = name;
+        request.user = user;
         return await this.bc.pushAction(this.contractName, "removeuser", request, permission);
     }
 
