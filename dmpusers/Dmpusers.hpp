@@ -7,6 +7,12 @@
 
 namespace dmp {
 
+   struct UserInfo {
+      std::string email;
+      std::string firstname;
+      std::string lastname;
+   };
+
    struct EncryptionData {
       std::string encrypted_info;
       std::string encrypted_master_key;
@@ -36,6 +42,7 @@ namespace dmp {
       struct [[eosio::table, eosio::contract("Dmpusers")]] Users {
          eosio::name id;
          eosio::name orgname;
+         UserInfo info;
          EncryptionData data;
 
          auto primary_key() const {
@@ -62,11 +69,11 @@ namespace dmp {
       [[eosio::action]] void upsertorg(eosio::name name, std::string email, std::string description);
       [[eosio::action]] void removeorg(eosio::name name);
 
-      [[eosio::action]] void registeruser(eosio::name orgname, eosio::name user, EncryptionData data);
-      [[eosio::action]] void updateuser(eosio::name orgname, eosio::name user, EncryptionData data);
+      [[eosio::action]] void registeruser(eosio::name orgname, eosio::name user, UserInfo info, EncryptionData data);
+      [[eosio::action]] void updateuser(eosio::name orgname, eosio::name user, UserInfo info, EncryptionData data);
       [[eosio::action]] void removeuser(eosio::name orgname, eosio::name user);
 
    private:
-      void upsertuser(UpsertCheck upsertCheck, eosio::name orgname, eosio::name user, const EncryptionData& data);
+      void upsertuser(UpsertCheck upsertCheck, eosio::name orgname, eosio::name user, const UserInfo& info, const EncryptionData& data);
    };
 }

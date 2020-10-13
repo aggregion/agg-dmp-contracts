@@ -2,6 +2,15 @@ const check = require('check-types');
 
 const AggregionBlockchain = require('./AggregionBlockchain.js');
 
+class UserInfo {
+    constructor() {
+        this.email = "";
+        this.firstname = "";
+        this.lastname = "";
+    }
+};
+module.exports = UserInfo;
+
 class EncryptedData {
     constructor() {
         this.encrypted_info = "";
@@ -60,9 +69,12 @@ class DmpusersContract {
      * @param {EncryptedData} data
      * @param {permission} permission
      */
-    async registeruser(orgname, user, data, permission) {
+    async registeruser(orgname, user, info, data, permission) {
         check.assert.assigned(orgname, 'orgname is required');
         check.assert.assigned(user, 'user is required');
+        check.assert.assigned(info.email, 'email is required');
+        check.assert.assigned(info.firstname, 'firstname is required');
+        check.assert.assigned(info.lastname, 'lastname is required');
         check.assert.assigned(data.encrypted_info, 'data.encrypted_info is required');
         check.assert.assigned(data.encrypted_master_key, 'data.encrypted_master_key is required');
         check.assert.assigned(data.salt, 'data.salt is required');
@@ -71,6 +83,7 @@ class DmpusersContract {
         let request = {};
         request.orgname = orgname;
         request.user = user;
+        request.info = info;
         request.data = data;
         return await this.bc.pushAction(this.contractName, "registeruser", request, permission);
     }
@@ -82,9 +95,12 @@ class DmpusersContract {
      * @param {EncryptedData} data
      * @param {permission} permission
      */
-    async updateuser(orgname, user, data, permission) {
+    async updateuser(orgname, user, info, data, permission) {
         check.assert.assigned(orgname, 'orgname is required');
         check.assert.assigned(user, 'user is required');
+        check.assert.assigned(info.email, 'email is required');
+        check.assert.assigned(info.firstname, 'firstname is required');
+        check.assert.assigned(info.lastname, 'lastname is required');
         check.assert.assigned(data.encrypted_info, 'data.encrypted_info is required');
         check.assert.assigned(data.encrypted_master_key, 'data.encrypted_master_key is required');
         check.assert.assigned(data.salt, 'data.salt is required');
@@ -93,6 +109,7 @@ class DmpusersContract {
         let request = {};
         request.orgname = orgname;
         request.user = user;
+        request.info = info;
         request.data = data;
         return await this.bc.pushAction(this.contractName, "updateuser", request, permission);
     }

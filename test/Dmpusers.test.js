@@ -5,6 +5,7 @@ const DmpusersUtility = require('../js/DmpusersUtility.js');
 const AggregionNode = require('../js/AggregionNode.js');
 const TestsConfig = require('../js/TestsConfig.js');
 const EncryptedData = require('../js/DmpusersContract.js');
+const UserInfo = require('../js/DmpusersContract.js');
 
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised');
@@ -60,6 +61,14 @@ describe('Dmpusers', function () {
         await node.stop();
     });
 
+    function anyUserInfo() {
+        const info = new UserInfo;
+        info.email = 'a@b.c';
+        info.firstname = 'firstname';
+        info.lastname = 'lastname';
+        return info;
+    }
+
     function anyEncryptedData() {
         const data = new EncryptedData;
         data.encrypted_info = "user private data";
@@ -94,16 +103,24 @@ describe('Dmpusers', function () {
             const org = await makeAccount(bc, 'orgaccount');
             await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
 
+            const info = new UserInfo;
+            info.email = 'user@b.c';
+            info.firstname = 'firstname';
+            info.lastname = 'lastname';
+
             const data = new EncryptedData;
             data.encrypted_info = "user private data";
             data.encrypted_master_key = "master key";
             data.salt = "salt";
             data.hash_params = "{n=10}";
-            await contract.registeruser(org.account, 'myuser', data, org.permission);
+            await contract.registeruser(org.account, 'myuser', info, data, org.permission);
 
             const user = await util.getUser('myuser');
             assert.equal(user.id, 'myuser');
             assert.equal(user.orgname, 'orgaccount');
+            assert.equal(user.info.email, 'user@b.c');
+            assert.equal(user.info.firstname, 'firstname');
+            assert.equal(user.info.lastname, 'lastname');
             assert.equal(user.data.encrypted_info, 'user private data');
             assert.equal(user.data.encrypted_master_key, 'master key');
             assert.equal(user.data.salt, 'salt');
@@ -119,13 +136,13 @@ describe('Dmpusers', function () {
                 return (await util.getOrganization(org.account)).users_count;
             };
 
-            await contract.registeruser(org.account, 'a', anyEncryptedData(), org.permission);
+            await contract.registeruser(org.account, 'a', anyUserInfo(), anyEncryptedData(), org.permission);
             assert.equal(await getCount(), 1);
 
-            await contract.registeruser(org.account, 'b', anyEncryptedData(), org.permission);
+            await contract.registeruser(org.account, 'b', anyUserInfo(), anyEncryptedData(), org.permission);
             assert.equal(await getCount(), 2);
 
-            await contract.registeruser(org.account, 'c', anyEncryptedData(), org.permission);
+            await contract.registeruser(org.account, 'c', anyUserInfo(), anyEncryptedData(), org.permission);
             assert.equal(await getCount(), 3);
 
             await contract.removeuser(org.account, 'a', org.permission);
@@ -140,9 +157,9 @@ describe('Dmpusers', function () {
             const orgB = await makeAccount(bc, 'orgb');
             await contract.upsertorg(orgB.account, 'b@b.b', 'BBB', orgB.permission);
 
-            await contract.registeruser(orgA.account, 'myuser', anyEncryptedData(), orgA.permission);
-            await contract.registeruser(orgA.account, 'myuser', anyEncryptedData(), orgA.permission).should.be.rejected;
-            await contract.registeruser(orgB.account, 'myuser', anyEncryptedData(), orgB.permission).should.be.rejected;
+            await contract.registeruser(orgA.account, 'myuser', anyUserInfo(), anyEncryptedData(), orgA.permission);
+            await contract.registeruser(orgA.account, 'myuser', anyUserInfo(), anyEncryptedData(), orgA.permission).should.be.rejected;
+            await contract.registeruser(orgB.account, 'myuser', anyUserInfo(), anyEncryptedData(), orgB.permission).should.be.rejected;
         });
 
 
@@ -150,30 +167,48 @@ describe('Dmpusers', function () {
             const org = await makeAccount(bc, 'orgaccount');
             await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
             {
+                const info = new UserInfo;
+                info.email = 'user@b.c';
+                info.firstname = 'firstname';
+                info.lastname = 'lastname';
+
                 const data = new EncryptedData;
                 data.encrypted_info = "111";
                 data.encrypted_master_key = "222";
                 data.salt = "333";
                 data.hash_params = "444";
-                await contract.registeruser(org.account, 'myuser', data, org.permission);
+
+                await contract.registeruser(org.account, 'myuser', info, data, org.permission);
                 const user = await util.getUser('myuser');
                 assert.equal(user.id, 'myuser');
                 assert.equal(user.orgname, 'orgaccount');
+                assert.equal(user.info.email, 'user@b.c');
+                assert.equal(user.info.firstname, 'firstname');
+                assert.equal(user.info.lastname, 'lastname');
                 assert.equal(user.data.encrypted_info, '111');
                 assert.equal(user.data.encrypted_master_key, '222');
                 assert.equal(user.data.salt, '333');
                 assert.equal(user.data.hash_params, '444');
             }
             {
+                const info = new UserInfo;
+                info.email = 'user@b.c';
+                info.firstname = 'firstname';
+                info.lastname = 'lastname';
+
                 const data = new EncryptedData;
                 data.encrypted_info = "AAA";
                 data.encrypted_master_key = "BBB";
                 data.salt = "CCC";
                 data.hash_params = "DDD";
-                await contract.updateuser(org.account, 'myuser', data, org.permission);
+
+                await contract.updateuser(org.account, 'myuser', info, data, org.permission);
                 const user = await util.getUser('myuser');
                 assert.equal(user.id, 'myuser');
                 assert.equal(user.orgname, 'orgaccount');
+                assert.equal(user.info.email, 'user@b.c');
+                assert.equal(user.info.firstname, 'firstname');
+                assert.equal(user.info.lastname, 'lastname');
                 assert.equal(user.data.encrypted_info, 'AAA');
                 assert.equal(user.data.encrypted_master_key, 'BBB');
                 assert.equal(user.data.salt, 'CCC');
@@ -187,18 +222,18 @@ describe('Dmpusers', function () {
         it('should not update unknown user', async () => {
             const org = await makeAccount(bc, 'orgaccount');
             await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
-            await contract.updateuser(org.account, 'myuser', anyEncryptedData(), org.permission).should.be.rejected;
+            await contract.updateuser(org.account, 'myuser', anyUserInfo(), anyEncryptedData(), org.permission).should.be.rejected;
         });
 
 
         it('should not update foreign user', async () => {
             const orgA = await makeAccount(bc, 'orga');
             await contract.upsertorg(orgA.account, 'a@a.a', 'AAA', orgA.permission);
-            await contract.registeruser(orgA.account, 'myuser', anyEncryptedData(), orgA.permission);
+            await contract.registeruser(orgA.account, 'myuser', anyUserInfo(), anyEncryptedData(), orgA.permission);
 
             const orgB = await makeAccount(bc, 'orgb');
             await contract.upsertorg(orgB.account, 'b@b.b', 'BBB', orgB.permission);
-            await contract.updateuser(orgB.account, 'myuser', anyEncryptedData(), orgB.permission).should.be.rejected;
+            await contract.updateuser(orgB.account, 'myuser', anyUserInfo(), anyEncryptedData(), orgB.permission).should.be.rejected;
         });
 
 
@@ -206,7 +241,7 @@ describe('Dmpusers', function () {
             const org = await makeAccount(bc, 'orgaccount');
             await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
 
-            await contract.registeruser(org.account, 'myuser', anyEncryptedData(), org.permission);
+            await contract.registeruser(org.account, 'myuser', anyUserInfo(), anyEncryptedData(), org.permission);
             (await util.isUserExists('myuser')).should.be.true;
 
             await contract.removeuser(org.account, 'myuser', org.permission);
@@ -217,7 +252,7 @@ describe('Dmpusers', function () {
         it('should not remove organization with users', async () => {
             const org = await makeAccount(bc, 'orgaccount');
             await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
-            await contract.registeruser(org.account, 'myuser', anyEncryptedData(), org.permission);
+            await contract.registeruser(org.account, 'myuser', anyUserInfo(), anyEncryptedData(), org.permission);
 
             await contract.removeorg(org.account, org.permission).should.be.rejected;
         });

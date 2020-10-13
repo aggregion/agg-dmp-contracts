@@ -36,7 +36,7 @@ namespace dmp {
       print("Success. Organization '", name, "' was removed");
    }
 
-   void Dmpusers::upsertuser(UpsertCheck upsertCheck, eosio::name orgname, eosio::name user, const EncryptionData& data) {
+   void Dmpusers::upsertuser(UpsertCheck upsertCheck, eosio::name orgname, eosio::name user, const UserInfo& info, const EncryptionData& data) {
       require_auth(orgname);
 
       org_table_t organizations{get_self(), Names::DefaultScope};
@@ -61,6 +61,7 @@ namespace dmp {
             row.id      = user;
             row.orgname = orgname;
             row.data    = data;
+            row.info    = info;
          });
          organizations.modify(orgit, get_self(), [&](auto& row) { row.users_count++; });
       } else {
@@ -72,12 +73,12 @@ namespace dmp {
       print("Success. User: '", user, "', organization: '", orgname, "'");
    }
 
-   void Dmpusers::registeruser(eosio::name orgname, eosio::name user, EncryptionData data) {
-      upsertuser(UpsertCheck::UserMustNotExists, orgname, user, data);
+   void Dmpusers::registeruser(eosio::name orgname, eosio::name user, UserInfo info, EncryptionData data) {
+      upsertuser(UpsertCheck::UserMustNotExists, orgname, user, info, data);
    }
 
-   void Dmpusers::updateuser(eosio::name orgname, eosio::name user, EncryptionData data) {
-      upsertuser(UpsertCheck::UserMustExists, orgname, user, data);
+   void Dmpusers::updateuser(eosio::name orgname, eosio::name user, UserInfo info, EncryptionData data) {
+      upsertuser(UpsertCheck::UserMustExists, orgname, user, info, data);
    }
 
    void Dmpusers::removeuser(eosio::name orgname, eosio::name user) {
