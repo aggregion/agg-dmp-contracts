@@ -149,6 +149,12 @@ export declare class AggregionContract {
     catremove(id: string, permission: any): Promise<void>;
 }
 
+export type UserInfo = {
+    email: string;
+    firstname: string;
+    lastname: string;
+};
+
 export type EncryptedData = {
     encrypted_info: string;
     encrypted_master_key: string;
@@ -166,8 +172,8 @@ export declare class DmpusersContract {
     upsertorg(name: any, email: string, description: string, permission: any): Promise<void>;
     removeorg(name: any, permission: any): Promise<void>;
 
-    registeruser(orgname: any, name: any, data: EncryptedData, permission: any): Promise<void>;
-    updateuser(orgname: any, name: any, data: EncryptedData, permission: any): Promise<void>;
+    registeruser(orgname: any, name: any, info: UserInfo, data: EncryptedData, permission: any): Promise<void>;
+    updateuser(orgname: any, name: any, info: UserInfo, data: EncryptedData, permission: any): Promise<void>;
     removeuser(orgname: any, name: any, permission: any): Promise<void>;
 }
 
