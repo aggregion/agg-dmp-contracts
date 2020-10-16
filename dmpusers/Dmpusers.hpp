@@ -11,6 +11,7 @@ namespace dmp {
       std::string email;
       std::string firstname;
       std::string lastname;
+      std::string other;
    };
 
    struct EncryptionData {

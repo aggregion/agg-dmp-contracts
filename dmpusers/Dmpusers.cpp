@@ -67,6 +67,7 @@ namespace dmp {
       } else {
          check(usrit->orgname == orgname, "403. User organization is different");
          users.modify(usrit, get_self(), [&](auto& row) {
+            row.info = info; //
             row.data = data; //
          });
       }

@@ -7,6 +7,7 @@ class UserInfo {
         this.email = "";
         this.firstname = "";
         this.lastname = "";
+        this.other = "";
     }
 };
 module.exports = UserInfo;

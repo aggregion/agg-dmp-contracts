@@ -43,6 +43,7 @@ describe('Dmpusers', function () {
         info.email = 'a@b.c';
         info.firstname = 'firstname';
         info.lastname = 'lastname';
+        info.other = 'other';
         return info;
     }
 
@@ -84,6 +85,7 @@ describe('Dmpusers', function () {
             info.email = 'user@b.c';
             info.firstname = 'firstname';
             info.lastname = 'lastname';
+            info.other = '{"some":"other info"}';
 
             const data = new EncryptedData;
             data.encrypted_info = "user private data";
@@ -98,6 +100,7 @@ describe('Dmpusers', function () {
             assert.equal(user.info.email, 'user@b.c');
             assert.equal(user.info.firstname, 'firstname');
             assert.equal(user.info.lastname, 'lastname');
+            assert.equal(user.info.other, '{"some":"other info"}');
             assert.equal(user.data.encrypted_info, 'user private data');
             assert.equal(user.data.encrypted_master_key, 'master key');
             assert.equal(user.data.salt, 'salt');
@@ -148,6 +151,7 @@ describe('Dmpusers', function () {
                 info.email = 'user@b.c';
                 info.firstname = 'firstname';
                 info.lastname = 'lastname';
+                info.other = 'other';
 
                 const data = new EncryptedData;
                 data.encrypted_info = "111";
@@ -162,6 +166,7 @@ describe('Dmpusers', function () {
                 assert.equal(user.info.email, 'user@b.c');
                 assert.equal(user.info.firstname, 'firstname');
                 assert.equal(user.info.lastname, 'lastname');
+                assert.equal(user.info.other, 'other');
                 assert.equal(user.data.encrypted_info, '111');
                 assert.equal(user.data.encrypted_master_key, '222');
                 assert.equal(user.data.salt, '333');
@@ -169,9 +174,10 @@ describe('Dmpusers', function () {
             }
             {
                 const info = new UserInfo;
-                info.email = 'user@b.c';
-                info.firstname = 'firstname';
-                info.lastname = 'lastname';
+                info.email = '1';
+                info.firstname = '2';
+                info.lastname = '3';
+                info.other = '4';
 
                 const data = new EncryptedData;
                 data.encrypted_info = "AAA";
@@ -183,9 +189,10 @@ describe('Dmpusers', function () {
                 const user = await util.getUser('myuser');
                 assert.equal(user.id, 'myuser');
                 assert.equal(user.orgname, 'orgaccount');
-                assert.equal(user.info.email, 'user@b.c');
-                assert.equal(user.info.firstname, 'firstname');
-                assert.equal(user.info.lastname, 'lastname');
+                assert.equal(user.info.email, '1');
+                assert.equal(user.info.firstname, '2');
+                assert.equal(user.info.lastname, '3');
+                assert.equal(user.info.other, '4');
                 assert.equal(user.data.encrypted_info, 'AAA');
                 assert.equal(user.data.encrypted_master_key, 'BBB');
                 assert.equal(user.data.salt, 'CCC');
