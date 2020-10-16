@@ -1,7 +1,7 @@
 
 const fs = require('fs');
 
-class TestsConfig {
+class TestConfig {
     constructor(path) {
         let rawdata = fs.readFileSync(path);
         let config = JSON.parse(rawdata);
@@ -20,4 +20,4 @@ class TestsConfig {
     }
 };
 
-module.exports = TestsConfig;
+module.exports = TestConfig;

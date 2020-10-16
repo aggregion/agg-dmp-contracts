@@ -3,7 +3,8 @@ const AggregionBlockchain = require('../js/AggregionBlockchain.js');
 const AggregionContract = require('../js/AggregionContract.js');
 const AggregionNode = require('../js/AggregionNode.js');
 const AggregionUtility = require('../js/AggregionUtility.js');
-const TestsConfig = require('../js/TestsConfig.js');
+const TestConfig = require('./TestConfig.js');
+const tools = require('./TestTools.js');
 
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised');
@@ -12,34 +13,9 @@ chai.use(chaiAsPromised);
 var assert = chai.assert;
 var should = chai.should();
 
-class TestAccount {
-    constructor(name, publicKey, privateKey) {
-        this.account = name;
-        this.publicKey = publicKey;
-        this.privateKey = privateKey;
-        this.permission = name + '@active';
-    }
-};
-
-/**
- *
- * @param {AggregionBlockchain} blockchain
- * @param {String} name
- * @returns {TestAccount}
- */
-async function makeAccount(blockchain, name) {
-    const pair = await AggregionBlockchain.createKeyPair();
-    const ownerKey = pair.publicKey;
-    const activeKey = ownerKey;
-    await blockchain.newaccount('eosio', name, ownerKey, activeKey, 'eosio@active');
-    await blockchain.addPrivateKey(pair.privateKey);
-    return new TestAccount(name, ownerKey, pair.privateKey);
-}
-
-
 describe('Aggregion', function () {
 
-    const config = new TestsConfig(__dirname + '/config.json')
+    const config = new TestConfig(__dirname + '/config.json')
     const contractConfig = config.contracts.aggregion;
 
     let node = new AggregionNode(config.getSignatureProvider(), config.node.endpoint, config.node.workdir);
@@ -52,7 +28,7 @@ describe('Aggregion', function () {
 
     beforeEach(async function () {
         await node.start();
-        aggregion = await makeAccount(bc, contractConfig.account);
+        aggregion = await tools.makeAccount(bc, contractConfig.account);
         await bc.deploy(aggregion.account, contractConfig.wasm, contractConfig.abi, aggregion.permission);
     });
 
@@ -62,21 +38,21 @@ describe('Aggregion', function () {
 
     describe('#providers', function () {
         it('should register new unique provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             (await util.isProviderExists(alice.account))
                 .should.be.true;
         });
 
         it('should not register provider if it already registered', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.regprov(alice.account, 'Alice provider', alice.permission)
                 .should.be.rejected;
         });
 
         it('should update description of provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             {
                 await contract.regprov(alice.account, 'Description One', alice.permission);
                 let prov = await util.getProviderByName(alice.account);
@@ -90,7 +66,7 @@ describe('Aggregion', function () {
         });
 
         it('should remove existing provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             {
                 await contract.regprov(alice.account, 'Alice provider', alice.permission);
                 await contract.unregprov(alice.account, alice.permission);
@@ -102,7 +78,7 @@ describe('Aggregion', function () {
 
     describe('#services', function () {
         it('should create several services for provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
             await contract.addsvc(alice.account, 'svc2', 'Alice provider Service Two', 'ftp', 'distributed', 'http://alicesvctwo.ru', alice.permission);
@@ -127,7 +103,7 @@ describe('Aggregion', function () {
         });
 
         it('should update service for provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
             await contract.updsvc(alice.account, 'svc1', 'MST', 'ftp', 'distributed', 'http://alicesvctwo.ru', alice.permission);
@@ -143,7 +119,7 @@ describe('Aggregion', function () {
         });
 
         it('should remove service for provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
             await contract.remsvc(alice.account, 'svc1', alice.permission);
@@ -155,7 +131,7 @@ describe('Aggregion', function () {
 
     describe('#scripts', function () {
         it('should create several scripts for user', async () => {
-            const bob = await makeAccount(bc, 'bob');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
             await contract.addscript(bob.account, 'script1', 'v2', 'Einstein function', 'def', 'http://eindef.com', bob.permission);
             {
@@ -179,7 +155,7 @@ describe('Aggregion', function () {
         });
 
         it('should update script if it does not approved', async () => {
-            const bob = await makeAccount(bc, 'bob');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.addscript(bob.account, 'script1', 'v1', 'meaningless description', 'hash', 'url', bob.permission);
             await contract.updscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
             {
@@ -194,7 +170,7 @@ describe('Aggregion', function () {
         });
 
         it('should remove script if it does not approved', async () => {
-            const bob = await makeAccount(bc, 'bob');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
             await contract.remscript(bob.account, 'script1', 'v1', bob.permission);
             let script = await util.getScript(bob.account, 'script1', 'v1');
@@ -202,7 +178,7 @@ describe('Aggregion', function () {
         });
 
         it('should fail if script version already exists', async () => {
-            const bob = await makeAccount(bc, 'bob');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
             await contract.addscript(bob.account, 'script1', 'v2', 'Einstein function', 'def', 'http://eindef.com', bob.permission);
             await contract.addscript(bob.account, 'script1', 'v2', 'Einstein function', 'def', 'http://eindef.com', bob.permission)
@@ -212,8 +188,8 @@ describe('Aggregion', function () {
 
     describe('#approves', function () {
         it('should not be approved by default', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
+            const alice = await tools.makeAccount(bc, 'alice');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
             let approved = await util.isScriptApproved(alice.account, bob.account, 'script1', 'v1');
@@ -221,8 +197,8 @@ describe('Aggregion', function () {
 
         });
         it('should approve existing script', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
+            const alice = await tools.makeAccount(bc, 'alice');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
             await contract.approve(alice.account, bob.account, 'script1', 'v1', alice.permission);
@@ -230,8 +206,8 @@ describe('Aggregion', function () {
             assert.isTrue(approved);
         });
         it('should deny approved script', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
+            const alice = await tools.makeAccount(bc, 'alice');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
             await contract.approve(alice.account, bob.account, 'script1', 'v1', alice.permission);
@@ -240,8 +216,8 @@ describe('Aggregion', function () {
             assert.isFalse(approved);
         });
         it('should not update script if it is approved', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
+            const alice = await tools.makeAccount(bc, 'alice');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addscript(bob.account, 'script1', 'v1', 'Description', 'Hash', 'Url', bob.permission);
             await contract.approve(alice.account, bob.account, 'script1', 'v1', alice.permission);
@@ -252,8 +228,8 @@ describe('Aggregion', function () {
         });
 
         it('should not remove script if it is approved', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
+            const alice = await tools.makeAccount(bc, 'alice');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addscript(bob.account, 'script1', 'v1', 'Description', 'Hash', 'Url', bob.permission);
             await contract.approve(alice.account, bob.account, 'script1', 'v1', alice.permission);
@@ -266,8 +242,8 @@ describe('Aggregion', function () {
 
     describe('#requestslog', function () {
         it('should write one item to requests log table', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
+            const alice = await tools.makeAccount(bc, 'alice');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.sendreq(alice.account, bob.account, 82034, "my request", alice.permission);
             let rows = await util.getRequestsLog();
             let item = rows.pop();
@@ -277,8 +253,8 @@ describe('Aggregion', function () {
             assert.equal('my request', item.request);
         });
         it('should write several items to requests log table', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
+            const alice = await tools.makeAccount(bc, 'alice');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.sendreq(alice.account, bob.account, 82034, "my request 1", alice.permission);
             await contract.sendreq(alice.account, bob.account, 82035, "my request 2", alice.permission);
             await contract.sendreq(bob.account, alice.account, 82035, "my request 2", bob.permission);
@@ -286,8 +262,8 @@ describe('Aggregion', function () {
             assert.equal(3, rows.length);
         });
         it('should not write duplicates to requests log table', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
+            const alice = await tools.makeAccount(bc, 'alice');
+            const bob = await tools.makeAccount(bc, 'bob');
             await contract.sendreq(alice.account, bob.account, 82034, "my request 1", alice.permission);
             await contract.sendreq(alice.account, bob.account, 82034, "my request 1", alice.permission)
                 .should.be.rejected;
@@ -346,13 +322,13 @@ describe('Aggregion', function () {
             assert.equal(0, rows.length);
         });
         it('should deny insert for non-root accounts', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.catinsert(null, 'abc', alice.permission)
                 .should.be.rejected;
         });
         it('should deny remove for non-root accounts', async () => {
             await contract.catinsert(125, null, 'abc', aggregion.permission);
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.catremove(125, alice.permission)
                 .should.be.rejected;
         });
@@ -419,13 +395,13 @@ describe('Aggregion', function () {
             assert.equal(0, rows.length);
         });
         it('should deny insert vendor for non-root accounts', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.vendinsert(null, 'abc', alice.permission)
                 .should.be.rejected;
         });
         it('should deny remove for non-root accounts', async () => {
             await contract.vendinsert(125, 'abc', aggregion.permission);
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.vendremove(125, alice.permission)
                 .should.be.rejected;
         });
@@ -457,12 +433,12 @@ describe('Aggregion', function () {
             assert.equal(0, rows.length);
         });
         it('should deny insert brand for non-root accounts', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.brandinsert(224, 'abc', alice.permission)
                 .should.be.rejected;
         });
         it('should deny remove for non-root accounts', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.brandinsert(224, 'abc', aggregion.permission)
             await contract.brandremove(224, alice.permission)
                 .should.be.rejected;
@@ -557,13 +533,13 @@ describe('Aggregion', function () {
             await contract.regionremove(111, aggregion.permission);
         });
         it('should deny insert region for non-root accounts', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regioninsert(null, 'abc', alice.permission)
                 .should.be.rejected;
         });
         it('should deny remove for non-root accounts', async () => {
             await contract.regioninsert(125, 'abc', aggregion.permission);
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regionremove(125, alice.permission)
                 .should.be.rejected;
         });
@@ -621,13 +597,13 @@ describe('Aggregion', function () {
             await contract.citytyperem(2222, aggregion.permission);
         });
         it('should deny insert for non-root accounts', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regioninsert(null, 'abc', alice.permission)
                 .should.be.rejected;
         });
         it('should deny remove for non-root accounts', async () => {
             await contract.regioninsert(125, 'abc', aggregion.permission);
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regionremove(125, alice.permission)
                 .should.be.rejected;
         });
@@ -679,14 +655,14 @@ describe('Aggregion', function () {
             assert.equal(0, rows.length);
         });
         it('should deny insert for non-root accounts', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regioninsert(111, 'Europa', aggregion.permission);
             await contract.citytypeins(222, 'City', aggregion.permission);
             await contract.cityinsert(999, 111, 222, 'London', 125553, alice.permission)
                 .should.be.rejected;
         });
         it('should deny remove for non-root accounts', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regioninsert(111, 'Europa', aggregion.permission);
             await contract.citytypeins(222, 'City', aggregion.permission);
             await contract.cityinsert(999, 111, 222, 'London', 125553, aggregion.permission);

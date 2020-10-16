@@ -15,6 +15,7 @@ export declare class AggregionBlockchain {
     pushAction(contractAccount: any, actionName: any, requestObject: any, permission: any): Promise<void>;
     deploy(contractAccount: any, wasmPath: any, abiPath: any, permission: any): Promise<void>;
     newaccount(creatorName: any, accountName: any, ownerKey: any, activeKey: any, permission: any): Promise<void>;
+    newaccountram(creator: any, name: any, owner: any, active: any, net: any, cpu: any, transfer: any, bytes: any, permission: any): Promise<void>;
 }
 export declare class AggregionBlockchainUtility {
     constructor(api: any);

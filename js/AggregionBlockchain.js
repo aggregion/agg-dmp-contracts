@@ -31,6 +31,52 @@ class AggregionBlockchainUtility {
 
 };
 
+const requests = {
+
+    newaccount: function (creator, name, owner, active) {
+        return {
+            creator: creator,
+            name: name,
+            owner: {
+                threshold: 1,
+                keys: [{
+                    key: owner,
+                    weight: 1
+                }],
+                accounts: [],
+                waits: []
+            },
+            active: {
+                threshold: 1,
+                keys: [{
+                    key: active,
+                    weight: 1
+                }],
+                accounts: [],
+                waits: []
+            }
+        };
+    },
+
+    delegatebw: function (from, receiver, net, cpu, transfer) {
+        return {
+            from: from,
+            receiver: receiver,
+            stake_net_quantity: net,
+            stake_cpu_quantity: cpu,
+            transfer: transfer,
+        };
+    },
+
+    buyrambytes: function (payer, receiver, bytes) {
+        return {
+            payer: payer,
+            receiver: receiver,
+            bytes: bytes
+        };
+    }
+};
+
 
 class AggregionBlockchain {
 
@@ -51,6 +97,10 @@ class AggregionBlockchain {
             privateKey,
             publicKey: ecc.privateToPublic(privateKey)
         };
+    }
+
+    async getAccount(name) {
+        return await this.rpc.get_account(name);
     }
 
     async addPrivateKey(privateKey) {
@@ -114,18 +164,22 @@ class AggregionBlockchain {
         return result;
     }
 
-    async pushAction(contractAccount, actionName, requestObject, permission) {
+    createAction(contract, name, req, permission) {
         let [actorName, permissionLevel] = permission.split('@');
+        return {
+            account: contract,
+            name: name,
+            authorization: [{ actor: actorName, permission: permissionLevel }],
+            data: req,
+        };
+    }
+
+    async pushTransaction(actions) {
         let attempt = 0;
         while (true) {
             try {
                 const txinfo = await this.api.transact({
-                    actions: [{
-                        account: contractAccount,
-                        name: actionName,
-                        authorization: [{ actor: actorName, permission: permissionLevel }],
-                        data: requestObject,
-                    }]
+                    actions: actions
                 }, { blocksBehind: 1, expireSeconds: 30 });
                 if (this.debug) {
                     txinfo.processed.action_traces.forEach(trace => {
@@ -150,6 +204,11 @@ class AggregionBlockchain {
         }
     }
 
+    async pushAction(contract, name, req, permission) {
+        const action = this.createAction(contract, name, req, permission);
+        await this.pushTransaction([action]);
+    }
+
     async deploy(contractAccount, wasmPath, abiPath, permission) {
         const wasmHexString = fs.readFileSync(wasmPath).toString('hex');
         await this.pushAction('eosio', 'setcode', {
@@ -167,31 +226,23 @@ class AggregionBlockchain {
         }, permission);
     }
 
-    async newaccount(creatorName, accountName, ownerKey, activeKey, permission) {
-        await this.pushAction(creatorName, 'newaccount', {
-            creator: creatorName,
-            name: accountName,
-            owner: {
-                threshold: 1,
-                keys: [{
-                    key: ownerKey,
-                    weight: 1
-                }],
-                accounts: [],
-                waits: []
-            },
-            active: {
-                threshold: 1,
-                keys: [{
-                    key: activeKey,
-                    weight: 1
-                }],
-                accounts: [],
-                waits: []
-            },
-        }, permission);
+    async newaccount(creator, name, owner, active, permission) {
+        const nar = requests.newaccount(creator, name, owner, active);
+        const act = this.createAction('eosio', 'newaccount', nar, permission);
+        await this.pushTransaction([act]);
     }
 
+    async newaccountram(creator, name, owner, active, net, cpu, transfer, bytes, permission) {
+        const nar = requests.newaccount(creator, name, owner, active);
+        const dbr = requests.delegatebw(creator, name, net, cpu, transfer);
+        const brr = requests.buyrambytes(creator, name, bytes);
+
+        const acts = [];
+        acts.push(this.createAction('eosio', 'newaccount', nar, permission));
+        acts.push(this.createAction('eosio', 'delegatebw', dbr, permission));
+        acts.push(this.createAction('eosio', 'buyrambytes', brr, permission));
+        await this.pushTransaction(acts);
+    }
 };
 
 module.exports = AggregionBlockchain;
