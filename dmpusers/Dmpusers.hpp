@@ -67,12 +67,15 @@ namespace dmp {
       using users_table_t = eosio::multi_index<Names::UsersTable, Tables::Users>;
       using org_table_t   = eosio::multi_index<Names::OrganizationsTable, Tables::Organizations>;
 
+      [[eosio::action]] void newacc(eosio::name name, eosio::public_key ownerkey, eosio::public_key activekey);
+
       [[eosio::action]] void upsertorg(eosio::name name, std::string email, std::string description);
       [[eosio::action]] void removeorg(eosio::name name);
 
       [[eosio::action]] void registeruser(eosio::name orgname, eosio::name user, UserInfo info, EncryptionData data);
       [[eosio::action]] void updateuser(eosio::name orgname, eosio::name user, UserInfo info, EncryptionData data);
       [[eosio::action]] void removeuser(eosio::name orgname, eosio::name user);
+
 
    private:
       void upsertuser(UpsertCheck upsertCheck, eosio::name orgname, eosio::name user, const UserInfo& info, const EncryptionData& data);

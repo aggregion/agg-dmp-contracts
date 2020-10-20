@@ -34,6 +34,25 @@ class DmpusersContract {
     }
 
     /**
+     * Create organization account.
+     * @param {EosioName} name
+     * @param {string} ownerkey
+     * @param {string} activekey
+     * @param {permission} permission
+     */
+    async newacc(name, ownerkey, activekey, permission) {
+        check.assert.assigned(name, 'name is required');
+        check.assert.assigned(ownerkey, 'ownerkey is required');
+        check.assert.assigned(activekey, 'activekey is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.name = name;
+        request.ownerkey = ownerkey;
+        request.activekey = activekey;
+        return await this.bc.pushAction(this.contractName, "newacc", request, permission);
+    }
+
+    /**
      * Register new organization.
      * @param {EosioName} name
      * @param {string} email
@@ -42,6 +61,8 @@ class DmpusersContract {
      */
     async upsertorg(name, email, description, permission) {
         check.assert.assigned(name, 'name is required');
+        check.assert.assigned(email, 'email is required');
+        check.assert.assigned(description, 'description is required');
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.name = name;

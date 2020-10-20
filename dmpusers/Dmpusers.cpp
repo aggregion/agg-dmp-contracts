@@ -1,8 +1,25 @@
 #include "Dmpusers.hpp"
+#include <eosio.system/eosio.system.hpp>
+#include <eosio.system/native.hpp>
 
 
 namespace dmp {
 
+
+   void Dmpusers::newacc(eosio::name name, eosio::public_key ownerkey, eosio::public_key activekey) {
+      eosiosystem::native::newaccount_action newaccount{eosio::name{"eosio"}, {get_self(), eosio::name{"active"}}};
+      eosiosystem::authority owner{.threshold = 1, .keys = {{ownerkey, 1}}};
+      eosiosystem::authority active{.threshold = 1, .keys = {{activekey, 1}}};
+      newaccount.send(get_self(), name, owner, active);
+
+      eosiosystem::system_contract::buyrambytes_action buyram{eosio::name{"eosio"}, {get_self(), eosio::name{"active"}}};
+      const auto ramkb = 4 * 1024;
+      buyram.send(get_self(), name, ramkb);
+
+      eosiosystem::system_contract::delegatebw_action delegatebw{eosio::name{"eosio"}, {get_self(), eosio::name{"active"}}};
+      const auto agr = asset{50000, symbol{"AGR", 4}};
+      delegatebw.send(get_self(), name, agr, agr, false);
+   }
 
    void Dmpusers::upsertorg(eosio::name name, std::string email, std::string description) {
       require_auth(name);

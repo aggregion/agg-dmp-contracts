@@ -7,6 +7,7 @@ Prerequisites
 
 1. EOS v2.0.4 tools `cleos` and `keosd` accessible in path (https://github.com/EOSIO/eos/tree/release/2.0.x).
 1. EOSIO.CDT installed (https://github.com/EOSIO/eosio.cdt/tree/release/1.7.x)
+1. EOSIO contracts cloned (https://github.com/EOSIO/eosio.contracts)
 
 
 Environment variables
@@ -15,6 +16,7 @@ Environment variables
 
 # Example
 export EOSIO_CDT_ROOT=/opt/eosio.cdt/
+export EOS_CONTRACTS_ROOT=/home/user/eosio.contracts/
 export NODE_URL=http://testnet:8888
 ```
 

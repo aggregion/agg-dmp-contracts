@@ -2,6 +2,13 @@
 
 
 
+<h1 class="contract">newacc</h1>
+---
+spec-version: 0.0.1
+title: New account
+summary: Create account for organization.
+icon:
+
 <h1 class="contract">upsertorg</h1>
 ---
 spec-version: 0.0.1
