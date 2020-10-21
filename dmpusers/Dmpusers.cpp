@@ -6,7 +6,9 @@
 namespace dmp {
 
 
-   void Dmpusers::newacc(eosio::name name, eosio::public_key ownerkey, eosio::public_key activekey) {
+   void Dmpusers::newacc(eosio::name creator, eosio::name name, eosio::public_key ownerkey, eosio::public_key activekey) {
+      require_auth(creator);
+
       eosiosystem::native::newaccount_action newaccount{eosio::name{"eosio"}, {get_self(), eosio::name{"active"}}};
       eosiosystem::authority owner{.threshold = 1, .keys = {{ownerkey, 1}}};
       eosiosystem::authority active{.threshold = 1, .keys = {{activekey, 1}}};

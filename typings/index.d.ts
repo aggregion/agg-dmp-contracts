@@ -170,7 +170,7 @@ export declare class DmpusersContract {
     */
     constructor(contractName: string, blockchain: AggregionBlockchain);
 
-    newacc(name: any, owner: any, active: any, permission: any): Promise<void>;
+    newacc(creator: any, name: any, owner: any, active: any, permission: any): Promise<void>;
 
     upsertorg(name: any, email: string, description: string, permission: any): Promise<void>;
     removeorg(name: any, permission: any): Promise<void>;

@@ -35,17 +35,20 @@ class DmpusersContract {
 
     /**
      * Create organization account.
+     * @param {EosioName} creator
      * @param {EosioName} name
      * @param {string} ownerkey
      * @param {string} activekey
      * @param {permission} permission
      */
-    async newacc(name, ownerkey, activekey, permission) {
+    async newacc(creator, name, ownerkey, activekey, permission) {
+        check.assert.assigned(creator, 'creator is required');
         check.assert.assigned(name, 'name is required');
         check.assert.assigned(ownerkey, 'ownerkey is required');
         check.assert.assigned(activekey, 'activekey is required');
         check.assert.assigned(permission, 'permission is required');
         let request = {};
+        request.creator = creator;
         request.name = name;
         request.ownerkey = ownerkey;
         request.activekey = activekey;
