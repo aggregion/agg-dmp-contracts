@@ -1,5 +1,4 @@
 # Aggregion Contract
-## Version : 1.0.0
 
 # CODE
 
