@@ -4,7 +4,6 @@ const DmpusersContract = require('../js/DmpusersContract.js');
 const DmpusersUtility = require('../js/DmpusersUtility.js');
 const AggregionNode = require('../js/AggregionNode.js');
 const TestConfig = require('./TestConfig.js');
-const EncryptedData = require('../js/DmpusersContract.js');
 const UserInfo = require('../js/DmpusersContract.js');
 const tools = require('./TestTools.js');
 
@@ -25,11 +24,13 @@ describe('Dmpusers', function () {
     let util = new DmpusersUtility(contractConfig.account, bc);
     let contract = new DmpusersContract(contractConfig.account, bc);
     let dmpusers = null;
+    let aggregiondmp = null;
 
     this.timeout(0);
 
     beforeEach(async function () {
         await node.start();
+        aggregiondmp = await tools.makeAccount(bc, 'aggregiondmp');
         dmpusers = await tools.makeAccount(bc, contractConfig.account);
         await bc.deploy(dmpusers.account, contractConfig.wasm, contractConfig.abi, dmpusers.permission);
     });
@@ -43,202 +44,114 @@ describe('Dmpusers', function () {
         info.email = 'a@b.c';
         info.firstname = 'firstname';
         info.lastname = 'lastname';
-        info.other = 'other';
+        info.data = 'data';
         return info;
-    }
-
-    function anyEncryptedData() {
-        const data = new EncryptedData;
-        data.encrypted_info = "user private data";
-        data.encrypted_master_key = "master key";
-        data.salt = "salt";
-        data.hash_params = "{n=10}";
-        return data;
     }
 
     describe('#dmpusers', function () {
         it('should register new organization', async () => {
-            const org = await tools.makeAccount(bc, 'orgaccount');
-            await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
-            const stored = await util.getOrganization(org.account);
-            assert.equal(stored.name, 'orgaccount');
+            await contract.upsertorg('myorg', 'a@b.c', 'Abc', aggregiondmp.permission);
+            const stored = await util.getOrganization('myorg');
+            assert.equal(stored.name, 'myorg');
             assert.equal(stored.email, 'a@b.c');
             assert.equal(stored.description, 'Abc');
-            assert.equal(stored.users_count, 0);
         });
 
 
-        it('should remove organization without users', async () => {
-            const org = await tools.makeAccount(bc, 'orgaccount');
-            await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
-            (await util.isOrganizationExists(org.account)).should.be.true;
-            await contract.removeorg(org.account, org.permission);
-            (await util.isOrganizationExists(org.account)).should.be.false;
+        it('should update organization', async () => {
+            {
+                await contract.upsertorg('myorg', 'a@b.c', 'Abc', aggregiondmp.permission);
+                const stored = await util.getOrganization('myorg');
+                assert.equal(stored.name, 'myorg');
+                assert.equal(stored.email, 'a@b.c');
+                assert.equal(stored.description, 'Abc');
+            }
+            {
+                await contract.upsertorg('myorg', '1', '2', aggregiondmp.permission);
+                const stored = await util.getOrganization('myorg');
+                assert.equal(stored.name, 'myorg');
+                assert.equal(stored.email, '1');
+                assert.equal(stored.description, '2');
+            }
         });
 
 
-        it('should add user to organization', async () => {
-            const org = await tools.makeAccount(bc, 'orgaccount');
-            await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
+        it('should remove organization', async () => {
+            await contract.upsertorg('myorg', 'a@b.c', 'Abc', aggregiondmp.permission);
+            (await util.isOrganizationExists('myorg')).should.be.true;
+            await contract.removeorg('myorg', aggregiondmp.permission);
+            (await util.isOrganizationExists('myorg')).should.be.false;
+        });
 
+
+        it('should register new user', async () => {
             const info = new UserInfo;
             info.email = 'user@b.c';
             info.firstname = 'firstname';
             info.lastname = 'lastname';
-            info.other = '{"some":"other info"}';
-
-            const data = new EncryptedData;
-            data.encrypted_info = "user private data";
-            data.encrypted_master_key = "master key";
-            data.salt = "salt";
-            data.hash_params = "{n=10}";
-            await contract.registeruser(org.account, 'myuser', info, data, org.permission);
+            info.data = '{"some":"other info"}';
+            await contract.registeruser('myuser', info, aggregiondmp.permission);
 
             const user = await util.getUser('myuser');
             assert.equal(user.id, 'myuser');
-            assert.equal(user.orgname, 'orgaccount');
             assert.equal(user.info.email, 'user@b.c');
             assert.equal(user.info.firstname, 'firstname');
             assert.equal(user.info.lastname, 'lastname');
-            assert.equal(user.info.other, '{"some":"other info"}');
-            assert.equal(user.data.encrypted_info, 'user private data');
-            assert.equal(user.data.encrypted_master_key, 'master key');
-            assert.equal(user.data.salt, 'salt');
-            assert.equal(user.data.hash_params, '{n=10}');
+            assert.equal(user.info.data, '{"some":"other info"}');
         });
-
-
-        it('should keep in sync organization users counter', async () => {
-            const org = await tools.makeAccount(bc, 'orgaccount');
-            await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
-
-            let getCount = async function () {
-                return (await util.getOrganization(org.account)).users_count;
-            };
-
-            await contract.registeruser(org.account, 'a', anyUserInfo(), anyEncryptedData(), org.permission);
-            assert.equal(await getCount(), 1);
-
-            await contract.registeruser(org.account, 'b', anyUserInfo(), anyEncryptedData(), org.permission);
-            assert.equal(await getCount(), 2);
-
-            await contract.registeruser(org.account, 'c', anyUserInfo(), anyEncryptedData(), org.permission);
-            assert.equal(await getCount(), 3);
-
-            await contract.removeuser(org.account, 'a', org.permission);
-            assert.equal(await getCount(), 2);
-        });
-
 
         it('should keep users uniqueness', async () => {
-            const orgA = await tools.makeAccount(bc, 'orga');
-            await contract.upsertorg(orgA.account, 'a@a.a', 'AAA', orgA.permission);
-
-            const orgB = await tools.makeAccount(bc, 'orgb');
-            await contract.upsertorg(orgB.account, 'b@b.b', 'BBB', orgB.permission);
-
-            await contract.registeruser(orgA.account, 'myuser', anyUserInfo(), anyEncryptedData(), orgA.permission);
-            await contract.registeruser(orgA.account, 'myuser', anyUserInfo(), anyEncryptedData(), orgA.permission).should.be.rejected;
-            await contract.registeruser(orgB.account, 'myuser', anyUserInfo(), anyEncryptedData(), orgB.permission).should.be.rejected;
+            await contract.registeruser('myuser', anyUserInfo(), aggregiondmp.permission);
+            await contract.registeruser('myuser', anyUserInfo(), aggregiondmp.permission).should.be.rejected;
         });
 
 
-        it('should update organization user', async () => {
-            const org = await tools.makeAccount(bc, 'orgaccount');
-            await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
+        it('should update user info', async () => {
             {
                 const info = new UserInfo;
                 info.email = 'user@b.c';
                 info.firstname = 'firstname';
                 info.lastname = 'lastname';
-                info.other = 'other';
+                info.data = 'data';
+                await contract.registeruser('myuser', info, aggregiondmp.permission);
 
-                const data = new EncryptedData;
-                data.encrypted_info = "111";
-                data.encrypted_master_key = "222";
-                data.salt = "333";
-                data.hash_params = "444";
-
-                await contract.registeruser(org.account, 'myuser', info, data, org.permission);
                 const user = await util.getUser('myuser');
                 assert.equal(user.id, 'myuser');
-                assert.equal(user.orgname, 'orgaccount');
                 assert.equal(user.info.email, 'user@b.c');
                 assert.equal(user.info.firstname, 'firstname');
                 assert.equal(user.info.lastname, 'lastname');
-                assert.equal(user.info.other, 'other');
-                assert.equal(user.data.encrypted_info, '111');
-                assert.equal(user.data.encrypted_master_key, '222');
-                assert.equal(user.data.salt, '333');
-                assert.equal(user.data.hash_params, '444');
+                assert.equal(user.info.data, 'data');
             }
             {
                 const info = new UserInfo;
                 info.email = '1';
                 info.firstname = '2';
                 info.lastname = '3';
-                info.other = '4';
+                info.data = '4';
+                await contract.updateuser('myuser', info, aggregiondmp.permission);
 
-                const data = new EncryptedData;
-                data.encrypted_info = "AAA";
-                data.encrypted_master_key = "BBB";
-                data.salt = "CCC";
-                data.hash_params = "DDD";
-
-                await contract.updateuser(org.account, 'myuser', info, data, org.permission);
                 const user = await util.getUser('myuser');
                 assert.equal(user.id, 'myuser');
-                assert.equal(user.orgname, 'orgaccount');
                 assert.equal(user.info.email, '1');
                 assert.equal(user.info.firstname, '2');
                 assert.equal(user.info.lastname, '3');
-                assert.equal(user.info.other, '4');
-                assert.equal(user.data.encrypted_info, 'AAA');
-                assert.equal(user.data.encrypted_master_key, 'BBB');
-                assert.equal(user.data.salt, 'CCC');
-                assert.equal(user.data.hash_params, 'DDD');
+                assert.equal(user.info.data, '4');
             }
-            const stored = await util.getOrganization(org.account);
-            assert.equal(stored.users_count, 1);
         });
 
 
         it('should not update unknown user', async () => {
-            const org = await tools.makeAccount(bc, 'orgaccount');
-            await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
-            await contract.updateuser(org.account, 'myuser', anyUserInfo(), anyEncryptedData(), org.permission).should.be.rejected;
-        });
-
-
-        it('should not update foreign user', async () => {
-            const orgA = await tools.makeAccount(bc, 'orga');
-            await contract.upsertorg(orgA.account, 'a@a.a', 'AAA', orgA.permission);
-            await contract.registeruser(orgA.account, 'myuser', anyUserInfo(), anyEncryptedData(), orgA.permission);
-
-            const orgB = await tools.makeAccount(bc, 'orgb');
-            await contract.upsertorg(orgB.account, 'b@b.b', 'BBB', orgB.permission);
-            await contract.updateuser(orgB.account, 'myuser', anyUserInfo(), anyEncryptedData(), orgB.permission).should.be.rejected;
+            await contract.updateuser('myuser', anyUserInfo(), aggregiondmp.permission).should.be.rejected;
         });
 
 
         it('should remove organization user', async () => {
-            const org = await tools.makeAccount(bc, 'orgaccount');
-            await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
-
-            await contract.registeruser(org.account, 'myuser', anyUserInfo(), anyEncryptedData(), org.permission);
+            await contract.registeruser('myuser', anyUserInfo(), aggregiondmp.permission);
             (await util.isUserExists('myuser')).should.be.true;
 
-            await contract.removeuser(org.account, 'myuser', org.permission);
+            await contract.removeuser('myuser', aggregiondmp.permission);
             (await util.isUserExists('myuser')).should.be.false;
         });
 
-
-        it('should not remove organization with users', async () => {
-            const org = await tools.makeAccount(bc, 'orgaccount');
-            await contract.upsertorg(org.account, 'a@b.c', 'Abc', org.permission);
-            await contract.registeruser(org.account, 'myuser', anyUserInfo(), anyEncryptedData(), org.permission);
-
-            await contract.removeorg(org.account, org.permission).should.be.rejected;
-        });
     });
 });

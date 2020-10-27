@@ -154,13 +154,7 @@ export type UserInfo = {
     email: string;
     firstname: string;
     lastname: string;
-};
-
-export type EncryptedData = {
-    encrypted_info: string;
-    encrypted_master_key: string;
-    salt: string;
-    has_params: string;
+    data: string;
 };
 
 export declare class DmpusersContract {
@@ -170,14 +164,12 @@ export declare class DmpusersContract {
     */
     constructor(contractName: string, blockchain: AggregionBlockchain);
 
-    newacc(creator: any, name: any, owner: any, active: any, permission: any): Promise<void>;
-
     upsertorg(name: any, email: string, description: string, permission: any): Promise<void>;
     removeorg(name: any, permission: any): Promise<void>;
 
-    registeruser(orgname: any, name: any, info: UserInfo, data: EncryptedData, permission: any): Promise<void>;
-    updateuser(orgname: any, name: any, info: UserInfo, data: EncryptedData, permission: any): Promise<void>;
-    removeuser(orgname: any, name: any, permission: any): Promise<void>;
+    registeruser(name: any, info: UserInfo, permission: any): Promise<void>;
+    updateuser(name: any, info: UserInfo, permission: any): Promise<void>;
+    removeuser(name: any, permission: any): Promise<void>;
 }
 
 /// <reference types="node" />

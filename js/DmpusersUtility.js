@@ -16,7 +16,7 @@ class AggregionUtility {
     }
 
     async getOrganization(name) {
-        const rows = await this.tables.getTableByPrimaryKey('org', name);
+        const rows = await this.tables.getTableByPrimaryKey('orgs', name);
         return rows[0];
     }
 

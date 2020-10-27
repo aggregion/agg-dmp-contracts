@@ -7,20 +7,11 @@ class UserInfo {
         this.email = "";
         this.firstname = "";
         this.lastname = "";
-        this.other = "";
+        this.data = "";
     }
 };
 module.exports = UserInfo;
 
-class EncryptedData {
-    constructor() {
-        this.encrypted_info = "";
-        this.encrypted_master_key = "";
-        this.hash_params = "";
-        this.salt = "";
-    }
-};
-module.exports = EncryptedData;
 
 class DmpusersContract {
 
@@ -31,28 +22,6 @@ class DmpusersContract {
     constructor(contractName, blockchain) {
         this.contractName = contractName;
         this.bc = blockchain;
-    }
-
-    /**
-     * Create organization account.
-     * @param {EosioName} creator
-     * @param {EosioName} name
-     * @param {string} ownerkey
-     * @param {string} activekey
-     * @param {permission} permission
-     */
-    async newacc(creator, name, ownerkey, activekey, permission) {
-        check.assert.assigned(creator, 'creator is required');
-        check.assert.assigned(name, 'name is required');
-        check.assert.assigned(ownerkey, 'ownerkey is required');
-        check.assert.assigned(activekey, 'activekey is required');
-        check.assert.assigned(permission, 'permission is required');
-        let request = {};
-        request.creator = creator;
-        request.name = name;
-        request.ownerkey = ownerkey;
-        request.activekey = activekey;
-        return await this.bc.pushAction(this.contractName, "newacc", request, permission);
     }
 
     /**
@@ -88,69 +57,52 @@ class DmpusersContract {
     }
 
     /**
-     * Add user to organization.
-     * @param {EosioName} orgname
+     * Register user.
      * @param {EosioName} name
-     * @param {EncryptedData} data
+     * @param {string} info
      * @param {permission} permission
      */
-    async registeruser(orgname, user, info, data, permission) {
-        check.assert.assigned(orgname, 'orgname is required');
+    async registeruser(user, info, permission) {
         check.assert.assigned(user, 'user is required');
         check.assert.assigned(info.email, 'email is required');
         check.assert.assigned(info.firstname, 'firstname is required');
         check.assert.assigned(info.lastname, 'lastname is required');
-        check.assert.assigned(data.encrypted_info, 'data.encrypted_info is required');
-        check.assert.assigned(data.encrypted_master_key, 'data.encrypted_master_key is required');
-        check.assert.assigned(data.salt, 'data.salt is required');
-        check.assert.assigned(data.hash_params, 'data.hash_params is required');
+        check.assert.assigned(info.data, 'data is required');
         check.assert.assigned(permission, 'permission is required');
         let request = {};
-        request.orgname = orgname;
         request.user = user;
         request.info = info;
-        request.data = data;
         return await this.bc.pushAction(this.contractName, "registeruser", request, permission);
     }
 
     /**
-     * Update user in organization.
-     * @param {EosioName} orgname
+     * Update user information.
      * @param {EosioName} name
-     * @param {EncryptedData} data
+     * @param {string} info
      * @param {permission} permission
      */
-    async updateuser(orgname, user, info, data, permission) {
-        check.assert.assigned(orgname, 'orgname is required');
+    async updateuser(user, info, permission) {
         check.assert.assigned(user, 'user is required');
         check.assert.assigned(info.email, 'email is required');
         check.assert.assigned(info.firstname, 'firstname is required');
         check.assert.assigned(info.lastname, 'lastname is required');
-        check.assert.assigned(data.encrypted_info, 'data.encrypted_info is required');
-        check.assert.assigned(data.encrypted_master_key, 'data.encrypted_master_key is required');
-        check.assert.assigned(data.salt, 'data.salt is required');
-        check.assert.assigned(data.hash_params, 'data.hash_params is required');
+        check.assert.assigned(info.data, 'data is required');
         check.assert.assigned(permission, 'permission is required');
         let request = {};
-        request.orgname = orgname;
         request.user = user;
         request.info = info;
-        request.data = data;
         return await this.bc.pushAction(this.contractName, "updateuser", request, permission);
     }
 
     /**
-     * Remove user from organization.
-     * @param {EosioName} orgname
+     * Unregister user.
      * @param {EosioName} user
      * @param {permission} permission
      */
-    async removeuser(orgname, user, permission) {
-        check.assert.assigned(orgname, 'orgname is required');
+    async removeuser(user, permission) {
         check.assert.assigned(user, 'user is required');
         check.assert.assigned(permission, 'permission is required');
         let request = {};
-        request.orgname = orgname;
         request.user = user;
         return await this.bc.pushAction(this.contractName, "removeuser", request, permission);
     }

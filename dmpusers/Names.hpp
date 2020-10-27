@@ -14,7 +14,10 @@ namespace dmp {
       static constexpr const int64_t DefaultScope{name{"default"}.value};
       static constexpr const name Contract{"dmpusers"};
 
+      static constexpr const name AccountsTable{"accounts"};
       static constexpr const name UsersTable{"users"};
-      static constexpr const name OrganizationsTable{"org"};
+      static constexpr const name OrganizationsTable{"orgs"};
+
+      static constexpr const name Aggregion{"aggregiondmp"};
    };
 }
