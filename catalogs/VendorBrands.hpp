@@ -5,7 +5,7 @@
 #include <libc/bits/stdint.h>
 #include <optional>
 
-namespace catalogs {
+namespace catalogs::vendorbrands {
 
    struct Tables {
 

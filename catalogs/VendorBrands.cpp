@@ -2,7 +2,7 @@
 #include "Brands.hpp"
 #include "Vendors.hpp"
 
-namespace catalogs {
+namespace catalogs::vendorbrands {
 
    using catalogs::brands::brands_table_t;
    using catalogs::vendors::vendors_table_t;
