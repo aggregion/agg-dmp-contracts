@@ -2,10 +2,10 @@
 #include "Brands.hpp"
 #include "Vendors.hpp"
 
-namespace aggregion::vendorbrands {
+namespace catalogs {
 
-   using aggregion::brands::brands_table_t;
-   using aggregion::vendors::vendors_table_t;
+   using catalogs::brands::brands_table_t;
+   using catalogs::vendors::vendors_table_t;
 
    void VendorBrands::venbrbind(uint64_t vendor_id, uint64_t brand_id) {
       require_auth(Names::Contract);

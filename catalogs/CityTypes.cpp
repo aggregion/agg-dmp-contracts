@@ -1,6 +1,6 @@
 #include "CityTypes.hpp"
 
-namespace aggregion::citytypes {
+namespace catalogs::citytypes {
 
    void CityTypes::citytypeins(std::optional<uint64_t> id, std::string name) {
       require_auth(Names::Contract);

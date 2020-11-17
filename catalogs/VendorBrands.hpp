@@ -1,16 +1,15 @@
 #pragma once
 
 #include "Names.hpp"
-#include <eosio/crypto.hpp>
 #include <eosio/eosio.hpp>
 #include <libc/bits/stdint.h>
 #include <optional>
 
-namespace aggregion::vendorbrands {
+namespace catalogs {
 
    struct Tables {
 
-      struct [[eosio::table, eosio::contract("Aggregion")]] VendorBrands {
+      struct [[eosio::table, eosio::contract("Catalogs")]] VendorBrands {
          uint64_t id;
          uint64_t vendor_id;
          uint64_t brand_id;
@@ -33,7 +32,7 @@ namespace aggregion::vendorbrands {
    using vendorbrands_table_t = eosio::multi_index<Names::VendorBrandsTable, Tables::VendorBrands, vendorbrands_index_t>;
 
 
-   struct [[eosio::contract("Aggregion")]] VendorBrands : contract {
+   struct [[eosio::contract("Catalogs")]] VendorBrands : contract {
       using contract::contract;
 
       [[eosio::action]] void venbrbind(uint64_t vendor_id, uint64_t brand_id);

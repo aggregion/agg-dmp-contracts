@@ -1,12 +1,12 @@
 #include "Aggregion.hpp"
 
 
-namespace dmp {
+namespace aggregion {
 
    /// @brief
    /// Register provider service.
    void Aggregion::addsvc(name provider, name service, std::string description, std::string protocol, std::string type, std::string endpoint) {
-      require_auth(provider);
+      require_auth(Names::AggregionDmp);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       providers.require_find(provider.value, "404. Unknown provider!");
@@ -29,7 +29,7 @@ namespace dmp {
    /// @brief
    /// Update provider service.
    void Aggregion::updsvc(name provider, name service, std::string description, std::string protocol, std::string type, std::string endpoint) {
-      require_auth(provider);
+      require_auth(Names::AggregionDmp);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       providers.require_find(provider.value, "404. Unknown provider!");
@@ -50,7 +50,7 @@ namespace dmp {
    /// @brief
    /// Remove provider service.
    void Aggregion::remsvc(name provider, name service) {
-      require_auth(provider);
+      require_auth(Names::AggregionDmp);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       auto pit = providers.find(provider.value);
@@ -71,7 +71,7 @@ namespace dmp {
 
 
    void Aggregion::remove_provider_services(name provider) {
-      require_auth(provider);
+      require_auth(Names::AggregionDmp);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       providers.require_find(provider.value, "404. Unknown provider!");

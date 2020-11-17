@@ -1,12 +1,12 @@
 #include "Aggregion.hpp"
 
 
-namespace dmp {
+namespace aggregion {
 
    /// @brief
    /// Register service provider.
    void Aggregion::regprov(name provider, std::string description) {
-      require_auth(provider);
+      require_auth(Names::AggregionDmp);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       check(providers.find(provider.value) == providers.end(), "403. Provider already registered!");
@@ -22,7 +22,7 @@ namespace dmp {
    /// @brief
    /// Update provider description.
    void Aggregion::updprov(name provider, std::string description) {
-      require_auth(provider);
+      require_auth(Names::AggregionDmp);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       auto it = providers.require_find(provider.value, "404. Unknown provider!");
@@ -35,7 +35,7 @@ namespace dmp {
    /// @brief
    /// Unregister service provider.
    void Aggregion::unregprov(name provider) {
-      require_auth(provider);
+      require_auth(Names::AggregionDmp);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       auto it = providers.require_find(provider.value, "404. Unknown provider!");

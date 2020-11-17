@@ -5,7 +5,7 @@
 #include <eosio/eosio.hpp>
 #include <libc/bits/stdint.h>
 
-namespace dmp {
+namespace aggregion {
 
    struct Tables {
 

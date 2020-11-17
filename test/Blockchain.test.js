@@ -16,7 +16,7 @@ describe('AggregionBlockchain', function () {
 
     const config = new TestConfig(__dirname + '/config.json')
 
-    let node = new AggregionNode(config.getSignatureProvider(), config.node.endpoint, config.node.workdir);
+    let node = new AggregionNode(config.getSignatureProvider(), config.node.executable, config.node.endpoint, config.node.workdir);
     let bc = new AggregionBlockchain(config.getNodeUrl(), [config.blockchain.eosio_root_key.private], config.debug);
 
     this.timeout(0);

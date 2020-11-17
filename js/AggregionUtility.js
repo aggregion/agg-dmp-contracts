@@ -35,41 +35,6 @@ class AggregionUtility {
         return await this.tables.getTable('reqslog');
     }
 
-    async getCategories() {
-        return await this.tables.getTable('categories');
-    }
-
-    async getCategoryById(id) {
-        const rows = await this.tables.getTable('categories', id);
-        return rows[0];
-    }
-
-    async getSubcategories(parentId) {
-        return await this.tables.getTableBySecondaryKey('categories', parentId);
-    }
-
-    async getCategoryPath(id) {
-        let path = [null, null, null, null, null];
-        while (true) {
-            const rows = await this.tables.getTable('categories', id);
-            const category = rows[0];
-            path.push(category.name);
-            if (category.parent_id) {
-                id = category.parent_id;
-                continue;
-            }
-            break;
-        }
-        const base = path.length;
-        return {
-            a0: path[base - 1],
-            a1: path[base - 2],
-            a2: path[base - 3],
-            a3: path[base - 4],
-            a4: path[base - 5]
-        };
-    }
-
     async getProviderByName(name) {
         let data = await this.bc.getTableRows(this.contractAccount, 'providers', 'default', name);
         let scoped = data.rows.map(r => { r.scope = name; return r; });

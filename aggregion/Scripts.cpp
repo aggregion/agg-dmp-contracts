@@ -1,6 +1,6 @@
 #include "Aggregion.hpp"
 
-namespace dmp {
+namespace aggregion {
 
    uint64_t Aggregion::get_script_id(name owner, name script, name version) {
       scripts_table_t scripts{get_self(), owner.value};
@@ -15,7 +15,7 @@ namespace dmp {
    /// @brief
    /// Add new script.
    void Aggregion::addscript(name owner, name script, name version, std::string description, std::string hash, std::string url) {
-      require_auth(owner);
+      require_auth(Names::AggregionDmp);
 
       check(get_script_id(owner, script, version) == 0, "403. Script version already exist!");
 
@@ -36,7 +36,7 @@ namespace dmp {
    /// @brief
    /// Modify script if it is not approved.
    void Aggregion::updscript(name owner, name script, name version, std::string description, std::string hash, std::string url) {
-      require_auth(owner);
+      require_auth(Names::AggregionDmp);
 
       auto script_id = get_script_id(owner, script, version);
 
@@ -56,7 +56,7 @@ namespace dmp {
    /// @brief
    /// Remove script if it is not approved.
    void Aggregion::remscript(name owner, name script, name version) {
-      require_auth(owner);
+      require_auth(Names::AggregionDmp);
 
       auto id = get_script_id(owner, script, version);
 

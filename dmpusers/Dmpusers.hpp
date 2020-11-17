@@ -5,7 +5,7 @@
 #include <eosio/eosio.hpp>
 #include <libc/bits/stdint.h>
 
-namespace dmp {
+namespace dmpusers {
 
    struct UserInfo {
       std::string email;
@@ -54,8 +54,8 @@ namespace dmp {
 
       using contract::contract;
 
-      using users_table_t    = eosio::multi_index<Names::UsersTable, Tables::Users>;
-      using org_table_t      = eosio::multi_index<Names::OrganizationsTable, Tables::Organizations>;
+      using users_table_t = eosio::multi_index<Names::UsersTable, Tables::Users>;
+      using org_table_t = eosio::multi_index<Names::OrganizationsTable, Tables::Organizations>;
 
       [[eosio::action]] void upsertorg(eosio::name name, std::string email, std::string description);
       [[eosio::action]] void removeorg(eosio::name name);

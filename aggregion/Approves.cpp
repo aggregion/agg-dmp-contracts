@@ -1,10 +1,10 @@
 #include "Aggregion.hpp"
 
-namespace dmp {
+namespace aggregion {
 
 
    void Aggregion::upsert_approve(name provider, name owner, name script, name version, bool approved) {
-      require_auth(provider);
+      require_auth(Names::AggregionDmp);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       providers.require_find(provider.value, "404. Unknown provider!");
@@ -65,7 +65,7 @@ namespace dmp {
    }
 
    void Aggregion::remove_provider_scripts_approves(name provider) {
-      require_auth(provider);
+      require_auth(Names::AggregionDmp);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       providers.require_find(provider.value, "404. Unknown provider!");
@@ -81,9 +81,7 @@ namespace dmp {
          if (item->approved) {
             scripts_table_t scripts{get_self(), item->script_owner.value};
             auto script_item = scripts.require_find(item->script_id, "500. Approve has invalid reference to script item!");
-            scripts.modify(script_item, get_self(), [&](Tables::Scripts& row) {
-               row.approves_count--;
-            });
+            scripts.modify(script_item, get_self(), [&](Tables::Scripts& row) { row.approves_count--; });
          }
 
          // Erase the approve item.

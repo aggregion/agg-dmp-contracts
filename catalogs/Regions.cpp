@@ -1,6 +1,6 @@
 #include "Regions.hpp"
 
-namespace aggregion::regions {
+namespace catalogs::regions {
 
    void Regions::regioninsert(std::optional<uint64_t> id, std::string name) {
       require_auth(Names::Contract);

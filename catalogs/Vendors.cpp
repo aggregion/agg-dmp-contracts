@@ -1,6 +1,6 @@
 #include "Vendors.hpp"
 
-namespace aggregion::vendors {
+namespace catalogs::vendors {
 
    void Vendors::vendinsert(std::optional<uint64_t> id, std::string name) {
       require_auth(Names::Contract);

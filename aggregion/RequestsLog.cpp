@@ -1,12 +1,12 @@
 #include "RequestsLog.hpp"
 
-namespace dmp {
+namespace aggregion {
 
 
    /// @brief
    /// Add new 'request' item.
    void RequestsLog::sendreq(name sender, name receiver, int date, std::string request) {
-      require_auth(sender);
+      require_auth(Names::AggregionDmp);
 
       reqlog_table_t logreq{get_self(), Names::DefaultScope};
       auto idx = logreq.get_index<Names::RequestsLogIndex>();

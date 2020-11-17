@@ -3,23 +3,23 @@
 #include <eosio.system/native.hpp>
 
 
-namespace dmp {
+namespace dmpusers {
 
    void Dmpusers::upsertorg(eosio::name name, std::string email, std::string description) {
-      require_auth(Names::Aggregion);
+      require_auth(Names::AggregionDmp);
 
       org_table_t organizations{get_self(), Names::DefaultScope};
       auto it = organizations.find(name.value);
 
       if (it == organizations.end()) {
          organizations.emplace(get_self(), [&](auto& row) {
-            row.name        = name;
-            row.email       = email;
+            row.name = name;
+            row.email = email;
             row.description = description;
          });
       } else {
          organizations.modify(it, get_self(), [&](auto& row) {
-            row.email       = email;
+            row.email = email;
             row.description = description;
          });
       }
@@ -28,7 +28,7 @@ namespace dmp {
 
 
    void Dmpusers::removeorg(eosio::name name) {
-      require_auth(Names::Aggregion);
+      require_auth(Names::AggregionDmp);
       org_table_t organizations{get_self(), Names::DefaultScope};
       auto it = organizations.require_find(name.value, "404. Organization not found");
       organizations.erase(it);
@@ -36,7 +36,7 @@ namespace dmp {
    }
 
    void Dmpusers::upsertuser(UpsertCheck upsertCheck, eosio::name user, const UserInfo& info) {
-      require_auth(Names::Aggregion);
+      require_auth(Names::AggregionDmp);
 
       users_table_t users{get_self(), Names::DefaultScope};
       auto usrit = users.find(user.value);
@@ -54,8 +54,8 @@ namespace dmp {
 
       if (usrit == users.end()) {
          users.emplace(get_self(), [&](auto& row) {
-            row.id      = user;
-            row.info    = info;
+            row.id = user;
+            row.info = info;
          });
       } else {
          users.modify(usrit, get_self(), [&](auto& row) {
@@ -74,7 +74,7 @@ namespace dmp {
    }
 
    void Dmpusers::removeuser(eosio::name user) {
-      require_auth(Names::Aggregion);
+      require_auth(Names::AggregionDmp);
       users_table_t users{get_self(), Names::DefaultScope};
       auto usrit = users.require_find(user.value, "404. User not found");
       users.erase(usrit);

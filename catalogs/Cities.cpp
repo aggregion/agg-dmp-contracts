@@ -2,10 +2,10 @@
 #include "CityTypes.hpp"
 #include "Regions.hpp"
 
-namespace aggregion::cities {
+namespace catalogs::cities {
 
-   using aggregion::citytypes::citytypes_table_t;
-   using aggregion::regions::regions_table_t;
+   using catalogs::citytypes::citytypes_table_t;
+   using catalogs::regions::regions_table_t;
 
    void Cities::cityinsert(std::optional<uint64_t> id, uint64_t region_id, uint64_t type_id, std::string name, uint64_t population) {
       require_auth(Names::Contract);

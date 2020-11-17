@@ -134,20 +134,6 @@ export declare class AggregionContract {
      * @param {permission} permission
      */
     sendreq(sender: string, receiver: string, date: any, body: string, permission: any): Promise<void>;
-    /**
-     * Insert new entry to categories catalog.
-     * @param {String} id Entry ID may be null (auto assigned), must be unique
-     * @param {String} parent_id Parent Entry ID (may be null)
-     * @param {String} name
-     * @param {permission} permission
-     */
-    catinsert(id: string, parent_id: string, name: string, permission: any): Promise<void>;
-    /**
-     * Remove entry from categories catalog.
-     * @param {String} id
-     * @param {permission} permission
-     */
-    catremove(id: string, permission: any): Promise<void>;
 }
 
 export type UserInfo = {
@@ -198,16 +184,6 @@ export declare class AggregionUtility {
     getScripts(): Promise<any[]>;
     getApproves(): Promise<any[]>;
     getRequestsLog(): Promise<any[]>;
-    getCategories(): Promise<any[]>;
-    getCategoryById(id: any): Promise<any>;
-    getSubcategories(parentId: any): Promise<any[]>;
-    getCategoryPath(id: any): Promise<{
-        a0: any;
-        a1: any;
-        a2: any;
-        a3: any;
-        a4: any;
-    }>;
     getProviderByName(name: any): Promise<any>;
     isProviderExists(name: any): Promise<boolean>;
     getService(provider: any, service: any): Promise<any>;
@@ -225,5 +201,49 @@ export declare class DmpusersUtility {
     getUser(name: any): Promise<any>;
     isUserExists(name: any): Promise<boolean>;
 }
+
+
+export declare class CatalogsContract {
+    /**
+     * @param {EosioName} contractName
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractName: string, blockchain: AggregionBlockchain);
+
+    /**
+     * Insert new entry to categories catalog.
+     * @param {String} id Entry ID may be null (auto assigned), must be unique
+     * @param {String} parent_id Parent Entry ID (may be null)
+     * @param {String} name
+     * @param {permission} permission
+     */
+    catinsert(id: string, parent_id: string, name: string, permission: any): Promise<void>;
+    /**
+     * Remove entry from categories catalog.
+     * @param {String} id
+     * @param {permission} permission
+     */
+    catremove(id: string, permission: any): Promise<void>;
+}
+
+
+export declare class CatalogsUtility {
+    /**
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractAccount: any, blockchain: AggregionBlockchain);
+    getCategories(): Promise<any[]>;
+    getCategoryById(id: any): Promise<any>;
+    getSubcategories(parentId: any): Promise<any[]>;
+    getCategoryPath(id: any): Promise<{
+        a0: any;
+        a1: any;
+        a2: any;
+        a3: any;
+        a4: any;
+    }>;
+}
+
+
 
 export { }

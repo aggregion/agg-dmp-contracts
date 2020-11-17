@@ -10,3 +10,4 @@ set -x
 cleos -u $NODE_URL set contract aggregion aggregion/ Aggregion.wasm Aggregion.abi -p aggregion@active
 cleos -u $NODE_URL set contract dmpusers dmpusers/ Dmpusers.wasm Dmpusers.abi -p dmpusers@active
 cleos -u $NODE_URL set account permission dmpusers active --add-code
+cleos -u $NODE_URL set contract catalogs catalogs/ Catalogs.wasm Catalogs.abi -p catalogs@active

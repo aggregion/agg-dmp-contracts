@@ -22,6 +22,7 @@ endfunction(add_contract)
 
 add_contract(aggregion)
 add_contract(dmpusers)
+add_contract(catalogs)
 
 configure_file(${CMAKE_SOURCE_DIR}/scripts/deploy.sh.in deploy.sh @ONLY)
 

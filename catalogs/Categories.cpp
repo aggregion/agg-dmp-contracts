@@ -1,6 +1,6 @@
 #include "Categories.hpp"
 
-namespace aggregion {
+namespace catalogs {
 
 
    /// @brief

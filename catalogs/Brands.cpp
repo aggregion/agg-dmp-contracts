@@ -1,9 +1,9 @@
 #include "Brands.hpp"
 #include "Vendors.hpp"
 
-namespace aggregion::brands {
+namespace catalogs::brands {
 
-   using aggregion::vendors::vendors_table_t;
+   using catalogs::vendors::vendors_table_t;
 
    void Brands::brandinsert(std::optional<uint64_t> id, std::string name) {
       require_auth(Names::Contract);

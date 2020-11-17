@@ -13,7 +13,7 @@ function until(conditionFunction) {
 
 class AggregionNode {
 
-    constructor(signatureProvider, endpoint, workdir) {
+    constructor(signatureProvider, nodeos, endpoint, workdir) {
         let args = [];
         args.push('--signature-provider', signatureProvider);
         args.push('--plugin', 'eosio::producer_plugin');
@@ -33,12 +33,13 @@ class AggregionNode {
         args.push('--abi-serializer-max-time-ms', '1000');
         args.push('--max-transaction-time', '500');
 
+        this.nodeos = nodeos;
         this.args = args;
         this.log = fs.createWriteStream(workdir + "/node.log", { flags: 'w', autoClose: true });
     }
 
     async start() {
-        const instance = spawn('nodeos', this.args);
+        const instance = spawn(this.nodeos, this.args);
 
         instance.stdout.on('data', (data) => {
             this.log.write(`${data}`);

@@ -19,7 +19,7 @@ describe('Dmpusers', function () {
     const config = new TestConfig(__dirname + '/config.json')
     const contractConfig = config.contracts.dmpusers;
 
-    let node = new AggregionNode(config.getSignatureProvider(), config.node.endpoint, config.node.workdir);
+    let node = new AggregionNode(config.getSignatureProvider(), config.node.executable, config.node.endpoint, config.node.workdir);
     let bc = new AggregionBlockchain(config.getNodeUrl(), [config.blockchain.eosio_root_key.private], config.debug);
     let util = new DmpusersUtility(contractConfig.account, bc);
     let contract = new DmpusersContract(contractConfig.account, bc);

@@ -4,7 +4,7 @@ IndentWidth: 3
 ColumnLimit: 160
 PointerAlignment: Left
 AlwaysBreakTemplateDeclarations: true
-AlignConsecutiveAssignments: true
+AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 BreakConstructorInitializers: BeforeComma
 NamespaceIndentation: All

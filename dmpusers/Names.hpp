@@ -1,23 +1,21 @@
 #pragma once
 
-#include <eosio/crypto.hpp>
+#include "../common/Names.hpp"
 #include <eosio/eosio.hpp>
-#include <libc/bits/stdint.h>
 
-namespace dmp {
+namespace dmpusers {
 
    using namespace eosio;
 
    /// @brief
    /// Contract fixed names.
-   struct Names {
-      static constexpr const int64_t DefaultScope{name{"default"}.value};
+   namespace Names {
+      using namespace common::Names;
+
       static constexpr const name Contract{"dmpusers"};
 
       static constexpr const name AccountsTable{"accounts"};
       static constexpr const name UsersTable{"users"};
       static constexpr const name OrganizationsTable{"orgs"};
-
-      static constexpr const name Aggregion{"aggregiondmp"};
    };
 }

@@ -1,16 +1,14 @@
 #pragma once
 
 #include "Names.hpp"
-#include <eosio/crypto.hpp>
 #include <eosio/eosio.hpp>
-#include <libc/bits/stdint.h>
 #include <optional>
 
-namespace aggregion::cities {
+namespace catalogs::cities {
 
    struct Tables {
 
-      struct [[eosio::table, eosio::contract("Aggregion")]] Cities {
+      struct [[eosio::table, eosio::contract("Catalogs")]] Cities {
          uint64_t id;
          std::string name;
          uint64_t region_id;
@@ -31,7 +29,7 @@ namespace aggregion::cities {
    using cities_table_t = eosio::multi_index<Names::CitiesTable, Tables::Cities, cities_byregion_index_t>;
 
 
-   struct [[eosio::contract("Aggregion")]] Cities : contract {
+   struct [[eosio::contract("Catalogs")]] Cities : contract {
       using contract::contract;
 
       [[eosio::action]] void cityinsert(std::optional<uint64_t> id, uint64_t region_id, uint64_t type_id, std::string name, uint64_t population);

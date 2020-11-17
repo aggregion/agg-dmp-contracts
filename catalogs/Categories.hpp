@@ -1,19 +1,17 @@
 #pragma once
 
 #include "Names.hpp"
-#include <eosio/crypto.hpp>
 #include <eosio/eosio.hpp>
-#include <libc/bits/stdint.h>
 #include <optional>
 
-namespace aggregion {
+namespace catalogs {
 
    struct Tables {
 
       /// @brief
       /// Categories catalog.
       /// Scope: Default.
-      struct [[eosio::table, eosio::contract("Aggregion")]] Categories {
+      struct [[eosio::table, eosio::contract("Catalogs")]] Categories {
          uint64_t id;
          uint64_t parent_id;
          std::string name;
@@ -34,7 +32,7 @@ namespace aggregion {
 
    /// @brief
    /// Aggregion categories catalog.
-   struct [[eosio::contract("Aggregion")]] Categories : contract {
+   struct [[eosio::contract("Catalogs")]] Categories : contract {
       using contract::contract;
 
       [[eosio::action]] void catinsert(std::optional<uint64_t> id, std::optional<uint64_t> parent_id, std::string name);
