@@ -34,6 +34,16 @@ class AggregionUtility {
         let u = await this.getUser(name);
         return typeof u != 'undefined';
     };
+
+    async getPublicKey(owner) {
+        const rows = await this.tables.getTableByPrimaryKey('pkeys', owner);
+        return rows[0];
+    }
+
+    async isPublicKeyExists(owner) {
+        let u = await this.getPublicKey(owner);
+        return typeof u != 'undefined';
+    };
 };
 
 module.exports = AggregionUtility;

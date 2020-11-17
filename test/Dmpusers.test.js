@@ -153,5 +153,20 @@ describe('Dmpusers', function () {
             (await util.isUserExists('myuser')).should.be.false;
         });
 
+
+        it('should keep provider public key', async () => {
+            await contract.upsertpkey('myprovider', 'MYPUBLICKEY', aggregiondmp.permission);
+
+            const pkey = await util.getPublicKey('myprovider');
+            assert.equal(pkey.owner, 'myprovider');
+            assert.equal(pkey.key, 'MYPUBLICKEY');
+        });
+
+        it('should remove provider public key', async () => {
+            await contract.upsertpkey('myprovider', 'MYPUBLICKEY', aggregiondmp.permission);
+            await contract.removepkey('myprovider', aggregiondmp.permission);
+
+            (await util.isPublicKeyExists('myprovider')).should.be.false;
+        });
     });
 });

@@ -44,4 +44,18 @@ title: Remove user
 summary: Remove user from organization.
 icon:
 
+<h1 class="contract">upsertpkey</h1>
+---
+spec-version: 0.0.1
+title: Add/Update provider public key
+summary: Add or update provider public key.
+icon:
+
+<h1 class="contract">removepkey</h1>
+---
+spec-version: 0.0.1
+title: Remove provider public key
+summary: Remove provider public key.
+icon:
+
 

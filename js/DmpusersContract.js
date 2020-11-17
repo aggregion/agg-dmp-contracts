@@ -107,6 +107,35 @@ class DmpusersContract {
         return await this.bc.pushAction(this.contractName, "removeuser", request, permission);
     }
 
+    /**
+     * Upsert provider public key.
+     * @param {EosioName} owner
+     * @param {string} key
+     * @param {permission} permission
+     */
+    async upsertpkey(owner, key, permission) {
+        check.assert.assigned(owner, 'owner is required');
+        check.assert.assigned(key, 'key is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.owner = owner;
+        request.key = key;
+        return await this.bc.pushAction(this.contractName, "upsertpkey", request, permission);
+    }
+
+    /**
+     * Remove provider public key.
+     * @param {EosioName} user
+     * @param {permission} permission
+     */
+    async removepkey(owner, permission) {
+        check.assert.assigned(owner, 'owner is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.owner = owner;
+        return await this.bc.pushAction(this.contractName, "removepkey", request, permission);
+    }
+
 };
 
 module.exports = DmpusersContract;

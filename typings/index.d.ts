@@ -156,6 +156,9 @@ export declare class DmpusersContract {
     registeruser(name: any, info: UserInfo, permission: any): Promise<void>;
     updateuser(name: any, info: UserInfo, permission: any): Promise<void>;
     removeuser(name: any, permission: any): Promise<void>;
+
+    upsertpkey(owner: any, key: any, permission: any): Promise<void>;
+    removepkey(owner: any, permission: any): Promise<void>;
 }
 
 /// <reference types="node" />
@@ -200,6 +203,8 @@ export declare class DmpusersUtility {
     isOrganizationExists(name: any): Promise<boolean>;
     getUser(name: any): Promise<any>;
     isUserExists(name: any): Promise<boolean>;
+    getPublicKey(owner: any): Promise<any>;
+    isPublicKeyExists(owner: any): Promise<boolean>;
 }
 
 

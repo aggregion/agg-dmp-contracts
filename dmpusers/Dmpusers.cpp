@@ -80,4 +80,34 @@ namespace dmpusers {
       users.erase(usrit);
       print("Success. User: '", user, "' was removed");
    }
+
+
+   void Dmpusers::upsertpkey(eosio::name owner, std::string key) {
+      require_auth(Names::AggregionDmp);
+
+      pkeys_table_t pkeys{get_self(), Names::DefaultScope};
+      auto it = pkeys.find(owner.value);
+
+      if (it == pkeys.end()) {
+         pkeys.emplace(get_self(), [&](auto& row) {
+            row.owner = owner;
+            row.key = key;
+         });
+      } else {
+         pkeys.modify(it, get_self(), [&](auto& row) {
+            row.key = key; //
+         });
+      }
+      print("Success. Owner: '", owner, "' key: '", key, "'");
+   }
+
+   void Dmpusers::removepkey(eosio::name owner) {
+      require_auth(Names::AggregionDmp);
+      pkeys_table_t pkeys{get_self(), Names::DefaultScope};
+      auto it = pkeys.require_find(owner.value, "404. Not found");
+      pkeys.erase(it);
+      print("Success. Public key owned by '", owner, "' was removed");
+   }
+
+
 }

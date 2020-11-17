@@ -17,5 +17,6 @@ namespace dmpusers {
       static constexpr const name AccountsTable{"accounts"};
       static constexpr const name UsersTable{"users"};
       static constexpr const name OrganizationsTable{"orgs"};
+      static constexpr const name PublicKeysTable{"pkeys"};
    };
 }
