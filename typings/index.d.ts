@@ -9,7 +9,7 @@ export declare class AggregionBlockchain {
     getTableRows(contractAccount: any, tableName: any, scopeName: any, primaryKeyValue?: any): Promise<{
         rows: any[];
     }>;
-    getTableRowsBySecondaryKey(contractAccount: any, tableName: any, scopeName: any, fromKey: any, toKey: any): Promise<{
+    getTableRowsByIndex(contractAccount: any, tableName: any, scopeName: any, indexPosition: any, keyType: any, fromKey: any, toKey: any): Promise<{
         rows: any[];
     }>;
     pushAction(contractAccount: any, actionName: any, requestObject: any, permission: any): Promise<void>;
@@ -174,7 +174,7 @@ export declare class TablesUtility {
     */
     constructor(contractAccount: any, blockchain: AggregionBlockchain);
     getTable(tableName: any, id?: any): Promise<any[]>;
-    getTableBySecondaryKey(tableName: any, keyValue: any): Promise<any[]>;
+    getTableByIndex(tableName: any, indexPosition: any, keyType: any, keyValue: any): Promise<any[]>;
 }
 
 export declare class AggregionUtility {
@@ -191,7 +191,10 @@ export declare class AggregionUtility {
     isProviderExists(name: any): Promise<boolean>;
     getService(provider: any, service: any): Promise<any>;
     getScript(owner: any, script: any, version: any): Promise<any>;
-    isScriptApproved(provider: any, owner: any, script: any, version: any): Promise<boolean>;
+    getScriptByHash(hash: any): Promise<boolean>;
+    isTrusted(truster: any, trustee: any): Promise<boolean>;
+    isScriptApprovedBy(provider: any, hash: any): Promise<boolean>;
+    isScriptAccessGrantedTo(grantee: any, hash: any): Promise<boolean>;
 }
 
 export declare class DmpusersUtility {

@@ -24,7 +24,7 @@ class CatalogsUtility {
     }
 
     async getSubcategories(parentId) {
-        return await this.tables.getTableBySecondaryKey('categories', parentId);
+        return await this.tables.getTableByIndex('categories', 2, 'i64', parentId);
     }
 
     async getCategoryPath(id) {
@@ -70,7 +70,7 @@ class CatalogsUtility {
     }
 
     async getRegionCities(region_id) {
-        return await this.tables.getTableBySecondaryKey('cities', region_id);
+        return await this.tables.getTableByIndex('cities', 2, 'i64', region_id);
     }
 };
 

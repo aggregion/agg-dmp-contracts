@@ -138,7 +138,7 @@ class AggregionBlockchain {
         return result;
     }
 
-    async getTableRowsBySecondaryKey(contractAccount, tableName, scopeName, fromKey, toKey) {
+    async getTableRowsByIndex(contractAccount, tableName, scopeName, indexPosition, keyType, fromKey, toKey) {
         let result = {
             rows: []
         };
@@ -149,8 +149,8 @@ class AggregionBlockchain {
                 code: contractAccount,
                 scope: scopeName,
                 table: tableName,
-                index_position: "secondary",
-                key_type: "i64",
+                index_position: indexPosition,
+                key_type: keyType,
                 lower_bound: lowerBound,
                 upper_bound: upperBound,
                 json: true,

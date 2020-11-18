@@ -17,9 +17,14 @@ namespace aggregion {
 
       static constexpr const name ProvidersTable{"providers"};
       static constexpr const name ServicesTable{"services"};
+
       static constexpr const name ScriptsTable{"scripts"};
-      static constexpr const name ScriptsIndex{"approvesidx"};
-      static constexpr const name ApprovesTable{"approves"};
+      static constexpr const name ScriptsVersionIndex{"scrveridx"};
+      static constexpr const name ScriptsHashIndex{"scrhashidx"};
+
+      static constexpr const name TrustedProvidersTable{"trustedprov"};
+      static constexpr const name ScriptApprovesTable{"approves"};
+      static constexpr const name ScriptAccessTable{"scriptaccess"};
 
       static constexpr const name RequestsLogTable{"reqslog"};
       static constexpr const name RequestsLogIndex{"reqslogidx"};

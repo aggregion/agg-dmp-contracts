@@ -30,12 +30,12 @@ class TablesUtility {
         return await this.getTable(tableName, id);
     }
 
-    async getTableBySecondaryKey(tableName, keyValue) {
+    async getTableByIndex(tableName, indexPosition, keyType, keyValue) {
         check.assert.assigned(keyValue, 'secondary key value is required');
         let scopes = await this.bc.getScopes(this.contractAccount, tableName);
         let rows = [];
         for (const item of scopes.rows) {
-            let data = await this.bc.getTableRowsBySecondaryKey(this.contractAccount, tableName, item.scope, keyValue, keyValue);
+            let data = await this.bc.getTableRowsByIndex(this.contractAccount, tableName, item.scope, indexPosition, keyType, keyValue, keyValue);
             let scoped = data.rows.map(r => { r.scope = item.scope; return r; });
             rows.push(...scoped);
         };

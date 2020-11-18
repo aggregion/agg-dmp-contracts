@@ -1,4 +1,4 @@
-
+const crypto = require('crypto');
 const check = require('check-types');
 const AggregionBlockchain = require('./AggregionBlockchain.js');
 const TablesUtility = require('./TablesUtility.js');
@@ -28,7 +28,7 @@ class AggregionUtility {
     }
 
     async getApproves() {
-        return await this.tables.getTable('approves');
+        return await this.tables.getTable('scriptapprvs');
     }
 
     async getRequestsLog() {
@@ -52,39 +52,35 @@ class AggregionUtility {
     }
 
     async getScript(owner, script, version) {
-        let scripts = await this.getScripts();
-        return scripts.filter(s => s.scope == owner && s.script == script && s.version == version)[0];
+        const hash = crypto.createHash('sha256').update(owner + script + version).digest('hex');
+        const result = await this.bc.getTableRowsByIndex(this.contractAccount, 'scripts', 'default', 2, 'sha256', hash, hash);
+        return result.rows[0];
     }
 
-    async isScriptApproved(provider, owner, script, version) {
-        let scriptObject = await this.getScript(owner, script, version);
-        let approves = await this.getApproves();
-        let approvalState = approves.filter(s => s.scope == provider && s.script_id == scriptObject.id)[0];
-        return typeof approvalState != 'undefined' && approvalState.approved == 1;
+    async getScriptByHash(hash) {
+        return await this.tables.getTableByIndex('scripts', 3, 'sha256', hash);
     }
 
-    async getVendors() {
-        return await this.tables.getTable('vendors');
+    async isTrusted(truster, trustee) {
+        const result = await this.bc.getTableRows(this.contractAccount, 'trustedprov', truster, trustee);
+        const item = result.rows[0];
+        return typeof item != 'undefined' && item.trust == 1;
     }
 
-    async getBrands() {
-        return await this.tables.getTable('brands');
+    async isScriptApprovedBy(provider, hash) {
+        const script = await this.getScriptByHash(hash);
+        const result = await this.bc.getTableRows(this.contractAccount, 'approves', provider, script.id);
+        check.assert.lessOrEqual(result.rows.length, 1);
+        const item = result.rows[0];
+        return typeof item != 'undefined' && item.approved == 1;
     }
 
-    async getRegions() {
-        return await this.tables.getTable('regions');
-    }
-
-    async getCityTypes() {
-        return await this.tables.getTable('citytypes');
-    }
-
-    async getCities() {
-        return await this.tables.getTable('cities');
-    }
-
-    async getRegionCities(region_id) {
-        return await this.tables.getTableBySecondaryKey('cities', region_id);
+    async isScriptAccessGrantedTo(grantee, hash) {
+        const script = await this.getScriptByHash(hash);
+        const result = await this.bc.getTableRows(this.contractAccount, 'scriptaccess', grantee, script.id);
+        check.assert.lessOrEqual(result.rows.length, 1);
+        const item = result.rows[0];
+        return typeof item == 'undefined' || item.granted == 1;
     }
 };
 

@@ -41,7 +41,6 @@ namespace aggregion {
       auto it = providers.require_find(provider.value, "404. Unknown provider!");
 
       remove_provider_services(provider);
-      remove_provider_scripts_approves(provider);
 
       // check(!provider_has_services(provider), "Provider has refs to services. Remove services first!");
       // check(!provider_has_approves(provider), "Provider has refs to approves. Remove approves first!");

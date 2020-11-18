@@ -1,27 +1,39 @@
-#include "Aggregion.hpp"
+#include "Scripts.hpp"
 
-namespace aggregion {
+namespace aggregion::scripts {
 
-   uint64_t Aggregion::get_script_id(name owner, name script, name version) {
-      scripts_table_t scripts{get_self(), owner.value};
-      auto idx = scripts.get_index<Names::ScriptsIndex>();
-      auto ait = idx.find(pack128t(script, version));
+   std::optional<uint64_t> get_script_id(name self, name owner, name script, name version) {
+      Tables::scripts_table_t scripts{self, Names::DefaultScope};
+      auto idx = scripts.get_index<Names::ScriptsVersionIndex>();
+      auto ait = idx.find(hash3s(owner, script, version));
       if (ait == idx.end()) {
-         return 0;
+         return std::nullopt;
+      }
+      return ait->id;
+   }
+
+   std::optional<uint64_t> get_script_id(name self, checksum256 hash) {
+      Tables::scripts_table_t scripts{self, Names::DefaultScope};
+      auto idx = scripts.get_index<Names::ScriptsHashIndex>();
+      auto ait = idx.find(hash);
+      if (ait == idx.end()) {
+         return std::nullopt;
       }
       return ait->id;
    }
 
    /// @brief
    /// Add new script.
-   void Aggregion::addscript(name owner, name script, name version, std::string description, std::string hash, std::string url) {
+   void Scripts::addscript(name owner, name script, name version, std::string description, checksum256 hash, std::string url) {
       require_auth(Names::AggregionDmp);
 
-      check(get_script_id(owner, script, version) == 0, "403. Script version already exist!");
+      check(get_script_id(get_self(), owner, script, version) == std::nullopt, "403. Script version already exist!");
+      check(get_script_id(get_self(), hash) == std::nullopt, "403. Script hash already exist!");
 
-      scripts_table_t scripts{get_self(), owner.value};
-      scripts.emplace(get_self(), [&](Tables::Scripts& row) {
+      Tables::scripts_table_t scripts{get_self(), Names::DefaultScope};
+      scripts.emplace(get_self(), [&](Def::Scripts& row) {
          row.id = scripts.available_primary_key();
+         row.owner = owner;
          row.script = script;
          row.version = version;
          row.description = description;
@@ -35,16 +47,18 @@ namespace aggregion {
 
    /// @brief
    /// Modify script if it is not approved.
-   void Aggregion::updscript(name owner, name script, name version, std::string description, std::string hash, std::string url) {
+   void Scripts::updscript(name owner, name script, name version, std::string description, checksum256 hash, std::string url) {
       require_auth(Names::AggregionDmp);
 
-      auto script_id = get_script_id(owner, script, version);
+      auto id = get_script_id(get_self(), owner, script, version);
+      check(id.has_value(), "404. Script version not found");
 
-      scripts_table_t scripts{get_self(), owner.value};
-      auto item = scripts.require_find(script_id, "500. Script version was not found!");
+      Tables::scripts_table_t scripts{get_self(), Names::DefaultScope};
+      auto item = scripts.require_find(id.value(), "500. Script not found!");
       check(item->approves_count == 0, "403. Can't update script. Script was approved!");
+      check(item->owner == owner, "403. Wrong owner");
 
-      scripts.modify(item, get_self(), [&](Tables::Scripts& row) {
+      scripts.modify(item, get_self(), [&](Def::Scripts& row) {
          row.description = description;
          row.hash = hash;
          row.url = url;
@@ -55,14 +69,16 @@ namespace aggregion {
 
    /// @brief
    /// Remove script if it is not approved.
-   void Aggregion::remscript(name owner, name script, name version) {
+   void Scripts::remscript(name owner, name script, name version) {
       require_auth(Names::AggregionDmp);
 
-      auto id = get_script_id(owner, script, version);
+      auto id = get_script_id(get_self(), owner, script, version);
+      check(id.has_value(), "404. Script version not found");
 
-      scripts_table_t scripts{get_self(), owner.value};
-      auto item = scripts.require_find(id, "Script version was not found!");
+      Tables::scripts_table_t scripts{get_self(), Names::DefaultScope};
+      auto item = scripts.require_find(id.value(), "500. Script not found!");
       check(item->approves_count == 0, "403. Can't remove script. Script was approved!");
+      check(item->owner == owner, "403. Wrong owner!");
 
       scripts.erase(item);
       print("Script '", script, "', version '", version, "' was removed by '", owner, "'");

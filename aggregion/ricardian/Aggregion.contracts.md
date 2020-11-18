@@ -72,17 +72,47 @@ icon:
 
 
 
-<h1 class="contract">approve</h1>
+<h1 class="contract">trust</h1>
+---
+spec-version: 0.0.1
+title: Trust provider
+summary:
+icon:
+
+<h1 class="contract">untrust</h1>
+---
+spec-version: 0.0.1
+title: Untrust provider.
+summary:
+icon:
+
+
+<h1 class="contract">execapprove</h1>
 ---
 spec-version: 0.0.1
 title: Approve script execution.
 summary:
 icon:
 
-<h1 class="contract">deny</h1>
+<h1 class="contract">execdeny</h1>
 ---
 spec-version: 0.0.1
 title: Deny script execution.
+summary:
+icon:
+
+
+<h1 class="contract">grantaccess</h1>
+---
+spec-version: 0.0.1
+title: Grant access to script.
+summary:
+icon:
+
+<h1 class="contract">denyaccess</h1>
+---
+spec-version: 0.0.1
+title: Deny access to script.
 summary:
 icon:
 
