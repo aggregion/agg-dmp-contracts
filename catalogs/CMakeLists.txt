@@ -11,6 +11,7 @@ add_contract(Catalogs Catalogs
     CityTypes.cpp
     Regions.cpp
     VendorBrands.cpp
-    Vendors.cpp)
+    Vendors.cpp
+)
 
 target_compile_options(Catalogs PUBLIC -R${CMAKE_SOURCE_DIR}/ricardian)
