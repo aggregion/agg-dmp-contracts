@@ -107,24 +107,57 @@ export declare class AggregionContract {
      * @param {permission} permission
      */
     remscript(user: any, script: any, version: any, permission: any): Promise<void>;
+
+    /**
+     * Trust provider.
+     * @param {EosioName} truster
+     * @param {EosioName} trustee
+     * @param {permission} permission
+     */
+    trust(truster: any, trustee: any, permission: any): Promise<void>;
+
+    /**
+     * Untrust provider.
+     * @param {EosioName} truster
+     * @param {EosioName} trustee
+     * @param {permission} permission
+     */
+    untrust(truster: any, trustee: any, permission: any): Promise<void>;
+
     /**
      * Approve execution of user script.
      * @param {EosioName} provider
-     * @param {EosioName} script_owner
-     * @param {EosioName} script
-     * @param {EosioName} version
+     * @param {string} script_hash
      * @param {permission} permission
      */
-    approve(provider: any, script_owner: any, script: any, version: any, permission: any): Promise<void>;
+    execapprove(provider: any, script_hash: any, permission: any): Promise<void>;
+
     /**
      * Deny execution of user script.
      * @param {EosioName} provider
-     * @param {EosioName} script_owner
-     * @param {EosioName} script
-     * @param {EosioName} version
+     * @param {string} script_hash
      * @param {permission} permission
      */
-    deny(provider: any, script_owner: any, script: any, version: any, permission: any): Promise<void>;
+    execdeny(provider: any, script_hash: any, permission: any): Promise<void>;
+
+    /**
+     * Grant provider access to script.
+     * @param {EosioName} owner
+     * @param {string} script_hash
+     * @param {EosioName} grantee
+     * @param {permission} permission
+     */
+    grantaccess(owner: any, script_hash: any, grantee: any, permission: any): Promise<void>;
+
+    /**
+     * Deny provider access to script.
+     * @param {EosioName} owner
+     * @param {string} script_hash
+     * @param {EosioName} grantee
+     * @param {permission} permission
+     */
+    denyaccess(owner: any, script_hash: any, grantee: any, permission: any): Promise<void>;
+
     /**
      * Log request.
      * @param {String} sender
