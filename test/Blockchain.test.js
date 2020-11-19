@@ -1,7 +1,6 @@
 
 const AggregionBlockchain = require('../js/AggregionBlockchain.js');
 const AggregionNode = require('../js/AggregionNode.js');
-
 const TestConfig = require('./TestConfig.js');
 
 const chai = require('chai')

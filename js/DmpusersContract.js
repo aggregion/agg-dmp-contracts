@@ -2,17 +2,6 @@ const check = require('check-types');
 
 const AggregionBlockchain = require('./AggregionBlockchain.js');
 
-class UserInfo {
-    constructor() {
-        this.email = "";
-        this.firstname = "";
-        this.lastname = "";
-        this.data = "";
-    }
-};
-module.exports = UserInfo;
-
-
 class DmpusersContract {
 
     /**

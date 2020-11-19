@@ -3,7 +3,7 @@ const AggregionBlockchain = require('./AggregionBlockchain.js');
 const TablesUtility = require('./TablesUtility.js');
 
 
-class AggregionUtility {
+class DmpusersUtility {
 
     /**
      * @param {String} contractAccount
@@ -46,4 +46,4 @@ class AggregionUtility {
     };
 };
 
-module.exports = AggregionUtility;
+module.exports = DmpusersUtility;

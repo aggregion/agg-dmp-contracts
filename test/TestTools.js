@@ -9,8 +9,6 @@ class TestAccount {
         this.permission = name + '@active';
     }
 };
-module.exports = TestAccount;
-
 
 module.exports = {
     /**
