@@ -110,9 +110,22 @@ class AggregionBlockchain {
         this.signatureProvider.availableKeys.push(publicKey);
     }
 
-
     async getScopes(contractAccount, tableName = null) {
-        return await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: contractAccount, table: tableName });
+        let result = {
+            rows: []
+        };
+        let lowerBound = null;
+        while (true) {
+            const part = await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: contractAccount, table: tableName, lower_bound: lowerBound });
+            if (!part)
+                break;
+            const rows = part.rows.filter(s => !s.table.match("^.{12}[0-9]$"));
+            result.rows.push(...rows);
+            lowerBound = part.next_key;
+            if (!part.more)
+                break;
+        }
+        return result;
     }
 
     async getTableRows(contractAccount, tableName, scopeName, primaryKeyValue = null) {

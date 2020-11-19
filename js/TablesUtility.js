@@ -26,12 +26,16 @@ class TablesUtility {
     }
 
     async getTableByPrimaryKey(tableName, id) {
+        check.assert.assigned(tableName, 'tableName value is required');
         check.assert.assigned(id, 'id is required');
         return await this.getTable(tableName, id);
     }
 
     async getTableByIndex(tableName, indexPosition, keyType, keyValue) {
-        check.assert.assigned(keyValue, 'secondary key value is required');
+        check.assert.assigned(tableName, 'tableName value is required');
+        check.assert.assigned(indexPosition, 'indexPosition value is required');
+        check.assert.assigned(keyType, 'keyType is required');
+        check.assert.assigned(keyValue, 'keyValue is required');
         let scopes = await this.bc.getScopes(this.contractAccount, tableName);
         let rows = [];
         for (const item of scopes.rows) {
