@@ -5,7 +5,7 @@ namespace aggregion::sar {
 
 
    void upsert_trust(name self, name truster, name trustee, bool trust) {
-      require_auth(Names::AggregionDmp); // truster
+      require_auth(truster);
       // TODO: Check that truster and trustee is providers
       Tables::trusted_providers_table_t trusted{self, truster.value};
       auto it = trusted.find(trustee.value);
@@ -22,7 +22,7 @@ namespace aggregion::sar {
 
 
    void upsert_execution_approve(name self, name provider, checksum256 script_hash, bool approve) {
-      require_auth(Names::AggregionDmp); // provider
+      require_auth(provider);
       // TODO: Сheck that given provider is real provider
       auto script_id = scripts::get_script_id(self, script_hash);
       check(script_id.has_value(), "404. Script not found by given hash");
@@ -47,7 +47,7 @@ namespace aggregion::sar {
 
 
    void upsert_script_access(name self, name owner, checksum256 script_hash, name grantee, bool granted) {
-      require_auth(Names::AggregionDmp); // owner
+      require_auth(owner);
       auto script_id = scripts::get_script_id(self, script_hash);
       check(script_id.has_value(), "404. Script not found by given hash");
 

@@ -28,7 +28,6 @@ describe('Aggregion', function () {
 
     beforeEach(async function () {
         await node.start();
-        aggregiondmp = await tools.makeAccount(bc, 'aggregiondmp');
         aggregion = await tools.makeAccount(bc, contractConfig.account);
         await bc.deploy(aggregion.account, contractConfig.wasm, contractConfig.abi, aggregion.permission);
     });
@@ -39,26 +38,29 @@ describe('Aggregion', function () {
 
     describe('#providers', function () {
         it('should register new unique provider', async () => {
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-            (await util.isProviderExists('alice'))
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.regprov(alice.account, 'Alice provider', alice.permission);
+            (await util.isProviderExists(alice.account))
                 .should.be.true;
         });
 
         it('should not register provider if it already registered', async () => {
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission)
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.regprov(alice.account, 'Alice provider', alice.permission);
+            await contract.regprov(alice.account, 'Alice provider', alice.permission)
                 .should.be.rejected;
         });
 
         it('should update description of provider', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
             {
-                await contract.regprov('alice', 'Description One', aggregiondmp.permission);
-                let prov = await util.getProviderByName('alice');
+                await contract.regprov(alice.account, 'Description One', alice.permission);
+                let prov = await util.getProviderByName(alice.account);
                 prov.description.should.be.eq('Description One');
             }
             {
-                await contract.updprov('alice', 'Description Two', aggregiondmp.permission);
-                let prov = await util.getProviderByName('alice');
+                await contract.updprov(alice.account, 'Description Two', alice.permission);
+                let prov = await util.getProviderByName(alice.account);
                 prov.description.should.be.eq('Description Two');
             }
         });
@@ -66,9 +68,9 @@ describe('Aggregion', function () {
         it('should remove existing provider', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             {
-                await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-                await contract.unregprov('alice', aggregiondmp.permission);
-                (await util.isProviderExists('alice'))
+                await contract.regprov(alice.account, 'Alice provider', alice.permission);
+                await contract.unregprov(alice.account, alice.permission);
+                (await util.isProviderExists(alice.account))
                     .should.be.false;
             }
         });
@@ -77,12 +79,12 @@ describe('Aggregion', function () {
     describe('#services', function () {
         it('should create several services for provider', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-            await contract.addsvc('alice', 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', aggregiondmp.permission);
-            await contract.addsvc('alice', 'svc2', 'Alice provider Service Two', 'ftp', 'distributed', 'http://alicesvctwo.ru', aggregiondmp.permission);
+            await contract.regprov(alice.account, 'Alice provider', alice.permission);
+            await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
+            await contract.addsvc(alice.account, 'svc2', 'Alice provider Service Two', 'ftp', 'distributed', 'http://alicesvctwo.ru', alice.permission);
             {
-                let svc = await util.getService('alice', 'svc1');
-                assert.equal('alice', svc.scope);
+                let svc = await util.getService(alice.account, 'svc1');
+                assert.equal(alice.account, svc.scope);
                 assert.equal('svc1', svc.service);
                 assert.equal('Alice provider Service One', svc.description);
                 assert.equal('http', svc.protocol);
@@ -90,8 +92,8 @@ describe('Aggregion', function () {
                 assert.equal('http://alicesvcone.ru/', svc.endpoint);
             }
             {
-                let svc = await util.getService('alice', 'svc2');
-                assert.equal('alice', svc.scope);
+                let svc = await util.getService(alice.account, 'svc2');
+                assert.equal(alice.account, svc.scope);
                 assert.equal('svc2', svc.service);
                 assert.equal('Alice provider Service Two', svc.description);
                 assert.equal('ftp', svc.protocol);
@@ -102,12 +104,12 @@ describe('Aggregion', function () {
 
         it('should update service for provider', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-            await contract.addsvc('alice', 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', aggregiondmp.permission);
-            await contract.updsvc('alice', 'svc1', 'MST', 'ftp', 'distributed', 'http://alicesvctwo.ru', aggregiondmp.permission);
+            await contract.regprov(alice.account, 'Alice provider', alice.permission);
+            await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
+            await contract.updsvc(alice.account, 'svc1', 'MST', 'ftp', 'distributed', 'http://alicesvctwo.ru', alice.permission);
             {
-                let svc = await util.getService('alice', 'svc1');
-                assert.equal('alice', svc.scope);
+                let svc = await util.getService(alice.account, 'svc1');
+                assert.equal(alice.account, svc.scope);
                 assert.equal('svc1', svc.service);
                 assert.equal('MST', svc.description);
                 assert.equal('ftp', svc.protocol);
@@ -118,10 +120,10 @@ describe('Aggregion', function () {
 
         it('should remove service for provider', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-            await contract.addsvc('alice', 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', aggregiondmp.permission);
-            await contract.remsvc('alice', 'svc1', aggregiondmp.permission);
-            let svc = await util.getService('alice', 'svc1');
+            await contract.regprov(alice.account, 'Alice provider', alice.permission);
+            await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
+            await contract.remsvc(alice.account, 'svc1', alice.permission);
+            let svc = await util.getService(alice.account, 'svc1');
             assert.isUndefined(svc);
         });
 
@@ -129,24 +131,30 @@ describe('Aggregion', function () {
 
     describe('#requestslog', function () {
         it('should write one item to requests log table', async () => {
-            await contract.sendreq('alice', 'bob', 82034, "my request", aggregiondmp.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            const jimbo = await tools.makeAccount(bc, 'jimbo');
+            await contract.sendreq(alice.account, jimbo.account, 82034, "my request", alice.permission);
             let rows = await util.getRequestsLog();
             let item = rows.pop();
-            assert.equal('alice', item.sender);
-            assert.equal('bob', item.receiver);
+            assert.equal(alice.account, item.sender);
+            assert.equal(jimbo.account, item.receiver);
             assert.equal('82034', item.date);
             assert.equal('my request', item.request);
         });
         it('should write several items to requests log table', async () => {
-            await contract.sendreq('alice', 'bob', 82034, "my request 1", aggregiondmp.permission);
-            await contract.sendreq('alice', 'bob', 82035, "my request 2", aggregiondmp.permission);
-            await contract.sendreq('bob', 'alice', 82035, "my request 2", aggregiondmp.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            const jimbo = await tools.makeAccount(bc, 'jimbo');
+            await contract.sendreq(alice.account, jimbo.account, 82034, "my request 1", alice.permission);
+            await contract.sendreq(alice.account, jimbo.account, 82035, "my request 2", alice.permission);
+            await contract.sendreq(jimbo.account, alice.account, 82035, "my request 2", jimbo.permission);
             let rows = await util.getRequestsLog();
             assert.equal(3, rows.length);
         });
         it('should not write duplicates to requests log table', async () => {
-            await contract.sendreq('alice', 'bob', 82034, "my request 1", aggregiondmp.permission);
-            await contract.sendreq('alice', 'bob', 82034, "my request 1", aggregiondmp.permission)
+            const alice = await tools.makeAccount(bc, 'alice');
+            const jimbo = await tools.makeAccount(bc, 'jimbo');
+            await contract.sendreq(alice.account, jimbo.account, 82034, "my request 1", alice.permission);
+            await contract.sendreq(alice.account, jimbo.account, 82034, "my request 1", alice.permission)
                 .should.be.rejected;
         });
     });

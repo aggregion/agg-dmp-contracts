@@ -25,7 +25,7 @@ namespace aggregion::scripts {
    /// @brief
    /// Add new script.
    void Scripts::addscript(name owner, name script, name version, std::string description, checksum256 hash, std::string url) {
-      require_auth(Names::AggregionDmp);
+      require_auth(owner);
 
       check(get_script_id(get_self(), owner, script, version) == std::nullopt, "403. Script version already exist!");
       check(get_script_id(get_self(), hash) == std::nullopt, "403. Script hash already exist!");
@@ -48,7 +48,7 @@ namespace aggregion::scripts {
    /// @brief
    /// Modify script if it is not approved.
    void Scripts::updscript(name owner, name script, name version, std::string description, checksum256 hash, std::string url) {
-      require_auth(Names::AggregionDmp);
+      require_auth(owner);
 
       auto id = get_script_id(get_self(), owner, script, version);
       check(id.has_value(), "404. Script version not found");
@@ -70,7 +70,7 @@ namespace aggregion::scripts {
    /// @brief
    /// Remove script if it is not approved.
    void Scripts::remscript(name owner, name script, name version) {
-      require_auth(Names::AggregionDmp);
+      require_auth(owner);
 
       auto id = get_script_id(get_self(), owner, script, version);
       check(id.has_value(), "404. Script version not found");

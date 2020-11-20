@@ -28,7 +28,6 @@ describe('AggregionScripts', function () {
 
     beforeEach(async function () {
         await node.start();
-        aggregiondmp = await tools.makeAccount(bc, 'aggregiondmp');
         aggregion = await tools.makeAccount(bc, contractConfig.account);
         await bc.deploy(aggregion.account, contractConfig.wasm, contractConfig.abi, aggregion.permission);
     });
@@ -42,11 +41,12 @@ describe('AggregionScripts', function () {
 
     describe('#scripts', function () {
         it('should create several scripts for user', async () => {
-            await contract.addscript('bob', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
-            await contract.addscript('bob', 'script1', 'v2', 'Einstein function', hashTwo, 'http://eindef.com', aggregiondmp.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
+            await contract.addscript(alice.account, 'script1', 'v2', 'Einstein function', hashTwo, 'http://eindef.com', alice.permission);
             {
-                let script = await util.getScript('bob', 'script1', 'v1');
-                assert.equal('bob', script.owner);
+                let script = await util.getScript(alice.account, 'script1', 'v1');
+                assert.equal(alice.account, script.owner);
                 assert.equal('script1', script.script);
                 assert.equal('v1', script.version);
                 assert.equal('Newton function', script.description);
@@ -54,8 +54,8 @@ describe('AggregionScripts', function () {
                 assert.equal('http://example.com', script.url);
             }
             {
-                let script = await util.getScript('bob', 'script1', 'v2');
-                assert.equal('bob', script.owner);
+                let script = await util.getScript(alice.account, 'script1', 'v2');
+                assert.equal(alice.account, script.owner);
                 assert.equal('script1', script.script);
                 assert.equal('v2', script.version);
                 assert.equal('Einstein function', script.description);
@@ -65,11 +65,12 @@ describe('AggregionScripts', function () {
         });
 
         it('should update script if it does not approved', async () => {
-            await contract.addscript('bob', 'script1', 'v1', 'meaningless description', hashOne, 'url', aggregiondmp.permission);
-            await contract.updscript('bob', 'script1', 'v1', 'Newton function', hashTwo, 'http://example.com', aggregiondmp.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.addscript(alice.account, 'script1', 'v1', 'meaningless description', hashOne, 'url', alice.permission);
+            await contract.updscript(alice.account, 'script1', 'v1', 'Newton function', hashTwo, 'http://example.com', alice.permission);
             {
-                let script = await util.getScript('bob', 'script1', 'v1');
-                assert.equal('bob', script.owner);
+                let script = await util.getScript(alice.account, 'script1', 'v1');
+                assert.equal(alice.account, script.owner);
                 assert.equal('script1', script.script);
                 assert.equal('v1', script.version);
                 assert.equal('Newton function', script.description);
@@ -79,35 +80,42 @@ describe('AggregionScripts', function () {
         });
 
         it('should not update nor remove foreign script', async () => {
-            await contract.addscript('john', 'script1', 'v1', 'meaningless description', hashOne, 'url', aggregiondmp.permission);
-            await contract.updscript('kate', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission)
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.addscript(john.account, 'script1', 'v1', 'meaningless description', hashOne, 'url', john.permission);
+            await contract.updscript(kate.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', kate.permission)
                 .should.be.rejected;
-            await contract.remscript('kate', 'script1', 'v1', 'Newton function', aggregiondmp.permission)
+            await contract.remscript(kate.account, 'script1', 'v1', 'Newton function', kate.permission)
                 .should.be.rejected;
         });
 
         it('should remove script if it does not approved', async () => {
-            await contract.addscript('bob', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
-            await contract.remscript('bob', 'script1', 'v1', aggregiondmp.permission);
-            let script = await util.getScript('bob', 'script1', 'v1');
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
+            await contract.remscript(alice.account, 'script1', 'v1', alice.permission);
+            let script = await util.getScript(alice.account, 'script1', 'v1');
             assert.isUndefined(script);
         });
 
         it('should fail if script version already exists', async () => {
-            await contract.addscript('bob', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
-            await contract.addscript('bob', 'script1', 'v2', 'Einstein function', hashTwo, 'http://eindef.com', aggregiondmp.permission);
-            await contract.addscript('bob', 'script1', 'v2', 'Einstein function', hashTwo, 'http://eindef.com', aggregiondmp.permission)
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
+            await contract.addscript(alice.account, 'script1', 'v2', 'Einstein function', hashTwo, 'http://eindef.com', alice.permission);
+            await contract.addscript(alice.account, 'script1', 'v2', 'Einstein function', hashTwo, 'http://eindef.com', alice.permission)
                 .should.be.rejected;
         });
 
         it('should not fail if script version already exists for different provider', async () => {
-            await contract.addscript('john', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
-            await contract.addscript('kate', 'script1', 'v1', 'Newton function', hashTwo, 'http://example.com', aggregiondmp.permission);
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.addscript(john.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', john.permission);
+            await contract.addscript(kate.account, 'script1', 'v1', 'Newton function', hashTwo, 'http://example.com', kate.permission);
         });
 
         it('should fail if script hash already exists', async () => {
-            await contract.addscript('bob', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
-            await contract.addscript('alice', 'script2', 'v2', 'Einstein function', hashOne, 'http://eindef.com', aggregiondmp.permission)
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
+            await contract.addscript('alice', 'script2', 'v2', 'Einstein function', hashOne, 'http://eindef.com', alice.permission)
                 .should.be.rejected;
         });
     });
@@ -115,95 +123,112 @@ describe('AggregionScripts', function () {
 
     describe('#providers trust', function () {
         it('should not trust by default', async () => {
-            await contract.regprov('john', 'John provider', aggregiondmp.permission);
-            await contract.regprov('kate', 'Kate provider', aggregiondmp.permission);
-            const trusted = await util.isTrusted('john', 'kate');
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            const trusted = await util.isTrusted(john.account, kate.account);
             assert.isFalse(trusted);
         });
         it('should add trusted provider', async () => {
-            await contract.regprov('john', 'John provider', aggregiondmp.permission);
-            await contract.regprov('kate', 'Kate provider', aggregiondmp.permission);
-            await contract.trust('john', 'kate', aggregiondmp.permission);
-            const trusted = await util.isTrusted('john', 'kate');
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            await contract.trust(john.account, kate.account, john.permission);
+            const trusted = await util.isTrusted(john.account, kate.account);
             assert.isTrue(trusted);
         });
         it('should remove trusted provider', async () => {
-            await contract.regprov('john', 'John provider', aggregiondmp.permission);
-            await contract.regprov('kate', 'Kate provider', aggregiondmp.permission);
-            await contract.trust('john', 'kate', aggregiondmp.permission);
-            assert.isTrue(await util.isTrusted('john', 'kate'));
-            await contract.untrust('john', 'kate', aggregiondmp.permission);
-            assert.isFalse(await util.isTrusted('john', 'kate'));
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            await contract.trust(john.account, kate.account, john.permission);
+            assert.isTrue(await util.isTrusted(john.account, kate.account));
+            await contract.untrust(john.account, kate.account, john.permission);
+            assert.isFalse(await util.isTrusted(john.account, kate.account));
         });
     });
 
 
     describe('#approves', function () {
         it('should not be approved by default', async () => {
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-            await contract.addscript('bob', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.regprov('alice', 'Alice provider', alice.permission);
+            await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
             const approved = await util.isScriptApprovedBy('alice', hashOne);
             assert.isFalse(approved);
         });
         it('should approve existing script', async () => {
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-            await contract.addscript('bob', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
-            await contract.execapprove('alice', hashOne, aggregiondmp.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.regprov('alice', 'Alice provider', alice.permission);
+            await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
+            await contract.execapprove('alice', hashOne, alice.permission);
             const approved = await util.isScriptApprovedBy('alice', hashOne);
             assert.isTrue(approved);
         });
         it('should deny approved script', async () => {
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-            await contract.addscript('bob', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
-            await contract.execapprove('alice', hashOne, aggregiondmp.permission);
-            await contract.execdeny('alice', hashOne, aggregiondmp.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.regprov('alice', 'Alice provider', alice.permission);
+            await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
+            await contract.execapprove('alice', hashOne, alice.permission);
+            await contract.execdeny('alice', hashOne, alice.permission);
             const approved = await util.isScriptApprovedBy('alice', hashOne);
             assert.isFalse(approved);
         });
         it('should not update script if it is approved', async () => {
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-            await contract.addscript('bob', 'script1', 'v1', 'Description', hashOne, 'Url', aggregiondmp.permission);
-            await contract.execapprove('alice', hashOne, aggregiondmp.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.regprov('alice', 'Alice provider', alice.permission);
+            await contract.addscript(alice.account, 'script1', 'v1', 'Description', hashOne, 'Url', alice.permission);
+            await contract.execapprove('alice', hashOne, alice.permission);
             const scr = await util.getScriptByHash(hashOne);
-            await contract.updscript('bob', 'script1', 'v1', 'Newton function', hashTwo, 'http://example.com', aggregiondmp.permission)
+            await contract.updscript(alice.account, 'script1', 'v1', 'Newton function', hashTwo, 'http://example.com', alice.permission)
                 .should.be.rejected;
-            await contract.execdeny('alice', hashOne, aggregiondmp.permission);
-            await contract.updscript('bob', 'script1', 'v1', 'Newton function', hashTwo, 'http://example.com', aggregiondmp.permission);
+            await contract.execdeny('alice', hashOne, alice.permission);
+            await contract.updscript(alice.account, 'script1', 'v1', 'Newton function', hashTwo, 'http://example.com', alice.permission);
         });
         it('should not remove script if it is approved', async () => {
-            await contract.regprov('alice', 'Alice provider', aggregiondmp.permission);
-            await contract.addscript('bob', 'script1', 'v1', 'Description', hashOne, 'Url', aggregiondmp.permission);
-            await contract.execapprove('alice', hashOne, aggregiondmp.permission);
-            await contract.remscript('bob', 'script1', 'v1', aggregiondmp.permission)
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.regprov('alice', 'Alice provider', alice.permission);
+            await contract.addscript(alice.account, 'script1', 'v1', 'Description', hashOne, 'Url', alice.permission);
+            await contract.execapprove('alice', hashOne, alice.permission);
+            await contract.remscript(alice.account, 'script1', 'v1', alice.permission)
                 .should.be.rejected;
-            await contract.execdeny('alice', hashOne, aggregiondmp.permission);
-            await contract.remscript('bob', 'script1', 'v1', aggregiondmp.permission);
+            await contract.execdeny('alice', hashOne, alice.permission);
+            await contract.remscript(alice.account, 'script1', 'v1', alice.permission);
         });
     });
 
     describe('#script access', function () {
         it('should not deny access by default', async () => {
-            await contract.regprov('john', 'John provider', aggregiondmp.permission);
-            await contract.regprov('kate', 'Kate provider', aggregiondmp.permission);
-            await contract.addscript('john', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
-            assert.isTrue(await util.isScriptAccessGrantedTo('john', hashOne));
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            await contract.addscript(john.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', john.permission);
+            assert.isTrue(await util.isScriptAccessGrantedTo(john.account, hashOne));
         });
         it('should deny access', async () => {
-            await contract.regprov('john', 'John provider', aggregiondmp.permission);
-            await contract.regprov('kate', 'Kate provider', aggregiondmp.permission);
-            await contract.addscript('john', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
-            await contract.denyaccess('john', hashOne, 'kate', aggregiondmp.permission);
-            assert.isFalse(await util.isScriptAccessGrantedTo('kate', hashOne));
-            await contract.grantaccess('john', hashOne, 'kate', aggregiondmp.permission);
-            assert.isTrue(await util.isScriptAccessGrantedTo('kate', hashOne));
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            await contract.addscript(john.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', john.permission);
+            await contract.denyaccess(john.account, hashOne, kate.account, john.permission);
+            assert.isFalse(await util.isScriptAccessGrantedTo(kate.account, hashOne));
+            await contract.grantaccess(john.account, hashOne, kate.account, john.permission);
+            assert.isTrue(await util.isScriptAccessGrantedTo(kate.account, hashOne));
         });
         it('should not grant access to non-owned script', async () => {
-            await contract.regprov('john', 'John provider', aggregiondmp.permission);
-            await contract.regprov('kate', 'Kate provider', aggregiondmp.permission);
-            await contract.addscript('john', 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', aggregiondmp.permission);
-            await contract.denyaccess('kate', hashOne, 'kate', aggregiondmp.permission)
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            await contract.addscript(john.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', john.permission);
+            await contract.denyaccess(kate.account, hashOne, kate.account, kate.permission)
                 .should.be.rejected;
-            await contract.grantaccess('kate', hashOne, 'kate', aggregiondmp.permission)
+            await contract.grantaccess(kate.account, hashOne, kate.account, kate.permission)
                 .should.be.rejected;
         });
     });
