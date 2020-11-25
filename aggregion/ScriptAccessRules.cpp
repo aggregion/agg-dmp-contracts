@@ -15,7 +15,9 @@ namespace aggregion::sar {
             row.trust = trust;
          });
       } else {
-         trusted.modify(it, self, [&](Def::TrustedProviders& row) { row.trust = trust; });
+         trusted.modify(it, self, [&](Def::TrustedProviders& row) {
+            row.trust = trust;
+         });
       }
       print("Success. Truster:'", truster, "' Trustee:'", trustee, "' Trust:'", trust, "'");
    }
@@ -35,12 +37,16 @@ namespace aggregion::sar {
             row.approved = approve;
          });
       } else {
-         approves.modify(it, self, [&](Def::ScriptApproves& row) { row.approved = approve; });
+         approves.modify(it, self, [&](Def::ScriptApproves& row) {
+            row.approved = approve;
+         });
       }
 
       scripts::Tables::scripts_table_t scripts{self, Names::DefaultScope};
       auto sit = scripts.require_find(script_id.value(), "500. Script not found");
-      scripts.modify(sit, self, [&](scripts::Def::Scripts& row) { row.approves_count += (approve ? 1 : -1); });
+      scripts.modify(sit, self, [&](scripts::Def::Scripts& row) {
+         row.approves_count += (approve ? 1 : -1);
+      });
 
       print("Success. Provider:'", provider, "' Script hash:'", script_hash, "' Approved:'", approve, "'");
    }
@@ -63,7 +69,9 @@ namespace aggregion::sar {
             row.granted = granted;
          });
       } else {
-         access.modify(it, self, [&](Def::ScriptsAccess& row) { row.granted = granted; });
+         access.modify(it, self, [&](Def::ScriptsAccess& row) {
+            row.granted = granted;
+         });
       }
       print("Success. Owner:'", owner, "' Script hash:'", script_hash, "' Grant access:'", granted, "'");
    }
@@ -91,5 +99,25 @@ namespace aggregion::sar {
 
    void ScriptAccessRules::denyaccess(name owner, checksum256 hash, name grantee) {
       upsert_script_access(get_self(), owner, hash, grantee, false);
+   }
+
+
+   void ScriptAccessRules::encscraccess(name enclave_owner, checksum256 script_hash, name grantee, bool granted) {
+      require_auth(enclave_owner);
+      auto script_id = scripts::get_script_id(get_self(), script_hash);
+      check(script_id.has_value(), "404. Script not found by given hash");
+
+      Tables::enclave_script_access_table_t esa{get_self(), enclave_owner.value};
+      auto it = esa.find(script_id.value());
+
+      if (it == esa.end()) {
+         it = esa.emplace(get_self(), [&](Def::EnclaveScriptsAccess& row) {
+            row.script_id = script_id.value();
+         });
+      }
+      esa.modify(it, get_self(), [&](Def::EnclaveScriptsAccess& row) {
+         row.permissions[grantee] = granted;
+      });
+      print("Success. Enclave owner:'", enclave_owner, "' Script hash:'", script_hash, "' Grant access:'", granted, "' to '", grantee, "'");
    }
 }

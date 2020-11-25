@@ -276,6 +276,28 @@ class AggregionContract {
     }
 
     /**
+     * Set provider access to script within enclave.
+     * @param {EosioName} enclaveOwner
+     * @param {string} script_hash
+     * @param {EosioName} grantee
+     * @param {Boolean} granted
+     * @param {permission} permission
+     */
+    async ecnlaveScriptAccess(enclaveOwner, script_hash, grantee, granted, permission) {
+        check.assert.assigned(enclaveOwner, 'enclaveOwner is required');
+        check.assert.assigned(script_hash, 'script_hash is required');
+        check.assert.assigned(grantee, 'grantee is required');
+        check.assert.assigned(granted, 'granted is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.enclave_owner = enclaveOwner;
+        request.script_hash = script_hash;
+        request.grantee = grantee;
+        request.granted = granted;
+        return await this.bc.pushAction(this.contractName, "encscraccess", request, permission);
+    }
+
+    /**
      * Log request.
      * @param {String} sender
      * @param {String} receiver

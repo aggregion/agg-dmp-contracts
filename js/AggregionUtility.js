@@ -3,7 +3,6 @@ const check = require('check-types');
 const AggregionBlockchain = require('./AggregionBlockchain.js');
 const TablesUtility = require('./TablesUtility.js');
 
-
 class AggregionUtility {
 
     /**
@@ -77,10 +76,31 @@ class AggregionUtility {
 
     async isScriptAccessGrantedTo(grantee, hash) {
         const script = await this.getScriptByHash(hash);
+        if (script.length === 0) {
+            return undefined;
+        }
         const result = await this.bc.getTableRows(this.contractAccount, 'scriptaccess', grantee, script.id);
         check.assert.lessOrEqual(result.rows.length, 1);
+        if (result.rows.length === 0) {
+            return undefined;
+        }
         const item = result.rows[0];
-        return typeof item == 'undefined' || item.granted === 1;
+        return item.granted === 1;
+    }
+
+    async isScriptAllowedWithinEnclave(enclaveOwner, hash, grantee) {
+        const script = await this.getScriptByHash(hash);
+        if (script.length === 0) {
+            return undefined;
+        }
+        const result = await this.bc.getTableRows(this.contractAccount, 'encscraccess', enclaveOwner, script.id);
+        check.assert.lessOrEqual(result.rows.length, 1);
+        if (result.rows.length === 0) {
+            return undefined;
+        }
+        const item = result.rows[0];
+        const permission = item.permissions.find(p => { return p.key === grantee; });
+        return permission.value === 1;
     }
 };
 

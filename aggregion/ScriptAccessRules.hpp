@@ -4,6 +4,7 @@
 #include <eosio/crypto.hpp>
 #include <eosio/eosio.hpp>
 #include <libc/bits/stdint.h>
+#include <map>
 
 namespace aggregion::sar {
 
@@ -42,12 +43,25 @@ namespace aggregion::sar {
             return script_id;
          }
       };
+
+      /// @brief
+      /// Provider (grantee) access to script within given enclave.
+      /// Scope: Provider (enclave owner, grantor).
+      /// (Script owner is ignored here)
+      struct [[eosio::table, eosio::contract("Aggregion")]] EnclaveScriptsAccess {
+         uint64_t script_id;
+         std::map<name, bool> permissions;
+         auto primary_key() const {
+            return script_id;
+         }
+      };
    };
 
    struct Tables {
       using trusted_providers_table_t = eosio::multi_index<Names::TrustedProvidersTable, Def::TrustedProviders>;
       using script_approves_table_t = eosio::multi_index<Names::ScriptApprovesTable, Def::ScriptApproves>;
       using script_access_table_t = eosio::multi_index<Names::ScriptAccessTable, Def::ScriptsAccess>;
+      using enclave_script_access_table_t = eosio::multi_index<Names::EnclaveScriptAccessTable, Def::EnclaveScriptsAccess>;
    };
 
    /// @brief
@@ -63,5 +77,7 @@ namespace aggregion::sar {
 
       [[eosio::action]] void grantaccess(name owner, checksum256 hash, name grantee);
       [[eosio::action]] void denyaccess(name owner, checksum256 hash, name grantee);
+
+      [[eosio::action]] void encscraccess(name enclave_owner, checksum256 script_hash, name grantee, bool granted);
    };
 }

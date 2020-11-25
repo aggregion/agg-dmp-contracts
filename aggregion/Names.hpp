@@ -25,6 +25,7 @@ namespace aggregion {
       static constexpr const name TrustedProvidersTable{"trustedprov"};
       static constexpr const name ScriptApprovesTable{"approves"};
       static constexpr const name ScriptAccessTable{"scriptaccess"};
+      static constexpr const name EnclaveScriptAccessTable{"encscraccess"};
 
       static constexpr const name RequestsLogTable{"reqslog"};
       static constexpr const name RequestsLogIndex{"reqslogidx"};

@@ -118,6 +118,15 @@ icon:
 
 
 
+<h1 class="contract">encscraccess</h1>
+---
+spec-version: 0.0.1
+title: Enclave script access
+summary:
+icon:
+
+
+
 <h1 class="contract">sendreq</h1>
 ---
 spec-version: 0.0.1

@@ -201,15 +201,22 @@ describe('AggregionScripts', function () {
     });
 
     describe('#script access', function () {
-        it('should not deny access by default', async () => {
+        it('should be undefined if unknown script', async () => {
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            assert.isUndefined(await util.isScriptAccessGrantedTo(john.account, hashOne));
+        });
+        it('should be undefined if no rule', async () => {
             const john = await tools.makeAccount(bc, 'john');
             const kate = await tools.makeAccount(bc, 'kate');
             await contract.regprov(john.account, 'John provider', john.permission);
             await contract.regprov(kate.account, 'Kate provider', kate.permission);
             await contract.addscript(john.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', john.permission);
-            assert.isTrue(await util.isScriptAccessGrantedTo(john.account, hashOne));
+            assert.isUndefined(await util.isScriptAccessGrantedTo(john.account, hashOne));
         });
-        it('should deny access', async () => {
+        it('should deny and grant access', async () => {
             const john = await tools.makeAccount(bc, 'john');
             const kate = await tools.makeAccount(bc, 'kate');
             await contract.regprov(john.account, 'John provider', john.permission);
@@ -230,6 +237,59 @@ describe('AggregionScripts', function () {
                 .should.be.rejected;
             await contract.grantaccess(kate.account, hashOne, kate.account, kate.permission)
                 .should.be.rejected;
+        });
+    });
+
+    describe('#enclave script access', function () {
+        it('should be undefined if unknown script', async () => {
+            const eown = await tools.makeAccount(bc, 'eown');
+            const sown = await tools.makeAccount(bc, 'sown');
+            const prov = await tools.makeAccount(bc, 'prov');
+            await contract.regprov(eown.account, 'Enclave Owner', eown.permission);
+            await contract.regprov(prov.account, 'Some Provider', prov.permission);
+            assert.isUndefined(await util.isScriptAllowedWithinEnclave(eown.account, hashOne, prov.account));
+        });
+        it('should be undefined if no rule', async () => {
+            const eown = await tools.makeAccount(bc, 'eown');
+            const sown = await tools.makeAccount(bc, 'sown');
+            const prov = await tools.makeAccount(bc, 'prov');
+            await contract.regprov(eown.account, 'Enclave Owner', eown.permission);
+            await contract.regprov(prov.account, 'Some Provider', prov.permission);
+            await contract.addscript(sown.account, 's1', 'v1', 'ABC', hashOne, 'http://example.com', sown.permission);
+            assert.isUndefined(await util.isScriptAllowedWithinEnclave(eown.account, hashOne, prov.account));
+        });
+        it('should deny access', async () => {
+            const eown = await tools.makeAccount(bc, 'eown');
+            const sown = await tools.makeAccount(bc, 'sown');
+            const prov = await tools.makeAccount(bc, 'prov');
+            await contract.regprov(eown.account, 'Enclave Owner', eown.permission);
+            await contract.regprov(prov.account, 'Some Provider', prov.permission);
+            await contract.addscript(sown.account, 's1', 'v1', 'ABC', hashOne, 'http://example.com', sown.permission);
+            await contract.ecnlaveScriptAccess(eown.account, hashOne, prov.account, false, eown.permission);
+            assert.isFalse(await util.isScriptAllowedWithinEnclave(eown.account, hashOne, prov.account));
+        });
+        it('should grant access', async () => {
+            const eown = await tools.makeAccount(bc, 'eown');
+            const sown = await tools.makeAccount(bc, 'sown');
+            const prov = await tools.makeAccount(bc, 'prov');
+            await contract.regprov(eown.account, 'Enclave Owner', eown.permission);
+            await contract.regprov(prov.account, 'Some Provider', prov.permission);
+            await contract.addscript(sown.account, 's1', 'v1', 'ABC', hashOne, 'http://example.com', sown.permission);
+            await contract.ecnlaveScriptAccess(eown.account, hashOne, prov.account, true, eown.permission);
+            assert.isTrue(await util.isScriptAllowedWithinEnclave(eown.account, hashOne, prov.account));
+        });
+        it('should not grant access to foreign enclave', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            const bob = await tools.makeAccount(bc, 'bob');
+            const sown = await tools.makeAccount(bc, 'sown');
+            const prov = await tools.makeAccount(bc, 'prov');
+            await contract.regprov(alice.account, 'Enclave Owner', alice.permission);
+            await contract.regprov(bob.account, 'Evil provider', bob.permission);
+            await contract.regprov(prov.account, 'Some Provider', prov.permission);
+            await contract.addscript(sown.account, 's1', 'v1', 'ABC', hashOne, 'http://example.com', sown.permission);
+            await contract.ecnlaveScriptAccess(alice.account, hashOne, prov.account, false, bob.permission)
+                .should.be.rejected;
+            assert.isUndefined(await util.isScriptAllowedWithinEnclave(alice.account, hashOne, prov.account));
         });
     });
 });
