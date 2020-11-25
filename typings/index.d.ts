@@ -283,6 +283,12 @@ export declare class CatalogsUtility {
         a3: any;
         a4: any;
     }>;
+    getBrands(): Promise<any[]>;
+    getCities(): Promise<any[]>;
+    getCityTypes(): Promise<any[]>;
+    getRegionCities(region_id: any): Promise<any[]>;
+    getRegions(): Promise<any[]>;
+    getVendors(): Promise<any[]>;
 }
 
 

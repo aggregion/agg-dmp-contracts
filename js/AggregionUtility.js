@@ -48,7 +48,7 @@ class AggregionUtility {
 
     async getService(provider, service) {
         let services = await this.getServices();
-        return services.filter(s => s.scope == provider && s.service == service)[0];
+        return services.filter(s => s.scope === provider && s.service === service)[0];
     }
 
     async getScript(owner, script, version) {
@@ -64,7 +64,7 @@ class AggregionUtility {
     async isTrusted(truster, trustee) {
         const result = await this.bc.getTableRows(this.contractAccount, 'trustedprov', truster, trustee);
         const item = result.rows[0];
-        return typeof item != 'undefined' && item.trust == 1;
+        return typeof item != 'undefined' && item.trust === 1;
     }
 
     async isScriptApprovedBy(provider, hash) {
@@ -72,7 +72,7 @@ class AggregionUtility {
         const result = await this.bc.getTableRows(this.contractAccount, 'approves', provider, script.id);
         check.assert.lessOrEqual(result.rows.length, 1);
         const item = result.rows[0];
-        return typeof item != 'undefined' && item.approved == 1;
+        return typeof item != 'undefined' && item.approved === 1;
     }
 
     async isScriptAccessGrantedTo(grantee, hash) {
@@ -80,7 +80,7 @@ class AggregionUtility {
         const result = await this.bc.getTableRows(this.contractAccount, 'scriptaccess', grantee, script.id);
         check.assert.lessOrEqual(result.rows.length, 1);
         const item = result.rows[0];
-        return typeof item == 'undefined' || item.granted == 1;
+        return typeof item == 'undefined' || item.granted === 1;
     }
 };
 
