@@ -159,6 +159,16 @@ export declare class AggregionContract {
     denyaccess(owner: any, script_hash: any, grantee: any, permission: any): Promise<void>;
 
     /**
+     * Set provider access to script within enclave.
+     * @param {EosioName} enclaveOwner
+     * @param {string} script_hash
+     * @param {EosioName} grantee
+     * @param {Boolean} granted
+     * @param {permission} permission
+     */
+    async enclaveScriptAccess(enclaveOwner: any, script_hash: any, grantee: any, granted: any, permission: any): Promise<void>;
+
+    /**
      * Log request.
      * @param {String} sender
      * @param {String} receiver
@@ -228,6 +238,7 @@ export declare class AggregionUtility {
     isTrusted(truster: any, trustee: any): Promise<boolean>;
     isScriptApprovedBy(provider: any, hash: any): Promise<boolean>;
     isScriptAccessGrantedTo(grantee: any, hash: any): Promise<boolean>;
+    isScriptAllowedWithinEnclave(enclaveOwner: any, hash: any, grantee: any): Promise<boolean>;
 }
 
 export declare class DmpusersUtility {

@@ -283,7 +283,7 @@ class AggregionContract {
      * @param {Boolean} granted
      * @param {permission} permission
      */
-    async ecnlaveScriptAccess(enclaveOwner, script_hash, grantee, granted, permission) {
+    async enclaveScriptAccess(enclaveOwner, script_hash, grantee, granted, permission) {
         check.assert.assigned(enclaveOwner, 'enclaveOwner is required');
         check.assert.assigned(script_hash, 'script_hash is required');
         check.assert.assigned(grantee, 'grantee is required');

@@ -265,7 +265,7 @@ describe('AggregionScripts', function () {
             await contract.regprov(eown.account, 'Enclave Owner', eown.permission);
             await contract.regprov(prov.account, 'Some Provider', prov.permission);
             await contract.addscript(sown.account, 's1', 'v1', 'ABC', hashOne, 'http://example.com', sown.permission);
-            await contract.ecnlaveScriptAccess(eown.account, hashOne, prov.account, false, eown.permission);
+            await contract.enclaveScriptAccess(eown.account, hashOne, prov.account, false, eown.permission);
             assert.isFalse(await util.isScriptAllowedWithinEnclave(eown.account, hashOne, prov.account));
         });
         it('should grant access', async () => {
@@ -275,7 +275,7 @@ describe('AggregionScripts', function () {
             await contract.regprov(eown.account, 'Enclave Owner', eown.permission);
             await contract.regprov(prov.account, 'Some Provider', prov.permission);
             await contract.addscript(sown.account, 's1', 'v1', 'ABC', hashOne, 'http://example.com', sown.permission);
-            await contract.ecnlaveScriptAccess(eown.account, hashOne, prov.account, true, eown.permission);
+            await contract.enclaveScriptAccess(eown.account, hashOne, prov.account, true, eown.permission);
             assert.isTrue(await util.isScriptAllowedWithinEnclave(eown.account, hashOne, prov.account));
         });
         it('should not grant access to foreign enclave', async () => {
@@ -287,7 +287,7 @@ describe('AggregionScripts', function () {
             await contract.regprov(bob.account, 'Evil provider', bob.permission);
             await contract.regprov(prov.account, 'Some Provider', prov.permission);
             await contract.addscript(sown.account, 's1', 'v1', 'ABC', hashOne, 'http://example.com', sown.permission);
-            await contract.ecnlaveScriptAccess(alice.account, hashOne, prov.account, false, bob.permission)
+            await contract.enclaveScriptAccess(alice.account, hashOne, prov.account, false, bob.permission)
                 .should.be.rejected;
             assert.isUndefined(await util.isScriptAllowedWithinEnclave(alice.account, hashOne, prov.account));
         });
