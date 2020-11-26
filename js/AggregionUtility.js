@@ -100,6 +100,9 @@ class AggregionUtility {
         }
         const item = result.rows[0];
         const permission = item.permissions.find(p => { return p.key === grantee; });
+        if (!permission) {
+            return undefined;
+        }
         return permission.value === 1;
     }
 };

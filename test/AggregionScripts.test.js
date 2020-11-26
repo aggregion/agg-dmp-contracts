@@ -258,6 +258,17 @@ describe('AggregionScripts', function () {
             await contract.addscript(sown.account, 's1', 'v1', 'ABC', hashOne, 'http://example.com', sown.permission);
             assert.isUndefined(await util.isScriptAllowedWithinEnclave(eown.account, hashOne, prov.account));
         });
+        it('should be undefined if has rule but unknown provider', async () => {
+            const eown = await tools.makeAccount(bc, 'eown');
+            const sown = await tools.makeAccount(bc, 'sown');
+            const prv1 = await tools.makeAccount(bc, 'prv1');
+            const prv2 = await tools.makeAccount(bc, 'prv2');
+            await contract.regprov(eown.account, 'Enclave Owner', eown.permission);
+            await contract.regprov(prv1.account, 'Some Provider', prv1.permission);
+            await contract.addscript(sown.account, 's1', 'v1', 'ABC', hashOne, 'http://example.com', sown.permission);
+            await contract.enclaveScriptAccess(eown.account, hashOne, prv1.account, true, eown.permission);
+            assert.isUndefined(await util.isScriptAllowedWithinEnclave(eown.account, hashOne, prv2.account));
+        });
         it('should deny access', async () => {
             const eown = await tools.makeAccount(bc, 'eown');
             const sown = await tools.makeAccount(bc, 'sown');

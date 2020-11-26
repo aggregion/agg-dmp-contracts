@@ -80,7 +80,6 @@ const requests = {
 
 class AggregionBlockchain {
 
-
     constructor(nodeUrl, privateKeys, debug = false, maxTransactionAttempt = 4) {
         check.assert.nonEmptyString(nodeUrl, 'node url must be specified');
         this.debug = debug;
