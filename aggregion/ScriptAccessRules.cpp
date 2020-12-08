@@ -77,37 +77,39 @@ namespace aggregion::sar {
    }
 
 
-   void ScriptAccessRules::trust(name truster, name trustee) {
-      upsert_trust(get_self(), truster, trustee, true);
+   void ScriptAccessRules::trust(std::string truster, std::string trustee) {
+      upsert_trust(get_self(), name{truster}, name{trustee}, true);
    }
 
-   void ScriptAccessRules::untrust(name truster, name trustee) {
-      upsert_trust(get_self(), truster, trustee, false);
+   void ScriptAccessRules::untrust(std::string truster, std::string trustee) {
+      upsert_trust(get_self(), name{truster}, name{trustee}, false);
    }
 
-   void ScriptAccessRules::execapprove(name provider, checksum256 hash) {
-      upsert_execution_approve(get_self(), provider, hash, true);
+   void ScriptAccessRules::execapprove(std::string provider, checksum256 hash) {
+      upsert_execution_approve(get_self(), name{provider}, hash, true);
    }
 
-   void ScriptAccessRules::execdeny(name provider, checksum256 hash) {
-      upsert_execution_approve(get_self(), provider, hash, false);
+   void ScriptAccessRules::execdeny(std::string provider, checksum256 hash) {
+      upsert_execution_approve(get_self(), name{provider}, hash, false);
    }
 
-   void ScriptAccessRules::grantaccess(name owner, checksum256 hash, name grantee) {
-      upsert_script_access(get_self(), owner, hash, grantee, true);
+   void ScriptAccessRules::grantaccess(std::string owner, checksum256 hash, std::string grantee) {
+      upsert_script_access(get_self(), name{owner}, hash, name{grantee}, true);
    }
 
-   void ScriptAccessRules::denyaccess(name owner, checksum256 hash, name grantee) {
-      upsert_script_access(get_self(), owner, hash, grantee, false);
+   void ScriptAccessRules::denyaccess(std::string owner, checksum256 hash, std::string grantee) {
+      upsert_script_access(get_self(), name{owner}, hash, name{grantee}, false);
    }
 
 
-   void ScriptAccessRules::encscraccess(name enclave_owner, checksum256 script_hash, name grantee, bool granted) {
-      require_auth(enclave_owner);
+   void ScriptAccessRules::encscraccess(std::string enclave_owner, checksum256 script_hash, std::string grantee, bool granted) {
+      const auto eo = name{enclave_owner};
+      const auto g = name{grantee};
+      require_auth(eo);
       auto script_id = scripts::get_script_id(get_self(), script_hash);
       check(script_id.has_value(), "404. Script not found by given hash");
 
-      Tables::enclave_script_access_table_t esa{get_self(), enclave_owner.value};
+      Tables::enclave_script_access_table_t esa{get_self(), eo.value};
       auto it = esa.find(script_id.value());
 
       if (it == esa.end()) {
@@ -116,8 +118,8 @@ namespace aggregion::sar {
          });
       }
       esa.modify(it, get_self(), [&](Def::EnclaveScriptsAccess& row) {
-         row.permissions[grantee] = granted;
+         row.permissions[g] = granted;
       });
-      print("Success. Enclave owner:'", enclave_owner, "' Script hash:'", script_hash, "' Grant access:'", granted, "' to '", grantee, "'");
+      print("Success. Enclave owner:'", eo, "' Script hash:'", script_hash, "' Grant access:'", granted, "' to '", g, "'");
    }
 }

@@ -36,7 +36,7 @@ class AggregionUtility {
 
     async getProviderByName(name) {
         let data = await this.bc.getTableRows(this.contractAccount, 'providers', 'default', name);
-        let scoped = data.rows.map(r => { r.scope = name; return r; });
+        let scoped = data.rows.map(r => { r.scope = 'default'; return r; });
         return scoped[0];
     }
 
@@ -46,8 +46,9 @@ class AggregionUtility {
     }
 
     async getService(provider, service) {
-        let services = await this.getServices();
-        return services.filter(s => s.scope === provider && s.service === service)[0];
+        let data = await this.bc.getTableRows(this.contractAccount, 'services', provider, service);
+        let scoped = data.rows.map(r => { r.scope = provider; return r; });
+        return scoped[0];
     }
 
     async getScript(owner, script, version) {

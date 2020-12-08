@@ -69,10 +69,11 @@ class AggregionContract {
         let request = {};
         request.provider = provider;
         request.service = service;
-        request.description = description;
-        request.protocol = protocol;
-        request.type = type;
-        request.endpoint = endpoint;
+        request.info = {};
+        request.info.description = description;
+        request.info.protocol = protocol;
+        request.info.type = type;
+        request.info.endpoint = endpoint;
         return await this.bc.pushAction(this.contractName, "addsvc", request, permission);
     }
 
@@ -91,10 +92,11 @@ class AggregionContract {
         let request = {};
         request.provider = provider;
         request.service = service;
-        request.description = description;
-        request.protocol = protocol;
-        request.type = type;
-        request.endpoint = endpoint;
+        request.info = {};
+        request.info.description = description;
+        request.info.protocol = protocol;
+        request.info.type = type;
+        request.info.endpoint = endpoint;
         return await this.bc.pushAction(this.contractName, "updsvc", request, permission);
     }
 

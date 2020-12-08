@@ -39,7 +39,24 @@ describe('AggregionScripts', function () {
     const hashOne = 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad';
     const hashTwo = 'cb8379ac2098aa165029e3938a51da0bcecfc008fd6795f401178647f96c5b34';
 
+
     describe('#scripts', function () {
+        it('should not register script with invalid provider name', async () => {
+            const alice = await tools.makeAccount(bc, 'ALiCE');
+            await contract.addscript(alice.account, 'script1', 'v1', 'description', hashOne, 'http://example.com', aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
+        it('should not register script with invalid script name', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.addscript(alice.account, 'SCRIPT', 'v1', 'description', hashOne, 'http://example.com', alice.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+
+        });
+        it('should not register script with invalid version name', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.addscript(alice.account, 'script1', 'VERSION', 'description', hashOne, 'http://example.com', alice.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
         it('should create several scripts for user', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
@@ -63,7 +80,6 @@ describe('AggregionScripts', function () {
                 assert.equal('http://eindef.com', script.url);
             }
         });
-
         it('should update script if it does not approved', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.addscript(alice.account, 'script1', 'v1', 'meaningless description', hashOne, 'url', alice.permission);
@@ -78,7 +94,6 @@ describe('AggregionScripts', function () {
                 assert.equal('http://example.com', script.url);
             }
         });
-
         it('should not update nor remove foreign script', async () => {
             const john = await tools.makeAccount(bc, 'john');
             const kate = await tools.makeAccount(bc, 'kate');
@@ -88,7 +103,6 @@ describe('AggregionScripts', function () {
             await contract.remscript(kate.account, 'script1', 'v1', 'Newton function', kate.permission)
                 .should.be.rejected;
         });
-
         it('should remove script if it does not approved', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
@@ -96,7 +110,6 @@ describe('AggregionScripts', function () {
             let script = await util.getScript(alice.account, 'script1', 'v1');
             assert.isUndefined(script);
         });
-
         it('should fail if script version already exists', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
@@ -104,14 +117,12 @@ describe('AggregionScripts', function () {
             await contract.addscript(alice.account, 'script1', 'v2', 'Einstein function', hashTwo, 'http://eindef.com', alice.permission)
                 .should.be.rejected;
         });
-
         it('should not fail if script version already exists for different provider', async () => {
             const john = await tools.makeAccount(bc, 'john');
             const kate = await tools.makeAccount(bc, 'kate');
             await contract.addscript(john.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', john.permission);
             await contract.addscript(kate.account, 'script1', 'v1', 'Newton function', hashTwo, 'http://example.com', kate.permission);
         });
-
         it('should fail if script hash already exists', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
@@ -120,8 +131,20 @@ describe('AggregionScripts', function () {
         });
     });
 
-
     describe('#providers trust', function () {
+        it('should fail if invalid truster name', async () => {
+            const john = await tools.makeAccount(bc, 'JOhN');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.trust(john.account, kate.account, aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+
+        });
+        it('should fail if invalid trustee name', async () => {
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'KATe');
+            await contract.trust(john.account, kate.account, aggregion.permission)
+                .should.be.rejected;
+        });
         it('should not trust by default', async () => {
             const john = await tools.makeAccount(bc, 'john');
             const kate = await tools.makeAccount(bc, 'kate');
@@ -153,6 +176,12 @@ describe('AggregionScripts', function () {
 
 
     describe('#approves', function () {
+        it('should fail if invalid provider name', async () => {
+            await contract.execapprove('ALiCE', hashOne, aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+            await contract.execdeny('ALiCE', hashOne, aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
         it('should not be approved by default', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov('alice', 'Alice provider', alice.permission);
@@ -201,6 +230,18 @@ describe('AggregionScripts', function () {
     });
 
     describe('#script access', function () {
+        it('should fail if invalid grantor name', async () => {
+            await contract.grantaccess('ALICe', hashOne, 'kate', aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+            await contract.denyaccess('ALICe', hashOne, 'kate', aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
+        it('should fail if invalid grantee name', async () => {
+            await contract.grantaccess('alice', hashOne, 'KaTe', aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+            await contract.denyaccess('alice', hashOne, 'KaTe', aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
         it('should be undefined if unknown script', async () => {
             const john = await tools.makeAccount(bc, 'john');
             const kate = await tools.makeAccount(bc, 'kate');
@@ -240,7 +281,14 @@ describe('AggregionScripts', function () {
         });
     });
 
+
     describe('#enclave script access', function () {
+        it('should fail if invalid names', async () => {
+            await contract.enclaveScriptAccess('AliCe', hashOne, 'kate', true, aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+            await contract.enclaveScriptAccess('alice', hashOne, 'KaTe', true, aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
         it('should be undefined if unknown script', async () => {
             const eown = await tools.makeAccount(bc, 'eown');
             const sown = await tools.makeAccount(bc, 'sown');

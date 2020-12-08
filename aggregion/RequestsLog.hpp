@@ -48,6 +48,6 @@ namespace aggregion {
    struct [[eosio::contract("Aggregion")]] RequestsLog : contract {
       using contract::contract;
 
-      [[eosio::action]] void sendreq(name sender, name receiver, int date, std::string request);
+      [[eosio::action]] void sendreq(std::string sender, std::string receiver, int date, std::string request);
    };
 }

@@ -24,18 +24,21 @@ namespace aggregion::scripts {
 
    /// @brief
    /// Add new script.
-   void Scripts::addscript(name owner, name script, name version, std::string description, checksum256 hash, std::string url) {
-      require_auth(owner);
+   void Scripts::addscript(std::string owner, std::string script, std::string version, std::string description, checksum256 hash, std::string url) {
+      const auto o = name{owner};
+      const auto s = name{script};
+      const auto v = name{version};
+      require_auth(o);
 
-      check(get_script_id(get_self(), owner, script, version) == std::nullopt, "403. Script version already exist!");
+      check(get_script_id(get_self(), o, s, v) == std::nullopt, "403. Script version already exist!");
       check(get_script_id(get_self(), hash) == std::nullopt, "403. Script hash already exist!");
 
       Tables::scripts_table_t scripts{get_self(), Names::DefaultScope};
       scripts.emplace(get_self(), [&](Def::Scripts& row) {
          row.id = scripts.available_primary_key();
-         row.owner = owner;
-         row.script = script;
-         row.version = version;
+         row.owner = o;
+         row.script = s;
+         row.version = v;
          row.description = description;
          row.hash = hash;
          row.url = url;

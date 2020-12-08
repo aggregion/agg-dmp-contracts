@@ -69,15 +69,15 @@ namespace aggregion::sar {
    struct [[eosio::contract("Aggregion")]] ScriptAccessRules : contract {
       using contract::contract;
 
-      [[eosio::action]] void trust(name truster, name trustee);
-      [[eosio::action]] void untrust(name truster, name trustee);
+      [[eosio::action]] void trust(std::string truster, std::string trustee);
+      [[eosio::action]] void untrust(std::string truster, std::string trustee);
 
-      [[eosio::action]] void execapprove(name provider, checksum256 hash);
-      [[eosio::action]] void execdeny(name provider, checksum256 hash);
+      [[eosio::action]] void execapprove(std::string provider, checksum256 hash);
+      [[eosio::action]] void execdeny(std::string provider, checksum256 hash);
 
-      [[eosio::action]] void grantaccess(name owner, checksum256 hash, name grantee);
-      [[eosio::action]] void denyaccess(name owner, checksum256 hash, name grantee);
+      [[eosio::action]] void grantaccess(std::string owner, checksum256 hash, std::string grantee);
+      [[eosio::action]] void denyaccess(std::string owner, checksum256 hash, std::string grantee);
 
-      [[eosio::action]] void encscraccess(name enclave_owner, checksum256 script_hash, name grantee, bool granted);
+      [[eosio::action]] void encscraccess(std::string enclave_owner, checksum256 script_hash, std::string grantee, bool granted);
    };
 }

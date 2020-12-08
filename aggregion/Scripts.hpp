@@ -58,7 +58,7 @@ namespace aggregion::scripts {
    struct [[eosio::contract("Aggregion")]] Scripts : contract {
       using contract::contract;
 
-      [[eosio::action]] void addscript(name owner, name script, name version, std::string description, checksum256 hash, std::string url);
+      [[eosio::action]] void addscript(std::string owner, std::string script, std::string version, std::string description, checksum256 hash, std::string url);
       [[eosio::action]] void updscript(name owner, name script, name version, std::string description, checksum256 hash, std::string url);
       [[eosio::action]] void remscript(name owner, name script, name version);
    };

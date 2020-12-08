@@ -5,22 +5,21 @@ namespace aggregion {
 
    /// @brief
    /// Register provider service.
-   void Aggregion::addsvc(name provider, name service, std::string description, std::string protocol, std::string type, std::string endpoint) {
-      require_auth(provider);
+   void Aggregion::addsvc(std::string provider, std::string service, ServiceInfo info) {
+      const auto p = name{provider};
+      const auto s = name{service};
+      require_auth(p);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
-      providers.require_find(provider.value, "404. Unknown provider!");
+      providers.require_find(p.value, "404. Unknown provider!");
 
-      services_table_t services{get_self(), provider.value};
-      auto sit = services.find(service.value);
+      services_table_t services{get_self(), p.value};
+      auto sit = services.find(s.value);
       check(sit == services.end(), "403. Provider service already registered!");
 
       services.emplace(get_self(), [&](Tables::Service& row) {
-         row.service = service;
-         row.description = description;
-         row.protocol = protocol;
-         row.type = type;
-         row.endpoint = endpoint;
+         row.service = s;
+         row.info = info;
       });
       print("Provider service '", service, "' was added to '", provider, "'");
    }
@@ -28,7 +27,7 @@ namespace aggregion {
 
    /// @brief
    /// Update provider service.
-   void Aggregion::updsvc(name provider, name service, std::string description, std::string protocol, std::string type, std::string endpoint) {
+   void Aggregion::updsvc(name provider, name service, ServiceInfo info) {
       require_auth(provider);
 
       providers_table_t providers{get_self(), Names::DefaultScope};
@@ -38,10 +37,7 @@ namespace aggregion {
       auto sit = services.require_find(service.value, "404. Provider service not found!");
 
       services.modify(sit, get_self(), [&](Tables::Service& row) {
-         row.description = description;
-         row.protocol = protocol;
-         row.type = type;
-         row.endpoint = endpoint;
+         row.info = info;
       });
       print("Provider '", provider, "' service '", service, "' was updated.");
    }

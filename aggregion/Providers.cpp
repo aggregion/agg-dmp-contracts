@@ -5,17 +5,18 @@ namespace aggregion {
 
    /// @brief
    /// Register service provider.
-   void Aggregion::regprov(name provider, std::string description) {
-      require_auth(provider);
+   void Aggregion::regprov(std::string provider, std::string description) {
+      const auto p = name{provider};
+      check(has_auth(p) || has_auth(get_self()), "missing authority");
 
       providers_table_t providers{get_self(), Names::DefaultScope};
-      check(providers.find(provider.value) == providers.end(), "403. Provider already registered!");
+      check(providers.find(p.value) == providers.end(), "403. Provider already registered!");
 
       providers.emplace(get_self(), [&](auto& row) {
-         row.provider = provider;
+         row.provider = p;
          row.description = description;
       });
-      print("New provider was registered '", provider, "'");
+      print("New provider was registered '", p, "'");
    }
 
 
@@ -27,7 +28,9 @@ namespace aggregion {
       providers_table_t providers{get_self(), Names::DefaultScope};
       auto it = providers.require_find(provider.value, "404. Unknown provider!");
 
-      providers.modify(it, get_self(), [&](auto& row) { row.description = description; });
+      providers.modify(it, get_self(), [&](auto& row) {
+         row.description = description;
+      });
       print("Provider '", provider, "' description was changed to '", description, "'");
    }
 

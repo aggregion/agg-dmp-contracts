@@ -37,20 +37,23 @@ describe('Aggregion', function () {
     });
 
     describe('#providers', function () {
+        it('should not register provider with invalid name', async () => {
+            const alice = await tools.makeAccount(bc, 'ALiCE');
+            await contract.regprov(alice.account, 'Alice provider', aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
         it('should register new unique provider', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             (await util.isProviderExists(alice.account))
                 .should.be.true;
         });
-
         it('should not register provider if it already registered', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.regprov(alice.account, 'Alice provider', alice.permission)
                 .should.be.rejected;
         });
-
         it('should update description of provider', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             {
@@ -64,7 +67,6 @@ describe('Aggregion', function () {
                 prov.description.should.be.eq('Description Two');
             }
         });
-
         it('should remove existing provider', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             {
@@ -77,6 +79,16 @@ describe('Aggregion', function () {
     });
 
     describe('#services', function () {
+        it('should not register service with invalid name', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.regprov(alice.account, 'Alice provider', alice.permission);
+            await contract.addsvc(alice.account, 'SVC1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
+        it('should not register service with long name', async () => {
+            await contract.addsvc('alice', 'verylongservicename', 'Description', 'http', 'local', 'url', aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: string is too long to be a valid name");
+        });
         it('should create several services for provider', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
@@ -86,22 +98,23 @@ describe('Aggregion', function () {
                 let svc = await util.getService(alice.account, 'svc1');
                 assert.equal(alice.account, svc.scope);
                 assert.equal('svc1', svc.service);
-                assert.equal('Alice provider Service One', svc.description);
-                assert.equal('http', svc.protocol);
-                assert.equal('local', svc.type);
-                assert.equal('http://alicesvcone.ru/', svc.endpoint);
+                const info = svc.info;
+                assert.equal('Alice provider Service One', info.description);
+                assert.equal('http', info.protocol);
+                assert.equal('local', info.type);
+                assert.equal('http://alicesvcone.ru/', info.endpoint);
             }
             {
                 let svc = await util.getService(alice.account, 'svc2');
                 assert.equal(alice.account, svc.scope);
                 assert.equal('svc2', svc.service);
-                assert.equal('Alice provider Service Two', svc.description);
-                assert.equal('ftp', svc.protocol);
-                assert.equal('distributed', svc.type);
-                assert.equal('http://alicesvctwo.ru', svc.endpoint);
+                const info = svc.info;
+                assert.equal('Alice provider Service Two', info.description);
+                assert.equal('ftp', info.protocol);
+                assert.equal('distributed', info.type);
+                assert.equal('http://alicesvctwo.ru', info.endpoint);
             }
         });
-
         it('should update service for provider', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
@@ -111,13 +124,13 @@ describe('Aggregion', function () {
                 let svc = await util.getService(alice.account, 'svc1');
                 assert.equal(alice.account, svc.scope);
                 assert.equal('svc1', svc.service);
-                assert.equal('MST', svc.description);
-                assert.equal('ftp', svc.protocol);
-                assert.equal('distributed', svc.type);
-                assert.equal('http://alicesvctwo.ru', svc.endpoint);
+                const info = svc.info;
+                assert.equal('MST', info.description);
+                assert.equal('ftp', info.protocol);
+                assert.equal('distributed', info.type);
+                assert.equal('http://alicesvctwo.ru', info.endpoint);
             }
         });
-
         it('should remove service for provider', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
@@ -130,6 +143,20 @@ describe('Aggregion', function () {
     });
 
     describe('#requestslog', function () {
+        it('should not write anything if sender has invalid name', async () => {
+            await contract.sendreq('ALICE', 'jimbo', 82034, "my request", aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
+        it('should not write anything if receiver has invalid name', async () => {
+            await contract.sendreq('alice', 'JIMBO', 82034, "my request", aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
+        it('should not write requests for different account', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            const jimbo = await tools.makeAccount(bc, 'jimbo');
+            await contract.sendreq(jimbo.account, jimbo.account, 82034, "my request 1", alice.permission)
+                .should.be.rejected;
+        });
         it('should write one item to requests log table', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             const jimbo = await tools.makeAccount(bc, 'jimbo');
@@ -158,4 +185,5 @@ describe('Aggregion', function () {
                 .should.be.rejected;
         });
     });
+
 });
