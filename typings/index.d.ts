@@ -5,6 +5,7 @@ export declare class AggregionBlockchain {
     }>;
     constructor(nodeUrl: string, privateKeys: any, maxTransactionAttempt?: number);
     addPrivateKey(privateKey: any): Promise<void>;
+    getAccount(name: any): Promise<void>;
     getScopes(contractAccount: any, tableName?: any): Promise<any>;
     getTableRows(contractAccount: any, tableName: any, scopeName: any, primaryKeyValue?: any): Promise<{
         rows: any[];
