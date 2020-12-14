@@ -1,4 +1,4 @@
-#include "Aggregion.hpp"
+#include "Providers.hpp"
 
 
 namespace aggregion {
@@ -21,7 +21,7 @@ namespace aggregion {
          row.service = s;
          row.info = info;
       });
-      print("Provider service '", service, "' was added to '", provider, "'");
+      print("Provider service '", s, "' was added by '", p, "'");
    }
 
 

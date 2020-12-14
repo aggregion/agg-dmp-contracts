@@ -66,4 +66,6 @@ namespace aggregion {
       bool provider_has_services(name provider);
       void remove_provider_services(name provider);
    };
+
+   bool is_provider(name self, name provider);
 }

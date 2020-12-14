@@ -39,7 +39,6 @@ describe('AggregionScripts', function () {
     const hashOne = 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad';
     const hashTwo = 'cb8379ac2098aa165029e3938a51da0bcecfc008fd6795f401178647f96c5b34';
 
-
     describe('#scripts', function () {
         it('should not register script with invalid provider name', async () => {
             const alice = await tools.makeAccount(bc, 'ALiCE');
@@ -145,6 +144,20 @@ describe('AggregionScripts', function () {
             await contract.trust(john.account, kate.account, aggregion.permission)
                 .should.be.rejected;
         });
+        it('should fail if truster is not provider', async () => {
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            await contract.trust(john.account, kate.account, john.permission)
+                .should.be.rejectedWith('404. Provider (truster) not found');
+        });
+        it('should fail if trustee is not provider', async () => {
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.trust(john.account, kate.account, john.permission)
+                .should.be.rejectedWith('404. Provider (trustee) not found');
+        });
         it('should not trust by default', async () => {
             const john = await tools.makeAccount(bc, 'john');
             const kate = await tools.makeAccount(bc, 'kate');
@@ -189,6 +202,12 @@ describe('AggregionScripts', function () {
             const approved = await util.isScriptApprovedBy('alice', hashOne);
             assert.isFalse(approved);
         });
+        it('should fail if not provider', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.addscript(alice.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', alice.permission);
+            await contract.execapprove('alice', hashOne, alice.permission)
+                .should.be.rejectedWith('404. Provider not found');
+        });
         it('should approve existing script', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov('alice', 'Alice provider', alice.permission);
@@ -229,6 +248,7 @@ describe('AggregionScripts', function () {
         });
     });
 
+
     describe('#script access', function () {
         it('should fail if invalid grantor name', async () => {
             await contract.grantaccess('ALICe', hashOne, 'kate', aggregion.permission)
@@ -257,10 +277,16 @@ describe('AggregionScripts', function () {
             await contract.addscript(john.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', john.permission);
             assert.isUndefined(await util.isScriptAccessGrantedTo(john.account, hashOne));
         });
+        it('should fail if grantee is not provider', async () => {
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.addscript(john.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', john.permission);
+            await contract.denyaccess(john.account, hashOne, kate.account, john.permission)
+                .should.be.rejectedWith('404. Provider (grantee) not found');
+        });
         it('should deny and grant access', async () => {
             const john = await tools.makeAccount(bc, 'john');
             const kate = await tools.makeAccount(bc, 'kate');
-            await contract.regprov(john.account, 'John provider', john.permission);
             await contract.regprov(kate.account, 'Kate provider', kate.permission);
             await contract.addscript(john.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', john.permission);
             await contract.denyaccess(john.account, hashOne, kate.account, john.permission);
@@ -271,7 +297,6 @@ describe('AggregionScripts', function () {
         it('should not grant access to non-owned script', async () => {
             const john = await tools.makeAccount(bc, 'john');
             const kate = await tools.makeAccount(bc, 'kate');
-            await contract.regprov(john.account, 'John provider', john.permission);
             await contract.regprov(kate.account, 'Kate provider', kate.permission);
             await contract.addscript(john.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', john.permission);
             await contract.denyaccess(kate.account, hashOne, kate.account, kate.permission)

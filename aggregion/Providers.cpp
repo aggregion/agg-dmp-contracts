@@ -1,4 +1,4 @@
-#include "Aggregion.hpp"
+#include "Providers.hpp"
 
 
 namespace aggregion {
@@ -23,7 +23,7 @@ namespace aggregion {
    /// @brief
    /// Update provider description.
    void Aggregion::updprov(name provider, std::string description) {
-      require_auth(provider);
+      check(has_auth(provider) || has_auth(get_self()), "missing authority");
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       auto it = providers.require_find(provider.value, "404. Unknown provider!");
@@ -38,7 +38,7 @@ namespace aggregion {
    /// @brief
    /// Unregister service provider.
    void Aggregion::unregprov(name provider) {
-      require_auth(provider);
+      check(has_auth(provider) || has_auth(get_self()), "missing authority");
 
       providers_table_t providers{get_self(), Names::DefaultScope};
       auto it = providers.require_find(provider.value, "404. Unknown provider!");
@@ -50,5 +50,11 @@ namespace aggregion {
 
       providers.erase(it);
       print("Provider '", provider, "' was unregistered.");
+   }
+
+
+   bool is_provider(name self, name provider) {
+      Aggregion::providers_table_t providers{self, Names::DefaultScope};
+      return providers.find(provider.value) != providers.end();
    }
 }
