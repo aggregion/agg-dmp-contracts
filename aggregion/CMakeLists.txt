@@ -7,8 +7,8 @@ find_package(eosio.cdt)
 add_contract(Aggregion Aggregion
     Providers.cpp
     RequestsLog.cpp
-    Scripts.cpp
     ScriptAccessRules.cpp
+    Scripts.cpp
     Services.cpp
 )
 

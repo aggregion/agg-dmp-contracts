@@ -139,7 +139,14 @@ describe('Aggregion', function () {
             let svc = await util.getService(alice.account, 'svc1');
             assert.isUndefined(svc);
         });
-
+        it('should remove provider services if provider was removed', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.regprov(alice.account, 'Alice provider', alice.permission);
+            await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
+            await contract.unregprov(alice.account, alice.permission);
+            let svc = await util.getService(alice.account, 'svc1');
+            assert.isUndefined(svc);
+        });
     });
 
     describe('#requestslog', function () {

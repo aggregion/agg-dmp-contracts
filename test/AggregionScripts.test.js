@@ -185,6 +185,19 @@ describe('AggregionScripts', function () {
             await contract.untrust(john.account, kate.account, john.permission);
             assert.isFalse(await util.isTrusted(john.account, kate.account));
         });
+        it('should remove trust statements if provider was removed', async () => {
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            await contract.trust(john.account, kate.account, john.permission);
+            await contract.trust(kate.account, john.account, kate.permission);
+            assert.isTrue(await util.isTrusted(john.account, kate.account));
+            assert.isTrue(await util.isTrusted(kate.account, john.account));
+            await contract.unregprov(john.account, john.permission);
+            assert.isFalse(await util.isTrusted(john.account, kate.account));
+            assert.isTrue(await util.isTrusted(kate.account, john.account));
+        });
     });
 
 
@@ -242,9 +255,24 @@ describe('AggregionScripts', function () {
             await contract.addscript(alice.account, 'script1', 'v1', 'Description', hashOne, 'Url', alice.permission);
             await contract.execapprove('alice', hashOne, alice.permission);
             await contract.remscript(alice.account, 'script1', 'v1', alice.permission)
-                .should.be.rejected;
+                .should.be.rejectedWith("403. Can't remove script. Script was approved!");
             await contract.execdeny('alice', hashOne, alice.permission);
             await contract.remscript(alice.account, 'script1', 'v1', alice.permission);
+        });
+        it('should remove approve statements if provider was removed', async () => {
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            const vika = await tools.makeAccount(bc, 'vika');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            await contract.addscript(vika.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', vika.permission);
+            await contract.execapprove(john.account, hashOne, john.permission);
+            await contract.execapprove(kate.account, hashOne, kate.permission);
+            assert.isTrue(await util.isScriptApprovedBy(john.account, hashOne));
+            assert.isTrue(await util.isScriptApprovedBy(kate.account, hashOne));
+            await contract.unregprov(john.account, john.permission);
+            assert.isFalse(await util.isScriptApprovedBy(john.account, hashOne));
+            assert.isTrue(await util.isScriptApprovedBy(kate.account, hashOne));
         });
     });
 
@@ -303,6 +331,21 @@ describe('AggregionScripts', function () {
                 .should.be.rejected;
             await contract.grantaccess(kate.account, hashOne, kate.account, kate.permission)
                 .should.be.rejected;
+        });
+        it('should remove script access statements if provider was removed', async () => {
+            const john = await tools.makeAccount(bc, 'john');
+            const kate = await tools.makeAccount(bc, 'kate');
+            const vika = await tools.makeAccount(bc, 'vika');
+            await contract.regprov(john.account, 'John provider', john.permission);
+            await contract.regprov(kate.account, 'Kate provider', kate.permission);
+            await contract.addscript(vika.account, 'script1', 'v1', 'Newton function', hashOne, 'http://example.com', vika.permission);
+            await contract.grantaccess(vika.account, hashOne, john.account, vika.permission);
+            await contract.grantaccess(vika.account, hashOne, kate.account, vika.permission);
+            assert.isTrue(await util.isScriptAccessGrantedTo(john.account, hashOne));
+            assert.isTrue(await util.isScriptAccessGrantedTo(kate.account, hashOne));
+            await contract.unregprov(john.account, john.permission);
+            assert.isUndefined(await util.isScriptAccessGrantedTo(john.account, hashOne));
+            assert.isTrue(await util.isScriptAccessGrantedTo(kate.account, hashOne));
         });
     });
 
@@ -374,6 +417,22 @@ describe('AggregionScripts', function () {
             await contract.enclaveScriptAccess(alice.account, hashOne, prov.account, false, bob.permission)
                 .should.be.rejected;
             assert.isUndefined(await util.isScriptAllowedWithinEnclave(alice.account, hashOne, prov.account));
+        });
+        it('should remove enclave access statements if enclave owner was removed', async () => {
+            const eown = await tools.makeAccount(bc, 'eown');
+            const eow2 = await tools.makeAccount(bc, 'eow2');
+            const sown = await tools.makeAccount(bc, 'sown');
+            const prov = await tools.makeAccount(bc, 'prov');
+            await contract.regprov(eown.account, 'Enclave Owner', eown.permission);
+            await contract.regprov(prov.account, 'Some Provider', prov.permission);
+            await contract.addscript(sown.account, 's1', 'v1', 'ABC', hashOne, 'http://example.com', sown.permission);
+            await contract.enclaveScriptAccess(eown.account, hashOne, prov.account, true, eown.permission);
+            await contract.enclaveScriptAccess(eow2.account, hashOne, prov.account, true, eow2.permission);
+            assert.isTrue(await util.isScriptAllowedWithinEnclave(eown.account, hashOne, prov.account));
+            assert.isTrue(await util.isScriptAllowedWithinEnclave(eow2.account, hashOne, prov.account));
+            await contract.unregprov(eown.account, eown.permission);
+            assert.isUndefined(await util.isScriptAllowedWithinEnclave(eown.account, hashOne, prov.account));
+            assert.isTrue(await util.isScriptAllowedWithinEnclave(eow2.account, hashOne, prov.account));
         });
     });
 });

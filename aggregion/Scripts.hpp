@@ -15,7 +15,7 @@ namespace aggregion::scripts {
       return sha256(mix.c_str(), mix.size());
    }
 
-   struct Def {
+   struct Tables {
       /// @brief
       /// Scripts declaration table.
       /// Scope: Default.
@@ -44,14 +44,12 @@ namespace aggregion::scripts {
    };
 
 
-   struct Tables {
-      struct Indexes {
-         using scripts_version_idx_t = indexed_by<Names::ScriptsVersionIndex, const_mem_fun<Def::Scripts, checksum256, &Def::Scripts::script_version_key>>;
-         using scripts_hash_idx_t = indexed_by<Names::ScriptsHashIndex, const_mem_fun<Def::Scripts, checksum256, &Def::Scripts::script_hash_key>>;
-      };
-
-      using scripts_table_t = eosio::multi_index<Names::ScriptsTable, Def::Scripts, Indexes::scripts_version_idx_t, Indexes::scripts_hash_idx_t>;
+   struct Indexes {
+      using scripts_version_idx_t = indexed_by<Names::ScriptsVersionIndex, const_mem_fun<Tables::Scripts, checksum256, &Tables::Scripts::script_version_key>>;
+      using scripts_hash_idx_t = indexed_by<Names::ScriptsHashIndex, const_mem_fun<Tables::Scripts, checksum256, &Tables::Scripts::script_hash_key>>;
    };
+
+   using scripts_table_t = eosio::multi_index<Names::ScriptsTable, Tables::Scripts, Indexes::scripts_version_idx_t, Indexes::scripts_hash_idx_t>;
 
    /// @brief
    /// Aggregion scripts.

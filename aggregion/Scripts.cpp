@@ -3,7 +3,7 @@
 namespace aggregion::scripts {
 
    std::optional<uint64_t> get_script_id(name self, name owner, name script, name version) {
-      Tables::scripts_table_t scripts{self, Names::DefaultScope};
+      scripts_table_t scripts{self, Names::DefaultScope};
       auto idx = scripts.get_index<Names::ScriptsVersionIndex>();
       auto ait = idx.find(hash3s(owner, script, version));
       if (ait == idx.end()) {
@@ -13,7 +13,7 @@ namespace aggregion::scripts {
    }
 
    std::optional<uint64_t> get_script_id(name self, checksum256 hash) {
-      Tables::scripts_table_t scripts{self, Names::DefaultScope};
+      scripts_table_t scripts{self, Names::DefaultScope};
       auto idx = scripts.get_index<Names::ScriptsHashIndex>();
       auto ait = idx.find(hash);
       if (ait == idx.end()) {
@@ -33,8 +33,8 @@ namespace aggregion::scripts {
       check(get_script_id(get_self(), o, s, v) == std::nullopt, "403. Script version already exist!");
       check(get_script_id(get_self(), hash) == std::nullopt, "403. Script hash already exist!");
 
-      Tables::scripts_table_t scripts{get_self(), Names::DefaultScope};
-      scripts.emplace(get_self(), [&](Def::Scripts& row) {
+      scripts_table_t scripts{get_self(), Names::DefaultScope};
+      scripts.emplace(get_self(), [&](Tables::Scripts& row) {
          row.id = scripts.available_primary_key();
          row.owner = o;
          row.script = s;
@@ -56,12 +56,12 @@ namespace aggregion::scripts {
       auto id = get_script_id(get_self(), owner, script, version);
       check(id.has_value(), "404. Script version not found");
 
-      Tables::scripts_table_t scripts{get_self(), Names::DefaultScope};
+      scripts_table_t scripts{get_self(), Names::DefaultScope};
       auto item = scripts.require_find(id.value(), "500. Script not found!");
       check(item->approves_count == 0, "403. Can't update script. Script was approved!");
       check(item->owner == owner, "403. Wrong owner");
 
-      scripts.modify(item, get_self(), [&](Def::Scripts& row) {
+      scripts.modify(item, get_self(), [&](Tables::Scripts& row) {
          row.description = description;
          row.hash = hash;
          row.url = url;
@@ -78,7 +78,7 @@ namespace aggregion::scripts {
       auto id = get_script_id(get_self(), owner, script, version);
       check(id.has_value(), "404. Script version not found");
 
-      Tables::scripts_table_t scripts{get_self(), Names::DefaultScope};
+      scripts_table_t scripts{get_self(), Names::DefaultScope};
       auto item = scripts.require_find(id.value(), "500. Script not found!");
       check(item->approves_count == 0, "403. Can't remove script. Script was approved!");
       check(item->owner == owner, "403. Wrong owner!");

@@ -76,6 +76,7 @@
         "strstream": "cpp",
         "typeindex": "cpp",
         "cfenv": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "__memory": "cpp"
     }
 }

@@ -10,7 +10,7 @@ namespace aggregion::sar {
 
    using eosio::name;
 
-   struct Def {
+   namespace Tables {
       /// @brief
       /// Trusted providers.
       /// Scope: Provider (truster).
@@ -57,12 +57,10 @@ namespace aggregion::sar {
       };
    };
 
-   struct Tables {
-      using trusted_providers_table_t = eosio::multi_index<Names::TrustedProvidersTable, Def::TrustedProviders>;
-      using script_approves_table_t = eosio::multi_index<Names::ScriptApprovesTable, Def::ScriptApproves>;
-      using script_access_table_t = eosio::multi_index<Names::ScriptAccessTable, Def::ScriptsAccess>;
-      using enclave_script_access_table_t = eosio::multi_index<Names::EnclaveScriptAccessTable, Def::EnclaveScriptsAccess>;
-   };
+   using trusted_providers_table_t = eosio::multi_index<Names::TrustedProvidersTable, Tables::TrustedProviders>;
+   using script_approves_table_t = eosio::multi_index<Names::ScriptApprovesTable, Tables::ScriptApproves>;
+   using script_access_table_t = eosio::multi_index<Names::ScriptAccessTable, Tables::ScriptsAccess>;
+   using enclave_script_access_table_t = eosio::multi_index<Names::EnclaveScriptAccessTable, Tables::EnclaveScriptsAccess>;
 
    /// @brief
    /// Aggregion script access permissions.
