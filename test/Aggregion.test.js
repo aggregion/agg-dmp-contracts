@@ -1,57 +1,35 @@
 
 const AggregionBlockchain = require('../js/AggregionBlockchain.js');
+const AggregionNode = require('../js/AggregionNode.js');
 const AggregionContract = require('../js/AggregionContract.js');
 const AggregionUtility = require('../js/AggregionUtility.js');
-const AggregionNode = require('../js/AggregionNode.js');
-const TestsConfig = require('../js/TestsConfig.js');
+const TestConfig = require('./TestConfig.js');
+const tools = require('./TestTools.js');
 
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised');
+const check = require('check-types');
 chai.use(chaiAsPromised);
 var assert = chai.assert;
 var should = chai.should();
 
-class TestAccount {
-    constructor(name, publicKey, privateKey) {
-        this.account = name;
-        this.publicKey = publicKey;
-        this.privateKey = privateKey;
-        this.permission = name + '@active';
-    }
-};
-
-/**
- *
- * @param {AggregionBlockchain} blockchain
- * @param {String} name
- * @returns {TestAccount}
- */
-async function makeAccount(blockchain, name) {
-    const pair = await AggregionBlockchain.createKeyPair();
-    const ownerKey = pair.publicKey;
-    const activeKey = ownerKey;
-    await blockchain.newaccount('eosio', name, ownerKey, activeKey, 'eosio@active');
-    await blockchain.addPrivateKey(pair.privateKey);
-    return new TestAccount(name, ownerKey, pair.privateKey);
-}
-
-
 describe('Aggregion', function () {
 
-    const config = new TestsConfig(__dirname + '/config.json')
+    const config = new TestConfig(__dirname + '/config.json')
+    const contractConfig = config.contracts.aggregion;
 
-    let node = new AggregionNode(config.getSignatureProvider(), config.node.endpoint, config.node.workdir);
-    let bc = new AggregionBlockchain(config.getNodeUrl(), [config.blockchain.eosio_root_key.private]);
-    let util = new AggregionUtility(config.contract.account, bc);
-    let contract = new AggregionContract(config.contract.account, bc);
+    let node = new AggregionNode(config.getSignatureProvider(), config.node.executable, config.node.endpoint, config.node.workdir);
+    let bc = new AggregionBlockchain(config.getNodeUrl(), [config.blockchain.eosio_root_key.private], config.debug);
+    let contract = new AggregionContract(contractConfig.account, bc);
+    let util = new AggregionUtility(contractConfig.account, bc);
     let aggregion = null;
 
     this.timeout(0);
 
     beforeEach(async function () {
         await node.start();
-        aggregion = await makeAccount(bc, config.contract.account);
-        await bc.deploy(aggregion.account, config.contract.wasm, config.contract.abi, aggregion.permission);
+        aggregion = await tools.makeAccount(bc, contractConfig.account);
+        await bc.deploy(aggregion.account, contractConfig.wasm, contractConfig.abi, aggregion.permission);
     });
 
     afterEach(async function () {
@@ -59,22 +37,25 @@ describe('Aggregion', function () {
     });
 
     describe('#providers', function () {
+        it('should not register provider with invalid name', async () => {
+            const alice = await tools.makeAccount(bc, 'ALiCE');
+            await contract.regprov(alice.account, 'Alice provider', aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
         it('should register new unique provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
-            (await util.isProviderExist(alice.account))
+            (await util.isProviderExists(alice.account))
                 .should.be.true;
         });
-
         it('should not register provider if it already registered', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.regprov(alice.account, 'Alice provider', alice.permission)
                 .should.be.rejected;
         });
-
         it('should update description of provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             {
                 await contract.regprov(alice.account, 'Description One', alice.permission);
                 let prov = await util.getProviderByName(alice.account);
@@ -86,21 +67,30 @@ describe('Aggregion', function () {
                 prov.description.should.be.eq('Description Two');
             }
         });
-
         it('should remove existing provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             {
                 await contract.regprov(alice.account, 'Alice provider', alice.permission);
                 await contract.unregprov(alice.account, alice.permission);
-                (await util.isProviderExist(alice.account))
+                (await util.isProviderExists(alice.account))
                     .should.be.false;
             }
         });
     });
 
     describe('#services', function () {
+        it('should not register service with invalid name', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.regprov(alice.account, 'Alice provider', alice.permission);
+            await contract.addsvc(alice.account, 'SVC1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
+        it('should not register service with long name', async () => {
+            await contract.addsvc('alice', 'verylongservicename', 'Description', 'http', 'local', 'url', aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: string is too long to be a valid name");
+        });
         it('should create several services for provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
             await contract.addsvc(alice.account, 'svc2', 'Alice provider Service Two', 'ftp', 'distributed', 'http://alicesvctwo.ru', alice.permission);
@@ -108,24 +98,25 @@ describe('Aggregion', function () {
                 let svc = await util.getService(alice.account, 'svc1');
                 assert.equal(alice.account, svc.scope);
                 assert.equal('svc1', svc.service);
-                assert.equal('Alice provider Service One', svc.description);
-                assert.equal('http', svc.protocol);
-                assert.equal('local', svc.type);
-                assert.equal('http://alicesvcone.ru/', svc.endpoint);
+                const info = svc.info;
+                assert.equal('Alice provider Service One', info.description);
+                assert.equal('http', info.protocol);
+                assert.equal('local', info.type);
+                assert.equal('http://alicesvcone.ru/', info.endpoint);
             }
             {
                 let svc = await util.getService(alice.account, 'svc2');
                 assert.equal(alice.account, svc.scope);
                 assert.equal('svc2', svc.service);
-                assert.equal('Alice provider Service Two', svc.description);
-                assert.equal('ftp', svc.protocol);
-                assert.equal('distributed', svc.type);
-                assert.equal('http://alicesvctwo.ru', svc.endpoint);
+                const info = svc.info;
+                assert.equal('Alice provider Service Two', info.description);
+                assert.equal('ftp', info.protocol);
+                assert.equal('distributed', info.type);
+                assert.equal('http://alicesvctwo.ru', info.endpoint);
             }
         });
-
         it('should update service for provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
             await contract.updsvc(alice.account, 'svc1', 'MST', 'ftp', 'distributed', 'http://alicesvctwo.ru', alice.permission);
@@ -133,259 +124,72 @@ describe('Aggregion', function () {
                 let svc = await util.getService(alice.account, 'svc1');
                 assert.equal(alice.account, svc.scope);
                 assert.equal('svc1', svc.service);
-                assert.equal('MST', svc.description);
-                assert.equal('ftp', svc.protocol);
-                assert.equal('distributed', svc.type);
-                assert.equal('http://alicesvctwo.ru', svc.endpoint);
+                const info = svc.info;
+                assert.equal('MST', info.description);
+                assert.equal('ftp', info.protocol);
+                assert.equal('distributed', info.type);
+                assert.equal('http://alicesvctwo.ru', info.endpoint);
             }
         });
-
         it('should remove service for provider', async () => {
-            const alice = await makeAccount(bc, 'alice');
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
             await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
             await contract.remsvc(alice.account, 'svc1', alice.permission);
             let svc = await util.getService(alice.account, 'svc1');
             assert.isUndefined(svc);
         });
-
-    });
-
-    describe('#scripts', function () {
-        it('should create several scripts for user', async () => {
-            const bob = await makeAccount(bc, 'bob');
-            await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
-            await contract.addscript(bob.account, 'script1', 'v2', 'Einstein function', 'def', 'http://eindef.com', bob.permission);
-            {
-                let script = await util.getScript(bob.account, 'script1', 'v1');
-                assert.equal(bob.account, script.scope);
-                assert.equal('script1', script.script);
-                assert.equal('v1', script.version);
-                assert.equal('Newton function', script.description);
-                assert.equal('abc', script.hash);
-                assert.equal('http://example.com', script.url);
-            }
-            {
-                let script = await util.getScript(bob.account, 'script1', 'v2');
-                assert.equal(bob.account, script.scope);
-                assert.equal('script1', script.script);
-                assert.equal('v2', script.version);
-                assert.equal('Einstein function', script.description);
-                assert.equal('def', script.hash);
-                assert.equal('http://eindef.com', script.url);
-            }
-        });
-
-        it('should update script if it does not approved', async () => {
-            const bob = await makeAccount(bc, 'bob');
-            await contract.addscript(bob.account, 'script1', 'v1', 'meaningless description', 'hash', 'url', bob.permission);
-            await contract.updscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
-            {
-                let script = await util.getScript(bob.account, 'script1', 'v1');
-                assert.equal(bob.account, script.scope);
-                assert.equal('script1', script.script);
-                assert.equal('v1', script.version);
-                assert.equal('Newton function', script.description);
-                assert.equal('abc', script.hash);
-                assert.equal('http://example.com', script.url);
-            }
-        });
-
-        it('should remove script if it does not approved', async () => {
-            const bob = await makeAccount(bc, 'bob');
-            await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
-            await contract.remscript(bob.account, 'script1', 'v1', bob.permission);
-            let script = await util.getScript(bob.account, 'script1', 'v1');
-            assert.isUndefined(script);
-        });
-
-        it('should fail if script version already exists', async () => {
-            const bob = await makeAccount(bc, 'bob');
-            await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
-            await contract.addscript(bob.account, 'script1', 'v2', 'Einstein function', 'def', 'http://eindef.com', bob.permission);
-            await contract.addscript(bob.account, 'script1', 'v2', 'Einstein function', 'def', 'http://eindef.com', bob.permission)
-                .should.be.rejected;
-        });
-    });
-
-    describe('#approves', function () {
-        it('should not be approved by default', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
+        it('should remove provider services if provider was removed', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
             await contract.regprov(alice.account, 'Alice provider', alice.permission);
-            await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
-            let approved = await util.isScriptApproved(alice.account, bob.account, 'script1', 'v1');
-            assert.isFalse(approved);
-
-        });
-        it('should approve existing script', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
-            await contract.regprov(alice.account, 'Alice provider', alice.permission);
-            await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
-            await contract.approve(alice.account, bob.account, 'script1', 'v1', alice.permission);
-            let approved = await util.isScriptApproved(alice.account, bob.account, 'script1', 'v1');
-            assert.isTrue(approved);
-        });
-        it('should deny approved script', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
-            await contract.regprov(alice.account, 'Alice provider', alice.permission);
-            await contract.addscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
-            await contract.approve(alice.account, bob.account, 'script1', 'v1', alice.permission);
-            await contract.deny(alice.account, bob.account, 'script1', 'v1', alice.permission);
-            let approved = await util.isScriptApproved(alice.account, bob.account, 'script1', 'v1');
-            assert.isFalse(approved);
-        });
-        it('should not update script if it is approved', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
-            await contract.regprov(alice.account, 'Alice provider', alice.permission);
-            await contract.addscript(bob.account, 'script1', 'v1', 'Description', 'Hash', 'Url', bob.permission);
-            await contract.approve(alice.account, bob.account, 'script1', 'v1', alice.permission);
-            await contract.updscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission)
-                .should.be.rejected;
-            await contract.deny(alice.account, bob.account, 'script1', 'v1', alice.permission);
-            await contract.updscript(bob.account, 'script1', 'v1', 'Newton function', 'abc', 'http://example.com', bob.permission);
-        });
-
-        it('should not remove script if it is approved', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
-            await contract.regprov(alice.account, 'Alice provider', alice.permission);
-            await contract.addscript(bob.account, 'script1', 'v1', 'Description', 'Hash', 'Url', bob.permission);
-            await contract.approve(alice.account, bob.account, 'script1', 'v1', alice.permission);
-            await contract.remscript(bob.account, 'script1', 'v1', bob.permission)
-                .should.be.rejected;
-            await contract.deny(alice.account, bob.account, 'script1', 'v1', alice.permission);
-            await contract.remscript(bob.account, 'script1', 'v1', bob.permission);
+            await contract.addsvc(alice.account, 'svc1', 'Alice provider Service One', 'http', 'local', 'http://alicesvcone.ru/', alice.permission);
+            await contract.unregprov(alice.account, alice.permission);
+            let svc = await util.getService(alice.account, 'svc1');
+            assert.isUndefined(svc);
         });
     });
 
     describe('#requestslog', function () {
+        it('should not write anything if sender has invalid name', async () => {
+            await contract.sendreq('ALICE', 'jimbo', 82034, "my request", aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
+        it('should not write anything if receiver has invalid name', async () => {
+            await contract.sendreq('alice', 'JIMBO', 82034, "my request", aggregion.permission)
+                .should.be.rejectedWith("assertion failure with message: character is not in allowed character set for names");
+        });
+        it('should not write requests for different account', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            const jimbo = await tools.makeAccount(bc, 'jimbo');
+            await contract.sendreq(jimbo.account, jimbo.account, 82034, "my request 1", alice.permission)
+                .should.be.rejected;
+        });
         it('should write one item to requests log table', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
-            await contract.sendreq(alice.account, bob.account, 82034, "my request", alice.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            const jimbo = await tools.makeAccount(bc, 'jimbo');
+            await contract.sendreq(alice.account, jimbo.account, 82034, "my request", alice.permission);
             let rows = await util.getRequestsLog();
             let item = rows.pop();
-            assert.equal('alice', item.sender);
-            assert.equal('bob', item.receiver);
+            assert.equal(alice.account, item.sender);
+            assert.equal(jimbo.account, item.receiver);
             assert.equal('82034', item.date);
             assert.equal('my request', item.request);
         });
         it('should write several items to requests log table', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
-            await contract.sendreq(alice.account, bob.account, 82034, "my request 1", alice.permission);
-            await contract.sendreq(alice.account, bob.account, 82035, "my request 2", alice.permission);
-            await contract.sendreq(bob.account, alice.account, 82035, "my request 2", bob.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            const jimbo = await tools.makeAccount(bc, 'jimbo');
+            await contract.sendreq(alice.account, jimbo.account, 82034, "my request 1", alice.permission);
+            await contract.sendreq(alice.account, jimbo.account, 82035, "my request 2", alice.permission);
+            await contract.sendreq(jimbo.account, alice.account, 82035, "my request 2", jimbo.permission);
             let rows = await util.getRequestsLog();
             assert.equal(3, rows.length);
         });
         it('should not write duplicates to requests log table', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            const bob = await makeAccount(bc, 'bob');
-            await contract.sendreq(alice.account, bob.account, 82034, "my request 1", alice.permission);
-            await contract.sendreq(alice.account, bob.account, 82034, "my request 1", alice.permission)
+            const alice = await tools.makeAccount(bc, 'alice');
+            const jimbo = await tools.makeAccount(bc, 'jimbo');
+            await contract.sendreq(alice.account, jimbo.account, 82034, "my request 1", alice.permission);
+            await contract.sendreq(alice.account, jimbo.account, 82034, "my request 1", alice.permission)
                 .should.be.rejected;
-        });
-    });
-
-    describe('#categories', function () {
-        it('should add root category and assign auto generated id', async () => {
-            await contract.catinsert(null, null, 'abc', aggregion.permission);
-            let rows = await util.getCategories();
-            let item = rows.pop();
-            assert.equal(1, item.id);
-            assert.equal(0, item.parent_id);
-            assert.equal(0, item.childs_count);
-            assert.equal('abc', item.name);
-        });
-        it('should not accept zero id value', async () => {
-            await contract.catinsert(0, null, 'abc', aggregion.permission)
-                .should.be.rejected;
-        });
-        it('should add root category with specified id', async () => {
-            await contract.catinsert(126, null, 'abc', aggregion.permission);
-            let rows = await util.getCategories();
-            let item = rows.pop();
-            assert.equal(126, item.id);
-            assert.equal(0, item.parent_id);
-            assert.equal(0, item.childs_count);
-            assert.equal('abc', item.name);
-        });
-        it('should add subcategory', async () => {
-            await contract.catinsert(1250, null, 'abc', aggregion.permission);
-            await contract.catinsert(1260, 1250, 'def', aggregion.permission);
-            let first = await util.getCategoryById(1250);
-            assert.equal(0, first.parent_id);
-            let second = await util.getCategoryById(1260);
-            assert.equal(1250, second.parent_id);
-        });
-        it('should remove category', async () => {
-            await contract.catinsert(224, null, 'abc', aggregion.permission);
-            await contract.catremove(224, aggregion.permission);
-            let rows = await util.getCategories();
-            assert.equal(0, rows.length);
-        });
-        it('should not remove category if it has subcategories', async () => {
-            await contract.catinsert(1250, null, 'abc', aggregion.permission);
-            await contract.catinsert(1260, 1250, 'def', aggregion.permission);
-            await contract.catremove(1250, aggregion.permission)
-                .should.be.rejected;
-        });
-        it('should remove category after its subcategories was removed', async () => {
-            await contract.catinsert(1250, null, 'abc', aggregion.permission);
-            await contract.catinsert(1260, 1250, 'def', aggregion.permission);
-            await contract.catremove(1260, aggregion.permission);
-            await contract.catremove(1250, aggregion.permission);
-            let rows = await util.getCategories();
-            assert.equal(0, rows.length);
-        });
-        it('should deny insert for non-root accounts', async () => {
-            const alice = await makeAccount(bc, 'alice');
-            await contract.catinsert(null, 'abc', alice.permission)
-                .should.be.rejected;
-        });
-        it('should deny remove for non-root accounts', async () => {
-            await contract.catinsert(125, null, 'abc', aggregion.permission);
-            const alice = await makeAccount(bc, 'alice');
-            await contract.catremove(125, alice.permission)
-                .should.be.rejected;
-        });
-        it('should find subcategories', async () => {
-            await contract.catinsert(1250, null, '111', aggregion.permission);
-            await contract.catinsert(1260, 1250, '222', aggregion.permission);
-            await contract.catinsert(1261, 1250, '333', aggregion.permission);
-            await contract.catinsert(1262, 1250, '444', aggregion.permission);
-            await contract.catinsert(1270, null, '555', aggregion.permission);
-            let rows = await util.getSubcategories(1250);
-            assert.equal(3, rows.length);
-        });
-
-        it('should build path for category at full depth', async () => {
-            await contract.catinsert(1111, null, '111', aggregion.permission);
-            await contract.catinsert(2222, 1111, '222', aggregion.permission);
-            await contract.catinsert(3333, 2222, '333', aggregion.permission);
-            await contract.catinsert(4444, 3333, '444', aggregion.permission);
-            await contract.catinsert(5555, 4444, '555', aggregion.permission);
-            {
-                let path = await util.getCategoryPath(5555);
-                assert.equal("111", path.a0);
-                assert.equal("222", path.a1);
-                assert.equal("333", path.a2);
-                assert.equal("444", path.a3);
-                assert.equal("555", path.a4);
-            }
-            {
-                let path = await util.getCategoryPath(3333);
-                assert.equal("111", path.a0);
-                assert.equal("222", path.a1);
-                assert.equal("333", path.a2);
-                assert.equal(null, path.a3);
-                assert.equal(null, path.a4);
-            }
         });
     });
 

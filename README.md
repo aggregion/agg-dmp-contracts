@@ -1,5 +1,4 @@
 # Aggregion Contract
-## Version : 1.0.0
 
 # CODE
 
@@ -7,6 +6,7 @@ Prerequisites
 
 1. EOS v2.0.4 tools `cleos` and `keosd` accessible in path (https://github.com/EOSIO/eos/tree/release/2.0.x).
 1. EOSIO.CDT installed (https://github.com/EOSIO/eosio.cdt/tree/release/1.7.x)
+1. EOSIO contracts cloned (https://github.com/EOSIO/eosio.contracts)
 
 
 Environment variables
@@ -15,8 +15,8 @@ Environment variables
 
 # Example
 export EOSIO_CDT_ROOT=/opt/eosio.cdt/
+export EOS_CONTRACTS_ROOT=/home/user/eosio.contracts/
 export NODE_URL=http://testnet:8888
-export AGGREGION_ACCOUNT=aggregion
 ```
 
 Building
@@ -41,7 +41,7 @@ Prerequisites
 1. `nodejs` (https://nodejs.org/) in system path.
 1. `nodeos` in system path.
 1. public and private keys for `eosio` (root) account.
-1. accessible contract wasm and abi files.
+1. accessible contracts wasm and abi files.
 
 Write config file and put it in `test` directory. Config file content example:
 
@@ -51,16 +51,24 @@ Write config file and put it in `test` directory. Config file content example:
         "endpoint": "127.0.0.1:8888",
         "workdir": "/tmp/aggregion_tests_blockchain_data"
     },
+    "debug" : false,
     "blockchain": {
         "eosio_root_key": {
             "public": "<eosio public key>",
             "private": "<eosio private key>"
         }
     },
-    "contract": {
-        "account" : "aggregion",
-        "wasm": "/home/user/aggregion-dmp-contracts/build/Aggregion/Aggregion.wasm",
-        "abi": "/home/user/aggregion-dmp-contracts/build/Aggregion/Aggregion.abi"
+    "contracts" : {
+        "aggregion": {
+            "account" : "aggregion",
+            "wasm": "/home/user/aggregion-dmp-contracts/build/aggregion/Aggregion.wasm",
+            "abi": "/home/user/aggregion-dmp-contracts/build/aggregion/Aggregion.abi"
+        }
+        "dmpusers": {
+            "account" : "dmpusers",
+            "wasm": "/home/user/aggregion-dmp-contracts/build/dmpusers/Dmpusers.wasm",
+            "abi": "/home/user/aggregion-dmp-contracts/build/dmpusers/Dmpusers.abi"
+        }
     }
 }
 

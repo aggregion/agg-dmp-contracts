@@ -6,13 +6,8 @@ then
       exit 1
 fi
 
-if [ -z "$AGGREGION_ACCOUNT" ]
-then
-      echo "\$AGGREGION_ACCOUNT is not defined"
-      exit 1
-fi
-
-PERMISSION="$AGGREGION_ACCOUNT@active"
-
 set -x
-cleos -u $NODE_URL set contract $AGGREGION_ACCOUNT Aggregion/ -p $PERMISSION
+cleos -u $NODE_URL set contract aggregion aggregion/ Aggregion.wasm Aggregion.abi -p aggregion@active
+cleos -u $NODE_URL set contract dmpusers dmpusers/ Dmpusers.wasm Dmpusers.abi -p dmpusers@active
+cleos -u $NODE_URL set account permission dmpusers active --add-code
+cleos -u $NODE_URL set contract catalogs catalogs/ Catalogs.wasm Catalogs.abi -p catalogs@active

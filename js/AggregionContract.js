@@ -69,10 +69,11 @@ class AggregionContract {
         let request = {};
         request.provider = provider;
         request.service = service;
-        request.description = description;
-        request.protocol = protocol;
-        request.type = type;
-        request.endpoint = endpoint;
+        request.info = {};
+        request.info.description = description;
+        request.info.protocol = protocol;
+        request.info.type = type;
+        request.info.endpoint = endpoint;
         return await this.bc.pushAction(this.contractName, "addsvc", request, permission);
     }
 
@@ -91,10 +92,11 @@ class AggregionContract {
         let request = {};
         request.provider = provider;
         request.service = service;
-        request.description = description;
-        request.protocol = protocol;
-        request.type = type;
-        request.endpoint = endpoint;
+        request.info = {};
+        request.info.description = description;
+        request.info.protocol = protocol;
+        request.info.type = type;
+        request.info.endpoint = endpoint;
         return await this.bc.pushAction(this.contractName, "updsvc", request, permission);
     }
 
@@ -174,39 +176,127 @@ class AggregionContract {
     }
 
     /**
-     * Approve execution of user script.
-     * @param {EosioName} provider
-     * @param {EosioName} script_owner
-     * @param {EosioName} script
-     * @param {EosioName} version
+     * Trust provider.
+     * @param {EosioName} truster
+     * @param {EosioName} trustee
      * @param {permission} permission
      */
-    async approve(provider, script_owner, script, version, permission) {
+    async trust(truster, trustee, permission) {
+        check.assert.assigned(truster, 'truster is required');
+        check.assert.assigned(trustee, 'trustee is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.truster = truster;
+        request.trustee = trustee;
+        return await this.bc.pushAction(this.contractName, "trust", request, permission);
+    }
+
+    /**
+     * Untrust provider.
+     * @param {EosioName} truster
+     * @param {EosioName} trustee
+     * @param {permission} permission
+     */
+    async untrust(truster, trustee, permission) {
+        check.assert.assigned(truster, 'truster is required');
+        check.assert.assigned(trustee, 'trustee is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.truster = truster;
+        request.trustee = trustee;
+        return await this.bc.pushAction(this.contractName, "untrust", request, permission);
+    }
+
+    /**
+     * Approve execution of user script.
+     * @param {EosioName} provider
+     * @param {string} script_hash
+     * @param {permission} permission
+     */
+    async execapprove(provider, script_hash, permission) {
+        check.assert.assigned(provider, 'provider is required');
+        check.assert.assigned(script_hash, 'script_hash is required');
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = provider;
-        request.owner = script_owner;
-        request.script = script;
-        request.version = version;
-        return await this.bc.pushAction(this.contractName, "approve", request, permission);
+        request.hash = script_hash;
+        return await this.bc.pushAction(this.contractName, "execapprove", request, permission);
     }
 
     /**
      * Deny execution of user script.
      * @param {EosioName} provider
-     * @param {EosioName} script_owner
-     * @param {EosioName} script
-     * @param {EosioName} version
+     * @param {string} script_hash
      * @param {permission} permission
      */
-    async deny(provider, script_owner, script, version, permission) {
+    async execdeny(provider, script_hash, permission) {
+        check.assert.assigned(provider, 'provider is required');
+        check.assert.assigned(script_hash, 'script_hash is required');
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.provider = provider;
-        request.owner = script_owner;
-        request.script = script;
-        request.version = version;
-        return await this.bc.pushAction(this.contractName, "deny", request, permission);
+        request.hash = script_hash;
+        return await this.bc.pushAction(this.contractName, "execdeny", request, permission);
+    }
+
+    /**
+     * Grant provider access to script.
+     * @param {EosioName} owner
+     * @param {string} script_hash
+     * @param {EosioName} grantee
+     * @param {permission} permission
+     */
+    async grantaccess(owner, script_hash, grantee, permission) {
+        check.assert.assigned(owner, 'owner is required');
+        check.assert.assigned(script_hash, 'script_hash is required');
+        check.assert.assigned(grantee, 'grantee is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.owner = owner;
+        request.hash = script_hash;
+        request.grantee = grantee;
+        return await this.bc.pushAction(this.contractName, "grantaccess", request, permission);
+    }
+
+    /**
+     * Deny provider access to script.
+     * @param {EosioName} owner
+     * @param {string} script_hash
+     * @param {EosioName} grantee
+     * @param {permission} permission
+     */
+    async denyaccess(owner, script_hash, grantee, permission) {
+        check.assert.assigned(owner, 'owner is required');
+        check.assert.assigned(script_hash, 'script_hash is required');
+        check.assert.assigned(grantee, 'grantee is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.owner = owner;
+        request.hash = script_hash;
+        request.grantee = grantee;
+        return await this.bc.pushAction(this.contractName, "denyaccess", request, permission);
+    }
+
+    /**
+     * Set provider access to script within enclave.
+     * @param {EosioName} enclaveOwner
+     * @param {string} script_hash
+     * @param {EosioName} grantee
+     * @param {Boolean} granted
+     * @param {permission} permission
+     */
+    async enclaveScriptAccess(enclaveOwner, script_hash, grantee, granted, permission) {
+        check.assert.assigned(enclaveOwner, 'enclaveOwner is required');
+        check.assert.assigned(script_hash, 'script_hash is required');
+        check.assert.assigned(grantee, 'grantee is required');
+        check.assert.assigned(granted, 'granted is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.enclave_owner = enclaveOwner;
+        request.script_hash = script_hash;
+        request.grantee = grantee;
+        request.granted = granted;
+        return await this.bc.pushAction(this.contractName, "encscraccess", request, permission);
     }
 
     /**
@@ -227,33 +317,6 @@ class AggregionContract {
         return await this.bc.pushAction(this.contractName, "sendreq", request, permission);
     }
 
-    /**
-     * Insert new entry to categories catalog.
-     * @param {String} id Entry ID may be null (auto assigned), must be unique
-     * @param {String} parent_id Parent Entry ID (may be null)
-     * @param {String} name
-     * @param {permission} permission
-     */
-    async catinsert(id, parent_id, name, permission) {
-        check.assert.assigned(permission, 'permission is required');
-        let request = {};
-        request.id = id;
-        request.parent_id = parent_id;
-        request.name = name;
-        return await this.bc.pushAction(this.contractName, "catinsert", request, permission);
-    }
-
-    /**
-     * Remove entry from categories catalog.
-     * @param {String} id
-     * @param {permission} permission
-     */
-    async catremove(id, permission) {
-        check.assert.assigned(permission, 'permission is required');
-        let request = {};
-        request.id = id;
-        return await this.bc.pushAction(this.contractName, "catremove", request, permission);
-    }
 
 };
 

@@ -1,10 +1,11 @@
 const fs = require('fs');
-const fetch = require('node-fetch');
+const { proxyFetch } = require('./Fetch');
 const { Api, JsonRpc, Numeric } = require('eosjs');
 const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');
 const { TextEncoder, TextDecoder } = require('util');
 const Serialize = require('eosjs/dist/eosjs-serialize');
 const ecc = require('eosjs-ecc')
+const check = require('check-types');
 
 class AggregionBlockchainUtility {
 
@@ -30,14 +31,61 @@ class AggregionBlockchainUtility {
 
 };
 
+const requests = {
+
+    newaccount: function (creator, name, owner, active) {
+        return {
+            creator: creator,
+            name: name,
+            owner: {
+                threshold: 1,
+                keys: [{
+                    key: owner,
+                    weight: 1
+                }],
+                accounts: [],
+                waits: []
+            },
+            active: {
+                threshold: 1,
+                keys: [{
+                    key: active,
+                    weight: 1
+                }],
+                accounts: [],
+                waits: []
+            }
+        };
+    },
+
+    delegatebw: function (from, receiver, net, cpu, transfer) {
+        return {
+            from: from,
+            receiver: receiver,
+            stake_net_quantity: net,
+            stake_cpu_quantity: cpu,
+            transfer: transfer,
+        };
+    },
+
+    buyrambytes: function (payer, receiver, bytes) {
+        return {
+            payer: payer,
+            receiver: receiver,
+            bytes: bytes
+        };
+    }
+};
+
 
 class AggregionBlockchain {
 
-
-    constructor(nodeUrl, privateKeys, maxTransactionAttempt = 4) {
+    constructor(nodeUrl, privateKeys, debug = false, maxTransactionAttempt = 4) {
+        check.assert.nonEmptyString(nodeUrl, 'node url must be specified');
+        this.debug = debug;
         this.maxTransactionAttempt = maxTransactionAttempt;
         this.signatureProvider = new JsSignatureProvider(privateKeys);
-        this.rpc = new JsonRpc(nodeUrl, { fetch });
+        this.rpc = new JsonRpc(nodeUrl, { fetch: proxyFetch() });
         this.api = new Api({ rpc: this.rpc, signatureProvider: this.signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
         this.utility = new AggregionBlockchainUtility(this.api);
     }
@@ -50,6 +98,10 @@ class AggregionBlockchain {
         };
     }
 
+    async getAccount(name) {
+        return await this.rpc.get_account(name);
+    }
+
     async addPrivateKey(privateKey) {
         const legacyPublicKey = ecc.PrivateKey.fromString(privateKey).toPublic();
         const publicKey = Numeric.convertLegacyPublicKey(legacyPublicKey.toString());
@@ -57,9 +109,22 @@ class AggregionBlockchain {
         this.signatureProvider.availableKeys.push(publicKey);
     }
 
-
     async getScopes(contractAccount, tableName = null) {
-        return await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: contractAccount, table: tableName });
+        let result = {
+            rows: []
+        };
+        let lowerBound = null;
+        while (true) {
+            const part = await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: contractAccount, table: tableName, lower_bound: lowerBound });
+            if (!part)
+                break;
+            const rows = part.rows.filter(s => !s.table.match("^.{12}[0-9]$"));
+            result.rows.push(...rows);
+            lowerBound = part.next_key;
+            if (!part.more)
+                break;
+        }
+        return result;
     }
 
     async getTableRows(contractAccount, tableName, scopeName, primaryKeyValue = null) {
@@ -85,7 +150,7 @@ class AggregionBlockchain {
         return result;
     }
 
-    async getTableRowsBySecondaryKey(contractAccount, tableName, scopeName, fromKey, toKey) {
+    async getTableRowsByIndex(contractAccount, tableName, scopeName, indexPosition, keyType, fromKey, toKey) {
         let result = {
             rows: []
         };
@@ -96,8 +161,8 @@ class AggregionBlockchain {
                 code: contractAccount,
                 scope: scopeName,
                 table: tableName,
-                index_position: "secondary",
-                key_type: "i64",
+                index_position: indexPosition,
+                key_type: keyType,
                 lower_bound: lowerBound,
                 upper_bound: upperBound,
                 json: true,
@@ -111,22 +176,41 @@ class AggregionBlockchain {
         return result;
     }
 
-    async pushAction(contractAccount, actionName, requestObject, permission) {
+    createAction(contract, name, req, permission) {
         let [actorName, permissionLevel] = permission.split('@');
+        return {
+            account: contract,
+            name: name,
+            authorization: [{ actor: actorName, permission: permissionLevel }],
+            data: req,
+        };
+    }
+
+    async pushTransaction(actions) {
         let attempt = 0;
         while (true) {
             try {
-                await this.api.transact({
-                    actions: [{
-                        account: contractAccount,
-                        name: actionName,
-                        authorization: [{ actor: actorName, permission: permissionLevel }],
-                        data: requestObject,
-                    }]
+                const txinfo = await this.api.transact({
+                    actions: actions
                 }, { blocksBehind: 1, expireSeconds: 30 });
+                if (this.debug) {
+                    txinfo.processed.action_traces.forEach(trace => {
+                        if (trace.console) {
+                            console.error(trace.console);
+                        }
+                    });
+                }
                 break;
             }
             catch (exc) {
+                if (this.debug) {
+                    console.error(exc.message);
+                }
+                const duplicate = exc.message.match("duplicate transaction");
+                if (attempt < this.maxTransactionAttempt && duplicate) {
+                    attempt++;
+                    continue;
+                }
                 const deadline = exc.message.match("deadline.*exceeded");
                 if (attempt < this.maxTransactionAttempt && deadline) {
                     attempt++;
@@ -135,6 +219,11 @@ class AggregionBlockchain {
                 throw exc;
             }
         }
+    }
+
+    async pushAction(contract, name, req, permission) {
+        const action = this.createAction(contract, name, req, permission);
+        await this.pushTransaction([action]);
     }
 
     async deploy(contractAccount, wasmPath, abiPath, permission) {
@@ -154,31 +243,23 @@ class AggregionBlockchain {
         }, permission);
     }
 
-    async newaccount(creatorName, accountName, ownerKey, activeKey, permission) {
-        await this.pushAction(creatorName, 'newaccount', {
-            creator: creatorName,
-            name: accountName,
-            owner: {
-                threshold: 1,
-                keys: [{
-                    key: ownerKey,
-                    weight: 1
-                }],
-                accounts: [],
-                waits: []
-            },
-            active: {
-                threshold: 1,
-                keys: [{
-                    key: activeKey,
-                    weight: 1
-                }],
-                accounts: [],
-                waits: []
-            },
-        }, permission);
+    async newaccount(creator, name, owner, active, permission) {
+        const nar = requests.newaccount(creator, name, owner, active);
+        const act = this.createAction('eosio', 'newaccount', nar, permission);
+        await this.pushTransaction([act]);
     }
 
+    async newaccountram(creator, name, owner, active, net, cpu, transfer, bytes, permission) {
+        const nar = requests.newaccount(creator, name, owner, active);
+        const dbr = requests.delegatebw(creator, name, net, cpu, transfer);
+        const brr = requests.buyrambytes(creator, name, bytes);
+
+        const acts = [];
+        acts.push(this.createAction('eosio', 'newaccount', nar, permission));
+        acts.push(this.createAction('eosio', 'delegatebw', dbr, permission));
+        acts.push(this.createAction('eosio', 'buyrambytes', brr, permission));
+        await this.pushTransaction(acts);
+    }
 };
 
 module.exports = AggregionBlockchain;

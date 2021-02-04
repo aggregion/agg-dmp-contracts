@@ -1,11 +1,8 @@
-build/*
-data/*
-**/node_modules/*
-**/*package-lock.json
+build/
+data/
+node_modules/
+package-lock.json
 
 test/config.json
-test/localnet.json
-test/testnet.json
-research/*
-init-test-node.sh
+research
 .vscode/launch.json

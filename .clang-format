@@ -12,3 +12,8 @@ FixNamespaceComments: false
 AccessModifierOffset: -3
 MaxEmptyLinesToKeep: 2
 AllowShortFunctionsOnASingleLine: false
+AllowShortLambdasOnASingleLine: Empty
+AlignAfterOpenBracket: Align
+BinPackParameters: false
+BinPackArguments: false
+AllowAllParametersOfDeclarationOnNextLine: false

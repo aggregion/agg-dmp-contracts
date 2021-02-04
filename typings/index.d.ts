@@ -5,16 +5,18 @@ export declare class AggregionBlockchain {
     }>;
     constructor(nodeUrl: string, privateKeys: any, maxTransactionAttempt?: number);
     addPrivateKey(privateKey: any): Promise<void>;
+    getAccount(name: any): Promise<void>;
     getScopes(contractAccount: any, tableName?: any): Promise<any>;
     getTableRows(contractAccount: any, tableName: any, scopeName: any, primaryKeyValue?: any): Promise<{
         rows: any[];
     }>;
-    getTableRowsBySecondaryKey(contractAccount: any, tableName: any, scopeName: any, fromKey: any, toKey: any): Promise<{
+    getTableRowsByIndex(contractAccount: any, tableName: any, scopeName: any, indexPosition: any, keyType: any, fromKey: any, toKey: any): Promise<{
         rows: any[];
     }>;
     pushAction(contractAccount: any, actionName: any, requestObject: any, permission: any): Promise<void>;
     deploy(contractAccount: any, wasmPath: any, abiPath: any, permission: any): Promise<void>;
     newaccount(creatorName: any, accountName: any, ownerKey: any, activeKey: any, permission: any): Promise<void>;
+    newaccountram(creator: any, name: any, owner: any, active: any, net: any, cpu: any, transfer: any, bytes: any, permission: any): Promise<void>;
 }
 export declare class AggregionBlockchainUtility {
     constructor(api: any);
@@ -106,24 +108,67 @@ export declare class AggregionContract {
      * @param {permission} permission
      */
     remscript(user: any, script: any, version: any, permission: any): Promise<void>;
+
+    /**
+     * Trust provider.
+     * @param {EosioName} truster
+     * @param {EosioName} trustee
+     * @param {permission} permission
+     */
+    trust(truster: any, trustee: any, permission: any): Promise<void>;
+
+    /**
+     * Untrust provider.
+     * @param {EosioName} truster
+     * @param {EosioName} trustee
+     * @param {permission} permission
+     */
+    untrust(truster: any, trustee: any, permission: any): Promise<void>;
+
     /**
      * Approve execution of user script.
      * @param {EosioName} provider
-     * @param {EosioName} script_owner
-     * @param {EosioName} script
-     * @param {EosioName} version
+     * @param {string} script_hash
      * @param {permission} permission
      */
-    approve(provider: any, script_owner: any, script: any, version: any, permission: any): Promise<void>;
+    execapprove(provider: any, script_hash: any, permission: any): Promise<void>;
+
     /**
      * Deny execution of user script.
      * @param {EosioName} provider
-     * @param {EosioName} script_owner
-     * @param {EosioName} script
-     * @param {EosioName} version
+     * @param {string} script_hash
      * @param {permission} permission
      */
-    deny(provider: any, script_owner: any, script: any, version: any, permission: any): Promise<void>;
+    execdeny(provider: any, script_hash: any, permission: any): Promise<void>;
+
+    /**
+     * Grant provider access to script.
+     * @param {EosioName} owner
+     * @param {string} script_hash
+     * @param {EosioName} grantee
+     * @param {permission} permission
+     */
+    grantaccess(owner: any, script_hash: any, grantee: any, permission: any): Promise<void>;
+
+    /**
+     * Deny provider access to script.
+     * @param {EosioName} owner
+     * @param {string} script_hash
+     * @param {EosioName} grantee
+     * @param {permission} permission
+     */
+    denyaccess(owner: any, script_hash: any, grantee: any, permission: any): Promise<void>;
+
+    /**
+     * Set provider access to script within enclave.
+     * @param {EosioName} enclaveOwner
+     * @param {string} script_hash
+     * @param {EosioName} grantee
+     * @param {Boolean} granted
+     * @param {permission} permission
+     */
+    async enclaveScriptAccess(enclaveOwner: any, script_hash: any, grantee: any, granted: any, permission: any): Promise<void>;
+
     /**
      * Log request.
      * @param {String} sender
@@ -133,20 +178,31 @@ export declare class AggregionContract {
      * @param {permission} permission
      */
     sendreq(sender: string, receiver: string, date: any, body: string, permission: any): Promise<void>;
+}
+
+export type UserInfo = {
+    email: string;
+    firstname: string;
+    lastname: string;
+    data: string;
+};
+
+export declare class DmpusersContract {
     /**
-     * Insert new entry to categories catalog.
-     * @param {String} id Entry ID may be null (auto assigned), must be unique
-     * @param {String} parent_id Parent Entry ID (may be null)
-     * @param {String} name
-     * @param {permission} permission
-     */
-    catinsert(id: string, parent_id: string, name: string, permission: any): Promise<void>;
-    /**
-     * Remove entry from categories catalog.
-     * @param {String} id
-     * @param {permission} permission
-     */
-    catremove(id: string, permission: any): Promise<void>;
+     * @param {EosioName} contractName
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractName: string, blockchain: AggregionBlockchain);
+
+    upsertorg(name: any, email: string, description: string, permission: any): Promise<void>;
+    removeorg(name: any, permission: any): Promise<void>;
+
+    registeruser(name: any, info: UserInfo, permission: any): Promise<void>;
+    updateuser(name: any, info: UserInfo, permission: any): Promise<void>;
+    removeuser(name: any, permission: any): Promise<void>;
+
+    upsertpkey(owner: any, key: any, permission: any): Promise<void>;
+    removepkey(owner: any, permission: any): Promise<void>;
 }
 
 /// <reference types="node" />
@@ -156,19 +212,95 @@ export declare class AggregionNode {
     stop(): Promise<void>;
 }
 
-export declare class AggregionUtility {
+export declare class TablesUtility {
     /**
      * @param {AggregionBlockchain} blockchain
     */
     constructor(contractAccount: any, blockchain: AggregionBlockchain);
     getTable(tableName: any, id?: any): Promise<any[]>;
-    getTableBySecondaryKey(tableName: any, keyValue: any): Promise<any[]>;
+    getTableByIndex(tableName: any, indexPosition: any, keyType: any, keyValue: any): Promise<any[]>;
+}
+
+export declare class AggregionUtility {
+    /**
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractAccount: any, blockchain: AggregionBlockchain);
     getProviders(): Promise<any[]>;
     getServices(): Promise<any[]>;
     getScripts(): Promise<any[]>;
     getApproves(): Promise<any[]>;
     getRequestsLog(): Promise<any[]>;
+    getProviderByName(name: any): Promise<any>;
+    isProviderExists(name: any): Promise<boolean>;
+    getService(provider: any, service: any): Promise<any>;
+    getScript(owner: any, script: any, version: any): Promise<any>;
+    getScriptByHash(hash: any): Promise<boolean>;
+    isTrusted(truster: any, trustee: any): Promise<boolean>;
+    isScriptApprovedBy(provider: any, hash: any): Promise<boolean>;
+    isScriptAccessGrantedTo(grantee: any, hash: any): Promise<boolean>;
+    isScriptAllowedWithinEnclave(enclaveOwner: any, hash: any, grantee: any): Promise<boolean>;
+}
+
+export declare class DmpusersUtility {
+    /**
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractAccount: any, blockchain: AggregionBlockchain);
+    getOrganization(name: any): Promise<any>;
+    isOrganizationExists(name: any): Promise<boolean>;
+    getUser(name: any): Promise<any>;
+    isUserExists(name: any): Promise<boolean>;
+    getPublicKey(owner: any): Promise<any>;
+    isPublicKeyExists(owner: any): Promise<boolean>;
+}
+
+
+export declare class CatalogsContract {
+    /**
+     * @param {EosioName} contractName
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractName: string, blockchain: AggregionBlockchain);
+
+    catupsert(categoryId: Number, parentId: Number, lang: string, name: string, permission: any): Promise<void>;
+    catuptrans(categoryId: Number, lang: string, name: string, permission: string): Promise<void>;
+    catremove(categoryId: Number, permission: any): Promise<void>;
+
+    vendinsert(vendorId: Number, name: string, permission: any): Promise<void>;
+    vendremove(vendorId: Number, permission: any): Promise<void>;
+
+    brandinsert(brandId: Number, name: string, permission: any): Promise<void>;
+    brandremove(brandId: Number, permission: any): Promise<void>;
+    bindBrandToVendor(vendorId: Number, brandId: Number, permission: any): Promise<void>;
+    unbindBrandFromVendor(vendorId: Number, brandId: Number, permission: any): Promise<void>;
+
+    regioninsert(regionId: Number, lang: string, name: string, permission: any): Promise<void>;
+    regionupdate(regionId: Number, lang: string, name: string, permission: any): Promise<void>;
+    regionremove(regionId: Number, permission: any): Promise<void>;
+
+    citytypeins(citytypeId: Number, lang: string, name: string, permission: any): Promise<void>;
+    citytypetrn(citytypeId: Number, lang: string, name: string, permission: any): Promise<void>;
+    citytyperem(citytypeId: Number, permission: any): Promise<void>;
+
+    cityinsert(cityId: Number, regionId: Number, citytypeId: Number, lang: string, name: string, population: Number, permission: any): Promise<void>;
+    citytrans(cityId: Number, lang: string, name: string, permission: string): Promise<void>;
+    cityremove(cityId: Number, permission: any): Promise<void>;
+
+    placeinsert(placeId: Number, lang: string, name: string, permission: any): Promise<void>;
+    placeupdate(placeId: Number, lang: string, name: string, permission: any): Promise<void>;
+    placeremove(placeId: Number, permission: any): Promise<void>;
+}
+
+
+export declare class CatalogsUtility {
+    /**
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractAccount: any, blockchain: AggregionBlockchain);
     getCategories(): Promise<any[]>;
+    getCategoriesByLang(lang: any): Promise<any>;
+    getCategoryName(lang: any, categoryId: any): Promise<any>;
     getCategoryById(id: any): Promise<any>;
     getSubcategories(parentId: any): Promise<any[]>;
     getCategoryPath(id: any): Promise<{
@@ -178,11 +310,28 @@ export declare class AggregionUtility {
         a3: any;
         a4: any;
     }>;
-    getProviderByName(name: any): Promise<any>;
-    isProviderExist(name: any): Promise<boolean>;
-    getService(provider: any, service: any): Promise<any>;
-    getScript(owner: any, script: any, version: any): Promise<any>;
-    isScriptApproved(provider: any, owner: any, script: any, version: any): Promise<boolean>;
+
+    getVendors(): Promise<any[]>;
+    getBrands(): Promise<any[]>;
+
+    getRegions(): Promise<any[]>;
+    getRegionsByLang(lang: any): Promise<any[]>;
+    getRegionName(lang: any, regionId: any): Promise<any[]>;
+
+    getCityTypes(): Promise<any[]>;
+    getCityTypesByLang(lang: any): Promise<any[]>;
+    getCityTypeName(lang: any, citytypeId: any): Promise<any[]>;
+
+    getCities(): Promise<any[]>;
+    getCitiesByLang(lang: any): Promise<any[]>;
+    getCityName(lang: any, cityId: any): Promise<any[]>;
+    getCitiesByRegion(regionId: any): Promise<any[]>;
+
+    getPlaces(): Promise<any[]>;
+    getPlacesByLang(lang: any): Promise<any[]>;
+    getPlaceName(lang: any, placeId: any): Promise<any[]>;
 }
+
+
 
 export { }

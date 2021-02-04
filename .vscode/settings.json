@@ -76,6 +76,12 @@
         "strstream": "cpp",
         "typeindex": "cpp",
         "cfenv": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "__memory": "cpp",
+        "codecvt": "cpp",
+        "csignal": "cpp",
+        "regex": "cpp",
+        "stack": "cpp",
+        "future": "cpp"
     }
 }
