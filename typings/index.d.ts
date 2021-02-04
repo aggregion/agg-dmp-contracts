@@ -263,20 +263,33 @@ export declare class CatalogsContract {
     */
     constructor(contractName: string, blockchain: AggregionBlockchain);
 
-    /**
-     * Insert new entry to categories catalog.
-     * @param {String} id Entry ID may be null (auto assigned), must be unique
-     * @param {String} parent_id Parent Entry ID (may be null)
-     * @param {String} name
-     * @param {permission} permission
-     */
-    catinsert(id: string, parent_id: string, name: string, permission: any): Promise<void>;
-    /**
-     * Remove entry from categories catalog.
-     * @param {String} id
-     * @param {permission} permission
-     */
-    catremove(id: string, permission: any): Promise<void>;
+    catupsert(categoryId: Number, parentId: Number, lang: string, name: string, permission: any): Promise<void>;
+    catuptrans(categoryId: Number, lang: string, name: string, permission: string): Promise<void>;
+    catremove(categoryId: Number, permission: any): Promise<void>;
+
+    vendinsert(vendorId: Number, name: string, permission: any): Promise<void>;
+    vendremove(vendorId: Number, permission: any): Promise<void>;
+
+    brandinsert(brandId: Number, name: string, permission: any): Promise<void>;
+    brandremove(brandId: Number, permission: any): Promise<void>;
+    bindBrandToVendor(vendorId: Number, brandId: Number, permission: any): Promise<void>;
+    unbindBrandFromVendor(vendorId: Number, brandId: Number, permission: any): Promise<void>;
+
+    regioninsert(regionId: Number, lang: string, name: string, permission: any): Promise<void>;
+    regionupdate(regionId: Number, lang: string, name: string, permission: any): Promise<void>;
+    regionremove(regionId: Number, permission: any): Promise<void>;
+
+    citytypeins(citytypeId: Number, lang: string, name: string, permission: any): Promise<void>;
+    citytypetrn(citytypeId: Number, lang: string, name: string, permission: any): Promise<void>;
+    citytyperem(citytypeId: Number, permission: any): Promise<void>;
+
+    cityinsert(cityId: Number, regionId: Number, citytypeId: Number, lang: string, name: string, population: Number, permission: any): Promise<void>;
+    citytrans(cityId: Number, lang: string, name: string, permission: string): Promise<void>;
+    cityremove(cityId: Number, permission: any): Promise<void>;
+
+    placeinsert(placeId: Number, lang: string, name: string, permission: any): Promise<void>;
+    placeupdate(placeId: Number, lang: string, name: string, permission: any): Promise<void>;
+    placeremove(placeId: Number, permission: any): Promise<void>;
 }
 
 
@@ -286,6 +299,8 @@ export declare class CatalogsUtility {
     */
     constructor(contractAccount: any, blockchain: AggregionBlockchain);
     getCategories(): Promise<any[]>;
+    getCategoriesByLang(lang: any): Promise<any>;
+    getCategoryName(lang: any, categoryId: any): Promise<any>;
     getCategoryById(id: any): Promise<any>;
     getSubcategories(parentId: any): Promise<any[]>;
     getCategoryPath(id: any): Promise<{
@@ -295,12 +310,26 @@ export declare class CatalogsUtility {
         a3: any;
         a4: any;
     }>;
-    getBrands(): Promise<any[]>;
-    getCities(): Promise<any[]>;
-    getCityTypes(): Promise<any[]>;
-    getRegionCities(region_id: any): Promise<any[]>;
-    getRegions(): Promise<any[]>;
+
     getVendors(): Promise<any[]>;
+    getBrands(): Promise<any[]>;
+
+    getRegions(): Promise<any[]>;
+    getRegionsByLang(lang: any): Promise<any[]>;
+    getRegionName(lang: any, regionId: any): Promise<any[]>;
+
+    getCityTypes(): Promise<any[]>;
+    getCityTypesByLang(lang: any): Promise<any[]>;
+    getCityTypeName(lang: any, citytypeId: any): Promise<any[]>;
+
+    getCities(): Promise<any[]>;
+    getCitiesByLang(lang: any): Promise<any[]>;
+    getCityName(lang: any, cityId: any): Promise<any[]>;
+    getCitiesByRegion(regionId: any): Promise<any[]>;
+
+    getPlaces(): Promise<any[]>;
+    getPlacesByLang(lang: any): Promise<any[]>;
+    getPlaceName(lang: any, placeId: any): Promise<any[]>;
 }
 
 

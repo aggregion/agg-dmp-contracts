@@ -7,7 +7,7 @@ namespace catalogs::brands {
 
    void Brands::brandinsert(std::optional<uint64_t> id, std::string name) {
       require_auth(Names::Contract);
-      check(!id || *id != 0, "403. Brand ID can't be zero.");
+      check(!id || *id != 0, "403. Brand ID can't be zero");
 
       brands_table_t brands{get_self(), Names::DefaultScope};
 

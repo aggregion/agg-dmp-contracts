@@ -1,10 +1,17 @@
 
 
 
-<h1 class="contract">catinsert</h1>
+<h1 class="contract">catupsert</h1>
 ---
 spec-version: 0.0.1
 title: Add new categories catalog entry.
+summary:
+icon:
+
+<h1 class="contract">catuptrans</h1>
+---
+spec-version: 0.0.1
+title: Add new translation for category.
 summary:
 icon:
 
@@ -50,6 +57,13 @@ title: Insert new city type.
 summary:
 icon:
 
+<h1 class="contract">citytypetrn</h1>
+---
+spec-version: 0.0.1
+title: Update city type title translation.
+summary:
+icon:
+
 <h1 class="contract">citytyperem</h1>
 ---
 spec-version: 0.0.1
@@ -61,6 +75,13 @@ icon:
 ---
 spec-version: 0.0.1
 title: Insert new city.
+summary:
+icon:
+
+<h1 class="contract">citytrans</h1>
+---
+spec-version: 0.0.1
+title: Update city name translation.
 summary:
 icon:
 
@@ -78,10 +99,38 @@ title: Insert new region.
 summary:
 icon:
 
+<h1 class="contract">regionupdate</h1>
+---
+spec-version: 0.0.1
+title: Update exising region name.
+summary:
+icon:
+
 <h1 class="contract">regionremove</h1>
 ---
 spec-version: 0.0.1
 title: Remove region.
+summary:
+icon:
+
+<h1 class="contract">placeinsert</h1>
+---
+spec-version: 0.0.1
+title: Insert new place.
+summary:
+icon:
+
+<h1 class="contract">placeupdate</h1>
+---
+spec-version: 0.0.1
+title: Update exising place name.
+summary:
+icon:
+
+<h1 class="contract">placeremove</h1>
+---
+spec-version: 0.0.1
+title: Remove place.
 summary:
 icon:
 

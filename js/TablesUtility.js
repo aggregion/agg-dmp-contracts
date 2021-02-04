@@ -25,6 +25,15 @@ class TablesUtility {
         return rows;
     }
 
+    async getTableScope(tableName, scope) {
+        check.assert.assigned(tableName, 'table name is required');
+        let rows = [];
+        let data = await this.bc.getTableRows(this.contractAccount, tableName, scope);
+        let scoped = data.rows.map(r => { r.scope = scope; return r; });
+        rows.push(...scoped);
+        return rows;
+    }
+
     async getTableByPrimaryKey(tableName, id) {
         check.assert.assigned(tableName, 'tableName value is required');
         check.assert.assigned(id, 'id is required');

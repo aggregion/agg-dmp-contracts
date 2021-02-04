@@ -1,20 +1,35 @@
 #include "CityTypes.hpp"
+#include "Translations.hpp"
 
 namespace catalogs::citytypes {
 
-   void CityTypes::citytypeins(std::optional<uint64_t> id, std::string name) {
+   void CityTypes::upsert(uint64_t id, std::string lang, std::string name, bool mustExists) {
       require_auth(Names::Contract);
-      check(!id || *id != 0, "403. City type ID can't be zero.");
+      check(id != 0, "403. City type ID can't be zero");
 
       citytypes_table_t citytypes{get_self(), Names::DefaultScope};
+      auto it = citytypes.find(id);
 
-      const auto citytype_id = id.value_or(citytypes.begin() == citytypes.end() ? 1 : citytypes.available_primary_key());
-      citytypes.emplace(get_self(), [&](auto& row) {
-         row.id = citytype_id;
-         row.name = name;
-         row.cities_count = 0;
-      });
-      print("New citytype was added. Name: '", name, "' Id:", citytype_id);
+      check(!mustExists || it != citytypes.end(), "404. City type not found");
+      check(mustExists || it == citytypes.end(), "403. City type with specified ID already exists");
+
+      if (it == citytypes.end()) {
+         it = citytypes.emplace(get_self(), [&](auto& row) {
+            row.id = id;
+            row.name = "";
+            row.cities_count = 0;
+         });
+      }
+      langs::upsert_translation<citytypes_translations_table_t>(get_self(), it->id, lang, name);
+      print("Success. City type ID: ", it->id, " Lang: '", lang, "' Name: '", name, "'");
+   }
+
+   void CityTypes::citytypeins(uint64_t id, std::string lang, std::string name) {
+      upsert(id, lang, name, false);
+   }
+
+   void CityTypes::citytypetrn(uint64_t id, std::string lang, std::string name) {
+      upsert(id, lang, name, true);
    }
 
    void CityTypes::citytyperem(uint64_t citytype_id) {
@@ -25,7 +40,8 @@ namespace catalogs::citytypes {
       check(it->cities_count == 0, "403. Region has cities");
       citytypes.erase(it);
 
-      print("City type (id=", citytype_id, ") was removed");
+      langs::remove_translations<citytypes_translations_table_t>(get_self(), citytype_id);
+      print("Success. City type ID: ", citytype_id, " was removed");
    }
 
 }

@@ -206,6 +206,11 @@ class AggregionBlockchain {
                 if (this.debug) {
                     console.error(exc.message);
                 }
+                const duplicate = exc.message.match("duplicate transaction");
+                if (attempt < this.maxTransactionAttempt && duplicate) {
+                    attempt++;
+                    continue;
+                }
                 const deadline = exc.message.match("deadline.*exceeded");
                 if (attempt < this.maxTransactionAttempt && deadline) {
                     attempt++;

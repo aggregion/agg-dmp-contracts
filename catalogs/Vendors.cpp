@@ -4,7 +4,7 @@ namespace catalogs::vendors {
 
    void Vendors::vendinsert(std::optional<uint64_t> id, std::string name) {
       require_auth(Names::Contract);
-      check(!id || *id != 0, "403. Vendor ID can't be zero.");
+      check(!id || *id != 0, "403. Vendor ID can't be zero");
 
       vendors_table_t vendors{get_self(), Names::DefaultScope};
 

@@ -1,35 +1,51 @@
 #include "Cities.hpp"
 #include "CityTypes.hpp"
 #include "Regions.hpp"
+#include "Translations.hpp"
 
 namespace catalogs::cities {
 
    using catalogs::citytypes::citytypes_table_t;
    using catalogs::regions::regions_table_t;
 
-   void Cities::cityinsert(std::optional<uint64_t> id, uint64_t region_id, uint64_t type_id, std::string name, uint64_t population) {
+   void Cities::cityinsert(uint64_t id, uint64_t region_id, uint64_t type_id, std::string lang, std::string name, uint64_t population) {
       require_auth(Names::Contract);
-      check(!id || *id != 0, "403. City ID can't be zero.");
+      check(id != 0, "403. City ID can't be zero");
 
       regions_table_t regions{get_self(), Names::DefaultScope};
-      auto rit = regions.require_find(region_id, "404. Region is not found");
-      regions.modify(rit, get_self(), [&](auto& row) { row.cities_count++; });
+      auto rit = regions.require_find(region_id, "404. Region not found");
+      regions.modify(rit, get_self(), [&](auto& row) {
+         row.cities_count++;
+      });
 
       citytypes_table_t citytypes{get_self(), Names::DefaultScope};
-      auto stit = citytypes.require_find(type_id, "404. City type is not found");
-      citytypes.modify(stit, get_self(), [&](auto& row) { row.cities_count++; });
+      auto stit = citytypes.require_find(type_id, "404. Citytype not found");
+      citytypes.modify(stit, get_self(), [&](auto& row) {
+         row.cities_count++;
+      });
 
       cities_table_t cities{get_self(), Names::DefaultScope};
+      auto it = cities.find(id);
+      check(it == cities.end(), "403. City with specified ID already exists");
+      if (it == cities.end()) {
+         it = cities.emplace(get_self(), [&](auto& row) {
+            row.id = id;
+            row.region_id = region_id;
+            row.name = "";
+            row.type_id = type_id;
+            row.population = population;
+         });
+      }
 
-      const auto city_id = id.value_or(cities.begin() == cities.end() ? 1 : cities.available_primary_key());
-      cities.emplace(get_self(), [&](auto& row) {
-         row.id = city_id;
-         row.region_id = region_id;
-         row.name = name;
-         row.type_id = type_id;
-         row.population = population;
-      });
-      print("New city was added. Name: '", name, "' Id:", city_id);
+      langs::upsert_translation<cities_translations_table_t>(get_self(), id, lang, name);
+      print("Success. City ID: ", id, ". Name: '", name);
+   }
+
+   void Cities::citytrans(uint64_t id, std::string lang, std::string name) {
+      require_auth(Names::Contract);
+      cities_table_t cities{get_self(), Names::DefaultScope};
+      check(cities.find(id) != cities.end(), "404. City not found");
+      langs::upsert_translation<cities_translations_table_t>(get_self(), id, lang, name);
    }
 
 
@@ -41,14 +57,19 @@ namespace catalogs::cities {
 
       regions_table_t region{get_self(), Names::DefaultScope};
       auto rit = region.require_find(it->region_id, "500. Unknown region");
-      region.modify(rit, get_self(), [&](auto& row) { row.cities_count--; });
+      region.modify(rit, get_self(), [&](auto& row) {
+         row.cities_count--;
+      });
 
       citytypes_table_t citytypes{get_self(), Names::DefaultScope};
       auto stit = citytypes.require_find(it->type_id, "500. Unknown city type");
-      citytypes.modify(stit, get_self(), [&](auto& row) { row.cities_count--; });
+      citytypes.modify(stit, get_self(), [&](auto& row) {
+         row.cities_count--;
+      });
 
       cities.erase(it);
-      print("City (id=", city_id, ") was removed");
+      langs::remove_translations<cities_translations_table_t>(get_self(), city_id);
+      print("Success. City ID: ", city_id, " was removed");
    }
 
 }
