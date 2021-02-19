@@ -48,6 +48,20 @@ namespace catalogs::cities {
       langs::upsert_translation<cities_translations_table_t>(get_self(), id, lang, name);
    }
 
+   void Cities::citychtype(uint64_t id, uint64_t type_id) {
+      require_auth(Names::Contract);
+
+      citytypes_table_t citytypes{get_self(), Names::DefaultScope};
+      check(citytypes.find(type_id) != citytypes.end(), "403. Unknown city type");
+
+      cities_table_t cities{get_self(), Names::DefaultScope};
+      const auto cit = cities.require_find(id, "404. City not found");
+      cities.modify(cit, get_self(), [&](auto& row) {
+         row.type_id = type_id;
+      });
+      print("Success. City ID: ", cit->id, ". New type: ", cit->type_id);
+   }
+
 
    void Cities::cityremove(uint64_t city_id) {
       require_auth(Names::Contract);

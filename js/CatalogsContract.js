@@ -304,6 +304,21 @@ class CatalogsContract {
     }
 
     /**
+    * Change city type.
+    * @param {Number} cityId
+    * @param {Number} cityTypeId
+    */
+    async citychtype(cityId, cityTypeId, permission) {
+        check.assert.assigned(cityId, 'cityId is required');
+        check.assert.assigned(cityTypeId, 'cityTypeId is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.id = cityId;
+        request.type_id = cityTypeId;
+        return await this.bc.pushAction(this.contractName, "citychtype", request, permission);
+    }
+
+    /**
      * Remove city.
      * @param {Number} cityId
      * @param {permission} permission

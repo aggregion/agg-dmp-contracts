@@ -45,6 +45,7 @@ namespace catalogs::cities {
       using contract::contract;
 
       [[eosio::action]] void cityinsert(uint64_t id, uint64_t region_id, uint64_t type_id, std::string lang, std::string name, uint64_t population);
+      [[eosio::action]] void citychtype(uint64_t id, uint64_t type_id);
       [[eosio::action]] void citytrans(uint64_t id, std::string lang, std::string name);
       [[eosio::action]] void cityremove(uint64_t city_id);
    };

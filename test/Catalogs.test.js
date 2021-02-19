@@ -36,6 +36,42 @@ describe('Catalogs', function () {
         await node.stop();
     });
 
+    describe('#cities type', function () {
+        it('should not return unknown city', async () => {
+            const city = await util.getCityById(1);
+            assert.isUndefined(city);
+        });
+        it('should change city type', async () => {
+            await contract.regioninsert(16, 'en', 'region', catalogs.permission);
+            await contract.citytypeins(111, 'en', 'aaa', catalogs.permission);
+            await contract.citytypeins(222, 'en', 'bbb', catalogs.permission);
+            await contract.citytypeins(333, 'en', 'bbb', catalogs.permission);
+            await contract.cityinsert(1, 16, 111, 'en', 'AAA', 1000, catalogs.permission);
+            const before = await util.getCityById(1);
+            assert.equal(111, before.type_id);
+            await contract.citychtype(1, 222, catalogs.permission);
+            const after = await util.getCityById(1);
+            assert.equal(222, after.type_id);
+        });
+        it('should fail if city is unknown when change city type ', async () => {
+            await contract.regioninsert(16, 'en', 'region', catalogs.permission);
+            await contract.citytypeins(111, 'en', 'aaa', catalogs.permission);
+            await contract.citytypeins(222, 'en', 'bbb', catalogs.permission);
+            await contract.cityinsert(1, 16, 111, 'en', 'AAA', 1000, catalogs.permission);
+            await contract.citychtype(999, 222, catalogs.permission)
+                .should.be.rejectedWith('404. City not found');
+        });
+        it('should not change to unknown city type', async () => {
+            await contract.regioninsert(16, 'en', 'region', catalogs.permission);
+            await contract.citytypeins(111, 'en', 'aaa', catalogs.permission);
+            await contract.cityinsert(1, 16, 111, 'en', 'AAA', 1000, catalogs.permission);
+            const city = await util.getCityById(1);
+            assert.equal(111, city.type_id);
+            await contract.citychtype(1, 222, catalogs.permission)
+                .should.be.rejectedWith('403. Unknown city type');
+        });
+    });
+
     describe('#cities translations', function () {
         it('should insert city with translations', async () => {
             await contract.citytypeins(999, 'en', 'citytype', catalogs.permission);
