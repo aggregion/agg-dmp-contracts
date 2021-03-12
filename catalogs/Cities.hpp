@@ -37,7 +37,7 @@ namespace catalogs::cities {
       };
    };
 
-   using cities_byregion_index_t = indexed_by<Names::CitiesByRegionTable, const_mem_fun<Tables::Cities, uint64_t, &Tables::Cities::by_region>>;
+   using cities_byregion_index_t = indexed_by<Names::CitiesByRegionIndex, const_mem_fun<Tables::Cities, uint64_t, &Tables::Cities::by_region>>;
    using cities_table_t = eosio::multi_index<Names::CitiesTable, Tables::Cities, cities_byregion_index_t>;
    using cities_translations_table_t = eosio::multi_index<Names::CitiesTranslationsTable, Tables::CitiesTranslations>;
 

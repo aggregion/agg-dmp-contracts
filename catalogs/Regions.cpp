@@ -15,7 +15,7 @@ namespace catalogs::regions {
       if (it == regions.end()) {
          it = regions.emplace(get_self(), [&](auto& row) {
             row.id = id;
-            row.name = "";
+            row.name = name;
             row.cities_count = 0;
          });
       }
@@ -42,5 +42,4 @@ namespace catalogs::regions {
       langs::remove_translations<regions_translations_table_t>(get_self(), region_id);
       print("Success. Region ID: ", region_id, " was removed");
    }
-
 }
