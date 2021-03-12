@@ -85,6 +85,13 @@ title: Update city name translation.
 summary:
 icon:
 
+<h1 class="contract">citychtype</h1>
+---
+spec-version: 0.0.1
+title: Change city type.
+summary:
+icon:
+
 <h1 class="contract">cityremove</h1>
 ---
 spec-version: 0.0.1

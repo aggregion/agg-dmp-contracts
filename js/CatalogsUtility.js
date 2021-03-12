@@ -118,6 +118,14 @@ class CatalogsUtility {
         return await this.tables.getTable('cities');
     }
 
+    async getCityById(cityId) {
+        check.assert.assigned(cityId, 'cityId is required');
+        const rows = await this.tables.getTableByPrimaryKey('cities', cityId);
+        if (rows && rows.length == 1)
+            return rows[0];
+        return undefined;
+    }
+
     async getCitiesByLang(lang) {
         check.assert.assigned(lang, 'lang is required');
         return await this.tables.getTableScope('ctr', lang);

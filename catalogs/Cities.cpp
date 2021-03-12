@@ -31,21 +31,42 @@ namespace catalogs::cities {
          it = cities.emplace(get_self(), [&](auto& row) {
             row.id = id;
             row.region_id = region_id;
-            row.name = "";
+            if (lang == "ru") {
+               row.name = name;
+            }
             row.type_id = type_id;
             row.population = population;
          });
       }
 
       langs::upsert_translation<cities_translations_table_t>(get_self(), id, lang, name);
-      print("Success. City ID: ", id, ". Name: '", name);
+      print("Success. City ID: ", id, ". Name: ", name);
    }
 
    void Cities::citytrans(uint64_t id, std::string lang, std::string name) {
       require_auth(Names::Contract);
       cities_table_t cities{get_self(), Names::DefaultScope};
-      check(cities.find(id) != cities.end(), "404. City not found");
+      auto it = cities.require_find(id, "404. City not found");
+      if (lang == "ru") {
+         cities.modify(it, get_self(), [&](auto& row) {
+            row.name = name;
+         });
+      }
       langs::upsert_translation<cities_translations_table_t>(get_self(), id, lang, name);
+   }
+
+   void Cities::citychtype(uint64_t id, uint64_t type_id) {
+      require_auth(Names::Contract);
+
+      citytypes_table_t citytypes{get_self(), Names::DefaultScope};
+      check(citytypes.find(type_id) != citytypes.end(), "403. Unknown city type");
+
+      cities_table_t cities{get_self(), Names::DefaultScope};
+      const auto cit = cities.require_find(id, "404. City not found");
+      cities.modify(cit, get_self(), [&](auto& row) {
+         row.type_id = type_id;
+      });
+      print("Success. City ID: ", cit->id, ". New type: ", cit->type_id);
    }
 
 
@@ -71,5 +92,4 @@ namespace catalogs::cities {
       langs::remove_translations<cities_translations_table_t>(get_self(), city_id);
       print("Success. City ID: ", city_id, " was removed");
    }
-
 }

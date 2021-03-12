@@ -285,6 +285,7 @@ export declare class CatalogsContract {
 
     cityinsert(cityId: Number, regionId: Number, citytypeId: Number, lang: string, name: string, population: Number, permission: any): Promise<void>;
     citytrans(cityId: Number, lang: string, name: string, permission: string): Promise<void>;
+    citychtype(cityId: Number, cityTypeId: Number, permission: string): Promise<void>;
     cityremove(cityId: Number, permission: any): Promise<void>;
 
     placeinsert(placeId: Number, lang: string, name: string, permission: any): Promise<void>;
@@ -323,6 +324,7 @@ export declare class CatalogsUtility {
     getCityTypeName(lang: any, citytypeId: any): Promise<any[]>;
 
     getCities(): Promise<any[]>;
+    getCityById(id: any): Promise<any[]>;
     getCitiesByLang(lang: any): Promise<any[]>;
     getCityName(lang: any, cityId: any): Promise<any[]>;
     getCitiesByRegion(regionId: any): Promise<any[]>;
