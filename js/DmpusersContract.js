@@ -22,9 +22,11 @@ class DmpusersContract {
      */
     async upsertorg(name, email, description, permission) {
         check.assert.assigned(name, 'name is required');
-        check.assert.assigned(email, 'email is required');
         check.assert.assigned(description, 'description is required');
         check.assert.assigned(permission, 'permission is required');
+        if (!email) {
+            email = '';
+        }
         let request = {};
         request.name = name;
         request.email = email;
