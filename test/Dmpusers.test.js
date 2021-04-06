@@ -57,6 +57,14 @@ describe('Dmpusers', function () {
             assert.equal(stored.description, 'Abc');
         });
 
+        it('should register new organization with no email', async () => {
+            await contract.upsertorg('myorg', null, 'Abc', aggregiondmp.permission);
+            const stored = await util.getOrganization('myorg');
+            assert.equal(stored.name, 'myorg');
+            assert.equal(stored.email, '');
+            assert.equal(stored.description, 'Abc');
+        });
+
 
         it('should update organization', async () => {
             {
@@ -67,10 +75,10 @@ describe('Dmpusers', function () {
                 assert.equal(stored.description, 'Abc');
             }
             {
-                await contract.upsertorg('myorg', '1', '2', aggregiondmp.permission);
+                await contract.upsertorg('myorg', null, '2', aggregiondmp.permission);
                 const stored = await util.getOrganization('myorg');
                 assert.equal(stored.name, 'myorg');
-                assert.equal(stored.email, '1');
+                assert.equal(stored.email, '');
                 assert.equal(stored.description, '2');
             }
         });
