@@ -18,9 +18,13 @@ namespace catalogs {
       static constexpr const name CategoriesByParIdx{"catbypar"};
       static constexpr const name CategoriesTable{"categories"};
       static constexpr const name CategoriesTranslationsTable{"cattrans"};
+      static constexpr const name CitiesByCountry{"citiesbycntr"};
       static constexpr const name CitiesByRegionIndex{"citiesbyreg"};
       static constexpr const name CitiesTable{"cities"};
       static constexpr const name CitiesTranslationsTable{"ctr"};
+      static constexpr const name CountriesTable{"countries"};
+      static constexpr const name CountriesTranslationsTable{"cnttr"};
+      static constexpr const name CityCountry{"citycountry"};
       static constexpr const name CityTypesTable{"citytypes"};
       static constexpr const name CityTypesTranslationsTable{"cttr"};
       static constexpr const name LanguagesTable{"langs"};

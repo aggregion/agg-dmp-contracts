@@ -71,6 +71,21 @@ title: Remove city type.
 summary:
 icon:
 
+<h1 class="contract">citycntrins</h1>
+---
+spec-version: 0.0.1
+title: Set city country ID.
+summary:
+icon:
+
+
+<h1 class="contract">citycntrrem</h1>
+---
+spec-version: 0.0.1
+title: Remove city country.
+summary:
+icon:
+
 <h1 class="contract">cityinsert</h1>
 ---
 spec-version: 0.0.1
@@ -138,6 +153,20 @@ icon:
 ---
 spec-version: 0.0.1
 title: Remove place.
+summary:
+icon:
+
+<h1 class="contract">countryups</h1>
+---
+spec-version: 0.0.1
+title: Upsert new country.
+summary:
+icon:
+
+<h1 class="contract">countryrem</h1>
+---
+spec-version: 0.0.1
+title: Remove country.
 summary:
 icon:
 

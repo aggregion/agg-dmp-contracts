@@ -162,6 +162,49 @@ class CatalogsUtility {
             return data.rows[0].name;
         return undefined;
     }
+
+    async getCountries() {
+        return await this.tables.getTable('countries');
+    }
+
+    async getCountriesByLang(lang) {
+        check.assert.assigned(lang, 'lang is required');
+        return await this.tables.getTableScope('cnttr', lang);
+    }
+
+    async getCountryName(lang, countryId) {
+        check.assert.assigned(lang, 'lang is required');
+        check.assert.assigned(countryId, 'countryId is required');
+        let data = await this.bc.getTableRows(this.contractAccount, 'cnttr', lang, countryId);
+        if (data && data.rows.length == 1 && data.rows[0].name)
+            return data.rows[0].name;
+        return undefined;
+    }
+
+    async getCountryCode(countryId) {
+        check.assert.assigned(countryId, 'countryId is required');
+        let rows = await this.tables.getTable('countries', countryId);
+        if (rows.length == 1 && rows[0].code)
+            return rows[0].code;
+        return undefined;
+    }
+
+    async getCitiesCountries() {
+        return await this.tables.getTable('citycountry');
+    }
+
+    async getCityCountry(cityId) {
+        check.assert.assigned(cityId, 'cityId is required');
+        const rows = await this.tables.getTableByPrimaryKey('citycountry', cityId);
+        if (rows && rows.length == 1)
+            return rows[0].country_id;
+        return undefined;
+    }
+
+    async getCitiesByCountry(countryId) {
+        check.assert.assigned(countryId, 'countryId is required');
+        return await this.tables.getTableByIndex('citycountry', 2, 'i64', countryId);
+    }
 };
 
 module.exports = CatalogsUtility;

@@ -383,6 +383,72 @@ class CatalogsContract {
         return await this.bc.pushAction(this.contractName, "placeremove", request, permission);
     }
 
+
+
+    /**
+    * Upsert country.
+    * @param {Number} countryId
+    * @param {String} lang
+    * @param {String} name
+    * @param {permission} permission
+    */
+     async upsertCountry(countryId, code, lang, name, permission) {
+        check.assert.assigned(countryId, 'countryId is required');
+        check.assert.assigned(code, 'code is required');
+        check.assert.assigned(lang, 'lang is required');
+        check.assert.assigned(name, 'name is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.id = countryId;
+        request.code = code;
+        request.lang = lang;
+        request.name = name;
+        return await this.bc.pushAction(this.contractName, "countryups", request, permission);
+    }
+
+    /**
+     * Remove country.
+     * @param {Number} countryId
+     * @param {permission} permission
+     */
+    async removeCountry(countryId, permission) {
+        check.assert.assigned(countryId, 'countryId is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.country_id = countryId;
+        return await this.bc.pushAction(this.contractName, "countryrem", request, permission);
+    }
+
+
+
+    /**
+    * Insert city country.
+    * @param {Number} cityId
+    * @param {Number} countryId
+    * @param {permission} permission
+    */
+     async setCityCountry(cityId, countryId, permission) {
+        check.assert.assigned(cityId, 'cityId is required');
+        check.assert.assigned(countryId, 'countryId is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.city_id = cityId;
+        request.country_id = countryId;
+        return await this.bc.pushAction(this.contractName, "citycntrins", request, permission);
+    }
+
+    /**
+     * Remove city.
+     * @param {Number} cityId
+     * @param {permission} permission
+     */
+    async removeCityCountry(cityId, permission) {
+        check.assert.assigned(cityId, 'cityId is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.city_id = cityId;
+        return await this.bc.pushAction(this.contractName, "citycntrrem", request, permission);
+    }
 };
 
 module.exports = CatalogsContract;

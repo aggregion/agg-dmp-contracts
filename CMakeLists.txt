@@ -6,6 +6,8 @@ if(EOSIO_CDT_ROOT STREQUAL "" OR NOT EOSIO_CDT_ROOT)
    find_package(eosio.cdt)
 endif()
 
+message("EOSIO.CDT PATH: " ${EOSIO_CDT_ROOT})
+
 function(add_contract FOLDER)
    ExternalProject_Add(
       ${FOLDER}_project

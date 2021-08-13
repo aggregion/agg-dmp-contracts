@@ -15,7 +15,7 @@ namespace catalogs::places {
       if (it == places.end()) {
          it = places.emplace(get_self(), [&](auto& row) {
             row.id = id;
-            row.name = "";
+            row.name = name;
          });
       }
       langs::upsert_translation<places_translations_table_t>(get_self(), it->id, lang, name);

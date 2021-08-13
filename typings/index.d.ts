@@ -291,6 +291,12 @@ export declare class CatalogsContract {
     placeinsert(placeId: Number, lang: string, name: string, permission: any): Promise<void>;
     placeupdate(placeId: Number, lang: string, name: string, permission: any): Promise<void>;
     placeremove(placeId: Number, permission: any): Promise<void>;
+
+    upsertCountry(countryId: Number, code: Number, lang: string, name: string, permission: any): Promise<void>;
+    removeCountry(countryId: Number, permission: any): Promise<void>;
+
+    setCityCountry(cityId: Number, countryId: Number, permission: any): Promise<void>;
+    removeCityCountry(cityId: Number, permission: any): Promise<void>;
 }
 
 
@@ -301,7 +307,7 @@ export declare class CatalogsUtility {
     constructor(contractAccount: any, blockchain: AggregionBlockchain);
     getCategories(): Promise<any[]>;
     getCategoriesByLang(lang: any): Promise<any>;
-    getCategoryName(lang: any, categoryId: any): Promise<any>;
+    getCategoryName(lang: any, categoryId: any): Promise<String>;
     getCategoryById(id: any): Promise<any>;
     getSubcategories(parentId: any): Promise<any[]>;
     getCategoryPath(id: any): Promise<{
@@ -317,7 +323,7 @@ export declare class CatalogsUtility {
 
     getRegions(): Promise<any[]>;
     getRegionsByLang(lang: any): Promise<any[]>;
-    getRegionName(lang: any, regionId: any): Promise<any[]>;
+    getRegionName(lang: any, regionId: any): Promise<String>;
 
     getCityTypes(): Promise<any[]>;
     getCityTypesByLang(lang: any): Promise<any[]>;
@@ -326,12 +332,21 @@ export declare class CatalogsUtility {
     getCities(): Promise<any[]>;
     getCityById(id: any): Promise<any[]>;
     getCitiesByLang(lang: any): Promise<any[]>;
-    getCityName(lang: any, cityId: any): Promise<any[]>;
+    getCityName(lang: any, cityId: any): Promise<String>;
     getCitiesByRegion(regionId: any): Promise<any[]>;
 
     getPlaces(): Promise<any[]>;
     getPlacesByLang(lang: any): Promise<any[]>;
-    getPlaceName(lang: any, placeId: any): Promise<any[]>;
+    getPlaceName(lang: any, placeId: any): Promise<String>;
+
+    getCountries(): Promise<any[]>;
+    getCountriesByLang(lang: any): Promise<any[]>;
+    getCountryCode(countryId: any): Promise<Number>;
+    getCountryName(lang: any, countryId: any): Promise<String>;
+
+    getCitiesCountries(): Promise<any[]>;
+    getCityCountry(cityId: any): Promise<Number>;
+    getCitiesByCountry(countryId: any): Promise<any[]>;
 }
 
 

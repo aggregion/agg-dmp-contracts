@@ -9,6 +9,7 @@ const tools = require('./TestTools.js');
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised');
 const check = require('check-types');
+const { utils } = require('mocha');
 chai.use(chaiAsPromised);
 var assert = chai.assert;
 var should = chai.should();
@@ -34,6 +35,89 @@ describe('Catalogs', function () {
 
     afterEach(async function () {
         await node.stop();
+    });
+
+    describe('#countries', function () {
+        it('should insert countries', async () => {
+            await contract.upsertCountry(1, 11111, 'en', 'aaa', catalogs.permission);
+            await contract.upsertCountry(1, 22222, 'fr', 'bbb', catalogs.permission);
+            await contract.upsertCountry(2, 33333, 'en', 'ccc', catalogs.permission);
+            await contract.upsertCountry(3, 44444, 'en', 'ddd', catalogs.permission);
+
+            assert.equal(22222, await util.getCountryCode(1));
+            assert.equal(33333, await util.getCountryCode(2));
+            assert.equal(44444, await util.getCountryCode(3));
+
+            assert.equal('aaa', await util.getCountryName('en', 1));
+            assert.equal('bbb', await util.getCountryName('fr', 1));
+            assert.equal('ccc', await util.getCountryName('en', 2));
+            assert.equal('ddd', await util.getCountryName('en', 3));
+
+            assert.equal(3, (await util.getCountries()).length);
+            assert.equal(3, (await util.getCountriesByLang('en')).length);
+            assert.equal(1, (await util.getCountriesByLang('fr')).length);
+        });
+        it('should update country if it already exists', async () => {
+            await contract.upsertCountry(1, 111, 'en', 'abc', catalogs.permission);
+            assert.equal('abc', await util.getCountryName('en', 1));
+            await contract.upsertCountry(1, 222, 'en', 'ABC', catalogs.permission)
+                .should.not.be.rejected;
+            assert.equal('ABC', await util.getCountryName('en', 1));
+        });
+        it('should not accept zero id value', async () => {
+            await contract.upsertCountry(0, 111, 'en', 'abc', catalogs.permission)
+                .should.be.rejected;
+        });
+        it('should remove country', async () => {
+            await contract.upsertCountry(224, 111, 'en', 'abc', catalogs.permission);
+            await contract.removeCountry(224, catalogs.permission);
+            let rows = await util.getCountries();
+            assert.equal(0, rows.length);
+        });
+        it('should deny insert country for non-root accounts', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.upsertCountry(1, 111, 'en', 'abc', alice.permission)
+                .should.be.rejectedWith('missing authority of catalogs');
+        });
+        it('should deny remove for non-root accounts', async () => {
+            await contract.upsertCountry(125, 111, 'en', 'abc', catalogs.permission);
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.removeCountry(125, alice.permission)
+                .should.be.rejectedWith('missing authority of catalogs');
+        });
+    });
+
+    describe('#cities countries', function () {
+        it('should not assign country to unknown city', async () => {
+            await contract.setCityCountry(1, 2, catalogs.permission)
+                .should.be.rejectedWith('404. City not found');
+        });
+        it('should fail when there is attempt to remove unassigned country', async () => {
+            await contract.removeCityCountry(999, catalogs.permission)
+                .should.be.rejectedWith('404. City not found');
+        });
+        it('should assign and update city country', async () => {
+            await contract.regioninsert(111, 'en', 'Europa', catalogs.permission);
+            await contract.citytypeins(222, 'en', 'City', catalogs.permission);
+            await contract.cityinsert(888, 111, 222, 'en', 'London', 125553, catalogs.permission);
+            await contract.cityinsert(999, 111, 222, 'en', 'London', 125553, catalogs.permission);
+            await contract.setCityCountry(888, 444, catalogs.permission).should.not.be.rejectedWith('404. City not found');
+            await contract.setCityCountry(999, 555, catalogs.permission).should.not.be.rejectedWith('404. City not found');
+            const countries = await util.getCitiesCountries();
+            assert.equal(2, countries.length);
+            assert.equal(555, await util.getCityCountry(999));
+            await contract.setCityCountry(999, 777, catalogs.permission).should.not.be.rejectedWith('404. City not found');
+            assert.equal(777, await util.getCityCountry(999));
+        });
+        it('should remove city country', async () => {
+            await contract.regioninsert(111, 'en', 'Europa', catalogs.permission);
+            await contract.citytypeins(222, 'en', 'City', catalogs.permission);
+            await contract.cityinsert(999, 111, 222, 'en', 'London', 125553, catalogs.permission);
+            await contract.setCityCountry(999, 555, catalogs.permission).should.not.be.rejectedWith('404. City not found');
+            assert.equal(555, await util.getCityCountry(999));
+            await contract.removeCityCountry(999, catalogs.permission).should.not.be.rejectedWith('404. City not found');
+            assert.isEmpty(await util.getCitiesCountries());
+        });
     });
 
     describe('#cities type', function () {
@@ -503,7 +587,7 @@ describe('Catalogs', function () {
             let item = rows.pop();
             assert.equal(1, item.id);
             assert.equal(0, item.cities_count);
-            assert.equal('', item.name);
+            assert.equal('abc', item.name);
         });
         it('should not accept zero id value', async () => {
             await contract.regioninsert(0, 'en', 'abc', catalogs.permission)
@@ -515,7 +599,7 @@ describe('Catalogs', function () {
             let item = rows.pop();
             assert.equal(126, item.id);
             assert.equal(0, item.cities_count);
-            assert.equal('', item.name);
+            assert.equal('abc', item.name);
         });
         it('should remove region', async () => {
             await contract.regioninsert(224, 'en', 'abc', catalogs.permission);
@@ -645,7 +729,7 @@ describe('Catalogs', function () {
             assert.equal(999, item.id);
             assert.equal(111, item.region_id);
             assert.equal(222, item.type_id);
-            assert.equal('', item.name);
+            assert.equal('London', item.name);
             assert.equal(125553, item.population);
         });
         it('should not accept zero id value', async () => {
@@ -710,7 +794,7 @@ describe('Catalogs', function () {
             let rows = await util.getPlaces();
             let item = rows.pop();
             assert.equal(1, item.id);
-            assert.equal('', item.name);
+            assert.equal('abc', item.name);
         });
         it('should not accept zero id value', async () => {
             await contract.placeinsert(0, 'en', 'abc', catalogs.permission)

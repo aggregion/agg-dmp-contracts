@@ -1,6 +1,5 @@
 #include "Dmpusers.hpp"
-#include <eosio.system/eosio.system.hpp>
-#include <eosio.system/native.hpp>
+#include <eosio/system.hpp>
 
 
 namespace dmpusers {
