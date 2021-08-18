@@ -12,6 +12,7 @@ add_contract(Catalogs Catalogs
     CityTypes.cpp
     Countries.cpp
     Places.cpp
+    RegionCountry.cpp
     Regions.cpp
     Translations.cpp
     VendorBrands.cpp

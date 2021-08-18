@@ -22,14 +22,16 @@ namespace catalogs {
       static constexpr const name CitiesByRegionIndex{"citiesbyreg"};
       static constexpr const name CitiesTable{"cities"};
       static constexpr const name CitiesTranslationsTable{"ctr"};
-      static constexpr const name CountriesTable{"countries"};
-      static constexpr const name CountriesTranslationsTable{"cnttr"};
       static constexpr const name CityCountry{"citycountry"};
       static constexpr const name CityTypesTable{"citytypes"};
       static constexpr const name CityTypesTranslationsTable{"cttr"};
+      static constexpr const name CountriesTable{"countries"};
+      static constexpr const name CountriesTranslationsTable{"cnttr"};
       static constexpr const name LanguagesTable{"langs"};
       static constexpr const name PlacesTable{"places"};
       static constexpr const name PlacesTranslationsTable{"pltr"};
+      static constexpr const name RegionCountry{"regncountry"};
+      static constexpr const name RegionsByCountry{"regnsbycntr"};
       static constexpr const name RegionsTable{"regions"};
       static constexpr const name RegionsTranslationsTable{"rtr"};
       static constexpr const name VendorBrandsIdx{"vendbrndidx"};

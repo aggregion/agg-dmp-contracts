@@ -135,6 +135,22 @@ title: Remove region.
 summary:
 icon:
 
+
+<h1 class="contract">regncntrups</h1>
+---
+spec-version: 0.0.1
+title: Set region country ID.
+summary:
+icon:
+
+<h1 class="contract">regncntrrem</h1>
+---
+spec-version: 0.0.1
+title: Unset region country ID
+summary:
+icon:
+
+
 <h1 class="contract">placeinsert</h1>
 ---
 spec-version: 0.0.1

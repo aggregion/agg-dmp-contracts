@@ -205,6 +205,23 @@ class CatalogsUtility {
         check.assert.assigned(countryId, 'countryId is required');
         return await this.tables.getTableByIndex('citycountry', 2, 'i64', countryId);
     }
+
+    async getRegionsCountries() {
+        return await this.tables.getTable('regncountry');
+    }
+
+    async getRegionCountry(regionId) {
+        check.assert.assigned(regionId, 'regionId is required');
+        const rows = await this.tables.getTableByPrimaryKey('regncountry', regionId);
+        if (rows && rows.length == 1)
+            return rows[0].country_id;
+        return undefined;
+    }
+
+    async getRegionsByCountry(countryId) {
+        check.assert.assigned(countryId, 'countryId is required');
+        return await this.tables.getTableByIndex('regncountry', 2, 'i64', countryId);
+    }
 };
 
 module.exports = CatalogsUtility;

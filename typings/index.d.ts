@@ -296,7 +296,10 @@ export declare class CatalogsContract {
     removeCountry(countryId: Number, permission: any): Promise<void>;
 
     setCityCountry(cityId: Number, countryId: Number, permission: any): Promise<void>;
-    removeCityCountry(cityId: Number, permission: any): Promise<void>;
+    unsetCityCountry(cityId: Number, permission: any): Promise<void>;
+
+    setRegionCountry(regionId: Number, countryId: Number, permission: any): Promise<void>;
+    unsetRegionCountry(regionId: Number, permission: any): Promise<void>;
 }
 
 
@@ -347,6 +350,10 @@ export declare class CatalogsUtility {
     getCitiesCountries(): Promise<any[]>;
     getCityCountry(cityId: any): Promise<Number>;
     getCitiesByCountry(countryId: any): Promise<any[]>;
+
+    getRegionsCountries(): Promise<any[]>;
+    getRegionCountry(regionId: any): Promise<Number>;
+    getRegionsByCountry(countryId: any): Promise<any[]>;
 }
 
 

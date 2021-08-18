@@ -37,6 +37,37 @@ describe('Catalogs', function () {
         await node.stop();
     });
 
+    describe('#region countries', function () {
+        it('should not assign country to unknown region', async () => {
+            await contract.setRegionCountry(1, 2, catalogs.permission)
+                .should.be.rejectedWith('404. Region not found');
+        });
+        it('should fail if try to unset country for unknown region', async () => {
+            await contract.unsetRegionCountry(999, catalogs.permission)
+                .should.be.rejectedWith('404. Region not found');
+        });
+        it('should assign and update region country', async () => {
+            await contract.regioninsert(111, 'en', 'Tatarstan', catalogs.permission);
+            await contract.regioninsert(222, 'en', 'Tatarstan', catalogs.permission);
+            await contract.setRegionCountry(111, 333, catalogs.permission).should.not.be.rejectedWith('404. Region not found');
+            await contract.setRegionCountry(111, 555, catalogs.permission).should.not.be.rejectedWith('404. Region not found');
+            await contract.setRegionCountry(222, 777, catalogs.permission).should.not.be.rejectedWith('404. Region not found');
+            const countries = await util.getRegionsCountries();
+            assert.equal(2, countries.length);
+            assert.equal(555, await util.getRegionCountry(111));
+            assert.equal(777, await util.getRegionCountry(222));
+            await contract.setRegionCountry(222, 888, catalogs.permission).should.not.be.rejectedWith('404. Region not found');
+            assert.equal(888, await util.getRegionCountry(222));
+        });
+        it('should remove region country', async () => {
+            await contract.regioninsert(111, 'en', 'Tatarstan', catalogs.permission);
+            await contract.setRegionCountry(111, 555, catalogs.permission).should.not.be.rejectedWith('404. Region not found');
+            assert.equal(555, await util.getRegionCountry(111));
+            await contract.unsetRegionCountry(111, catalogs.permission).should.not.be.rejectedWith('404. Region not found');
+            assert.isEmpty(await util.getRegionsCountries());
+        });
+    });
+
     describe('#countries', function () {
         it('should insert countries', async () => {
             await contract.upsertCountry(1, 11111, 'en', 'aaa', catalogs.permission);
@@ -92,8 +123,8 @@ describe('Catalogs', function () {
             await contract.setCityCountry(1, 2, catalogs.permission)
                 .should.be.rejectedWith('404. City not found');
         });
-        it('should fail when there is attempt to remove unassigned country', async () => {
-            await contract.removeCityCountry(999, catalogs.permission)
+        it('should fail if try to unset country for unknown region', async () => {
+            await contract.unsetCityCountry(999, catalogs.permission)
                 .should.be.rejectedWith('404. City not found');
         });
         it('should assign and update city country', async () => {
@@ -115,7 +146,7 @@ describe('Catalogs', function () {
             await contract.cityinsert(999, 111, 222, 'en', 'London', 125553, catalogs.permission);
             await contract.setCityCountry(999, 555, catalogs.permission).should.not.be.rejectedWith('404. City not found');
             assert.equal(555, await util.getCityCountry(999));
-            await contract.removeCityCountry(999, catalogs.permission).should.not.be.rejectedWith('404. City not found');
+            await contract.unsetCityCountry(999, catalogs.permission).should.not.be.rejectedWith('404. City not found');
             assert.isEmpty(await util.getCitiesCountries());
         });
     });

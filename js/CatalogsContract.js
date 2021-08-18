@@ -419,10 +419,8 @@ class CatalogsContract {
         return await this.bc.pushAction(this.contractName, "countryrem", request, permission);
     }
 
-
-
     /**
-    * Insert city country.
+    * Set city country.
     * @param {Number} cityId
     * @param {Number} countryId
     * @param {permission} permission
@@ -438,16 +436,45 @@ class CatalogsContract {
     }
 
     /**
-     * Remove city.
+     * Unset city country.
      * @param {Number} cityId
      * @param {permission} permission
      */
-    async removeCityCountry(cityId, permission) {
+    async unsetCityCountry(cityId, permission) {
         check.assert.assigned(cityId, 'cityId is required');
         check.assert.assigned(permission, 'permission is required');
         let request = {};
         request.city_id = cityId;
         return await this.bc.pushAction(this.contractName, "citycntrrem", request, permission);
+    }
+
+    /**
+    * Set region country.
+    * @param {Number} regionId
+    * @param {Number} countryId
+    * @param {permission} permission
+    */
+     async setRegionCountry(regionId, countryId, permission) {
+        check.assert.assigned(regionId, 'regionId is required');
+        check.assert.assigned(countryId, 'countryId is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.region_id = regionId;
+        request.country_id = countryId;
+        return await this.bc.pushAction(this.contractName, "regncntrups", request, permission);
+    }
+
+    /**
+     * Unset region country.
+     * @param {Number} regionId
+     * @param {permission} permission
+     */
+    async unsetRegionCountry(regionId, permission) {
+        check.assert.assigned(regionId, 'regionId is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.region_id = regionId;
+        return await this.bc.pushAction(this.contractName, "regncntrrem", request, permission);
     }
 };
 
