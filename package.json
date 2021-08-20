@@ -1,6 +1,6 @@
 {
   "name": "@aggregion/dmp-contracts",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "description": "",
   "keywords": [],
   "homepage": "https://github.com/aggregion/agg-dmp-contracts#readme",
@@ -26,7 +26,7 @@
     "access": "public"
   },
   "engines": {
-    "node": "=10.9.0"
+    "node": ">=14.17.4"
   },
   "requires": true,
   "lockfileVersion": 1,
