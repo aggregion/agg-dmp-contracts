@@ -58,4 +58,35 @@ title: Remove provider public key
 summary: Remove provider public key.
 icon:
 
+<h1 class="contract">upsertorgv2</h1>
+---
+spec-version: 0.0.1
+title: Upsert organization public key
+summary: Upsert organization public key
+icon:
+
+<h1 class="contract">upsproject</h1>
+---
+spec-version: 0.0.1
+title: Upsert project
+summary: Upsert project
+icon:
+
+
+<h1 class="contract">upsdataset</h1>
+---
+spec-version: 0.0.1
+title: Upsert dataset
+summary: Upsert dataset
+icon:
+
+
+
+<h1 class="contract">upsdsreq</h1>
+---
+spec-version: 0.0.1
+title: Upsert dataset request
+summary: Upsert dataset request
+icon:
+
 

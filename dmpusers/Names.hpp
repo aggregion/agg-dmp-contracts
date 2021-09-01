@@ -18,5 +18,15 @@ namespace dmpusers {
       static constexpr const name UsersTable{"users"};
       static constexpr const name OrganizationsTable{"orgs"};
       static constexpr const name PublicKeysTable{"pkeys"};
+      static constexpr const name OrganizationsTableV2{"orgsv2"};
+      static constexpr const name ProjectsTable{"projects"};
+      static constexpr const name ProjectsTableByReceiver{"projbyrecidx"};
+      static constexpr const name ProjectsTableByReceiverAndUpdateAt{"projbrupdidx"};
+      static constexpr const name DatasetsTable{"datasets"};
+      static constexpr const name DatasetsTableByUpdateAt{"dsupdatidx"};
+      static constexpr const name DatasetsTableByReceiver{"dsrecidx"};
+      static constexpr const name DatasetsTableBySender{"dssendidx"};
+      static constexpr const name DsReqsTable{"dsreqs"};
+      static constexpr const name DsReqsTableByReceiverAndUpdateAt{"drqsrecupidx"};
    };
 }

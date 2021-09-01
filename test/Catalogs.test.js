@@ -836,7 +836,7 @@ describe('Catalogs', function () {
             let rows = await util.getPlaces();
             let item = rows.pop();
             assert.equal(126, item.id);
-            assert.equal('', item.name);
+            assert.equal('abc', item.name);
         });
         it('should remove place', async () => {
             await contract.placeinsert(224, 'en', 'abc', catalogs.permission);

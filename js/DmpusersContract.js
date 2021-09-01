@@ -127,6 +127,93 @@ class DmpusersContract {
         return await this.bc.pushAction(this.contractName, "removepkey", request, permission);
     }
 
+
+    /**
+     * Register/update new organization.
+     * @param {permission} permission
+     */
+     async upsertorg2(orgId, data, publicKey, updatedAt, bcVersion, permission) {
+        check.assert.assigned(orgId, 'orgId is required');
+        check.assert.assigned(data, 'data is required');
+        check.assert.assigned(publicKey, 'publicKey is required');
+        check.assert.assigned(updatedAt, 'updatedAt is required');
+        check.assert.assigned(bcVersion, 'bcVersion is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.org_id = orgId;
+        request.data = data;
+        request.public_key = publicKey;
+        request.updated_at = updatedAt;
+        request.bc_version = bcVersion;
+        return await this.bc.pushAction(this.contractName, "upsertorgv2", request, permission);
+    }
+
+    /**
+     * Send/update project
+     * @param {permission} permission
+     */
+     async upsproject(projectId, receiverOrgId, senderOrgId, updatedAt, data, masterKey, permission) {
+        check.assert.assigned(projectId, 'projectId is required');
+        check.assert.assigned(receiverOrgId, 'receiverOrgId is required');
+        check.assert.assigned(senderOrgId, 'senderOrgId is required');
+        check.assert.assigned(updatedAt, 'updatedAt is required');
+        check.assert.assigned(data, 'data is required');
+        check.assert.assigned(masterKey, 'masterKey is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.project_id = projectId;
+        request.receiver_org_id = receiverOrgId;
+        request.updated_at = updatedAt;
+        request.info = {};
+        request.info.sender_org_id = senderOrgId;
+        request.info.data = data;
+        request.info.master_key = masterKey;
+        return await this.bc.pushAction(this.contractName, "upsproject", request, permission);
+    }
+
+    /**
+     * Send/update dataset
+     * @param {permission} permission
+     */
+     async upsdataset(datasetId,  senderOrgId, receiverOrgId, updatedAt, bcVersion, data, permission) {
+        check.assert.assigned(datasetId, 'datasetId is required');
+        check.assert.assigned(senderOrgId, 'senderOrgId is required');
+        check.assert.assigned(receiverOrgId, 'receiverOrgId is required');
+        check.assert.assigned(updatedAt, 'updatedAt is required');
+        check.assert.assigned(bcVersion, 'bcVersion is required');
+        check.assert.assigned(data, 'data is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.dataset_id = datasetId;
+        request.info = {};
+        request.info.sender_org_id = senderOrgId;
+        request.info.receiver_org_id = receiverOrgId;
+        request.info.updated_at = updatedAt;
+        request.info.bc_version = bcVersion;
+        request.info.data = data;
+        return await this.bc.pushAction(this.contractName, "upsdataset", request, permission);
+    }
+
+    /**
+     * Send/update dataset request
+     * @param {permission} permission
+     */
+     async upsdsreq(dsReqId, receiverOrgId, updatedAt, bcVersion, data, permission) {
+        check.assert.assigned(dsReqId, 'dsReqId is required');
+        check.assert.assigned(receiverOrgId, 'receiverOrgId is required');
+        check.assert.assigned(updatedAt, 'updatedAt is required');
+        check.assert.assigned(bcVersion, 'bcVersion is required');
+        check.assert.assigned(data, 'data is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.dsreq_id = dsReqId;
+        request.info = {};
+        request.info.data = data;
+        request.info.receiver_org_id = receiverOrgId;
+        request.info.updated_at = updatedAt;
+        request.info.bc_version = bcVersion;
+        return await this.bc.pushAction(this.contractName, "upsdsreq", request, permission);
+    }
 };
 
 module.exports = DmpusersContract;

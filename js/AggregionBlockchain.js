@@ -115,7 +115,7 @@ class AggregionBlockchain {
         };
         let lowerBound = null;
         while (true) {
-            const part = await this.rpc.fetch('/v1/chain/get_table_by_scope', { code: contractAccount, table: tableName, lower_bound: lowerBound });
+            const part = await this.rpc.fetch('/v1/chain/get_table_by_scope', { limit: 1000, code: contractAccount, table: tableName, lower_bound: lowerBound });
             if (!part)
                 break;
             const rows = part.rows.filter(s => !s.table.match("^.{12}[0-9]$"));

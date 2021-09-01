@@ -203,6 +203,13 @@ export declare class DmpusersContract {
 
     upsertpkey(owner: any, key: any, permission: any): Promise<void>;
     removepkey(owner: any, permission: any): Promise<void>;
+
+    upsertorg2(orgId: string, data: string, publicKey: string, updatedAt: string, bcVersion: string, permission: string): Promise<void>;
+    upsproject(projectId: string, receiverOrgId: string, senderOrgId: string, updatedAt: string, data: string, masterKey: string, permission: string): Promise<void>;
+    upsdataset(datasetId: string, senderOrgId: string, receiverOrgId: string, updatedAt: string, bcVersion: string, data: string, permission: string): Promise<void>;
+    upsdsreq(dsReqId: string, receiverOrgId: string, updatedAt: string, bcVersion: string, data: string, permission: string): Promise<void>;
+
+
 }
 
 /// <reference types="node" />
@@ -253,6 +260,20 @@ export declare class DmpusersUtility {
     isUserExists(name: any): Promise<boolean>;
     getPublicKey(owner: any): Promise<any>;
     isPublicKeyExists(owner: any): Promise<boolean>;
+
+    getOrg2(orgId: string): Promise<any>;
+
+    getProjectById(projectId: string): Promise<any>;
+    getProjectsByReceiver(receiverOrgId: string): Promise<any[]>;
+    getProjectsByReceiverAndUpdatedAt(receiverOrgId: string, updatedAt: string): Promise<any[]>;
+
+    getDatasetById(datasetId: string): Promise<any>;
+    getDatasetsByUpdateAt(lower: string, upper: string): Promise<any[]>;
+    getDatasetsBySender(senderOrgId: string): Promise<any[]>;
+    getDatasetsByReceiver(receiverOrgId: string): Promise<any[]>;
+
+    getDatasetRequestById(dsReqId: string): Promise<any>;
+    getDatasetRequestsByReceiverAndUpdatedAt(receiverOrgId: string, updatedAt: string): Promise<any[]>;
 }
 
 
