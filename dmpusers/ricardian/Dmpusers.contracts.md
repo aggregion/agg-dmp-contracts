@@ -59,3 +59,18 @@ summary: Remove provider public key.
 icon:
 
 
+<h1 class="contract">insertmsg</h1>
+---
+spec-version: 0.0.1
+title: Insert/update new message
+summary: Insert/update new message
+icon:
+
+<h1 class="contract">removemsg</h1>
+---
+spec-version: 0.0.1
+title: Remove message by id
+summary: Remove message by id
+icon:
+
+

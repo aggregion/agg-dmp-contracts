@@ -256,6 +256,30 @@ export declare class DmpusersUtility {
 }
 
 
+export declare class MessagesContract {
+    /**
+     * @param {EosioName} contractName
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractName: string, blockchain: AggregionBlockchain);
+
+    insertmsg(topic: string, sender: string, receiver: string, data: string, permission: string): Promise<void>;
+    removemsg(messageId: string, permission: string): Promise<void>;
+}
+
+export declare class MessagesUtility {
+    /**
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractAccount: any, blockchain: AggregionBlockchain);
+
+    getMessageById(id: number): Promise<any>;
+    getMessagesAfter(id: number): Promise<any[]>;
+    getMessagesBefore(id: number): Promise<any[]>;
+    getMessagesRange(from: number, to: number): Promise<any[]>;
+}
+
+
 export declare class CatalogsContract {
     /**
      * @param {EosioName} contractName
