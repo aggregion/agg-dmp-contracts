@@ -108,5 +108,106 @@ namespace dmpusers {
       print("Success. Public key owned by '", owner, "' was removed");
    }
 
+   void Dmpusers::upsertorgv2(std::string org_id, std::string data, std::string public_key, uint64_t updated_at, uint64_t bc_version) {
+      const auto org = name{org_id};
+      require_auth(org);
+
+      orgsv2_table_t orgs{get_self(), Names::DefaultScope};
+      auto it = orgs.find(org.value);
+
+      if (it == orgs.end()) {
+         orgs.emplace(get_self(), [&](Tables::OrgsV2& row) {
+            row.id = org;
+            row.data = data;
+            row.public_key = public_key;
+            row.updated_at = updated_at;
+            row.bc_version = bc_version;
+         });
+      } else {
+         check(it->updated_at < updated_at, "403. Version too old");
+         orgs.modify(it, get_self(), [&](Tables::OrgsV2& row) {
+            row.data = data;
+            row.public_key = public_key;
+            row.updated_at = updated_at;
+            row.bc_version = bc_version;
+         });
+      }
+      print("Success. Org: '", org, "' data: '", data, "' pk: '", public_key);
+   }
+
+
+   void Dmpusers::upsproject(std::string project_id, std::string receiver_org_id, uint64_t updated_at, ProjectInfo info) {
+      const auto project = name{project_id};
+      const auto sender = name{info.sender_org_id};
+      require_auth(sender);
+
+      projects_table_t projects{get_self(), Names::DefaultScope};
+      auto it = projects.find(project.value);
+
+      if (it == projects.end()) {
+         projects.emplace(get_self(), [&](Tables::Projects& row) {
+            row.id = project;
+            row.receiver_org_id = receiver_org_id;
+            row.updated_at = updated_at;
+            row.info = info;
+         });
+      } else {
+         check(it->info.sender_org_id == info.sender_org_id, "401. Access denied");
+         check(it->updated_at < updated_at, "403. Version too old");
+         projects.modify(it, get_self(), [&](Tables::Projects& row) {
+            row.receiver_org_id = receiver_org_id;
+            row.updated_at = updated_at;
+            row.info = info;
+         });
+      }
+      print("Success. Project: '", project_id, "' receiver: '", receiver_org_id, "' sender: '", info.sender_org_id);
+   }
+
+   void Dmpusers::upsdataset(std::string dataset_id, DatasetInfo info) {
+      const auto dataset = name{dataset_id};
+      // const auto receiver = name{receiver_org_id};
+      const auto sender = name{info.sender_org_id};
+      require_auth(sender);
+
+      datasets_table_t datasets{get_self(), Names::DefaultScope};
+      auto it = datasets.find(dataset.value);
+
+      if (it == datasets.end()) {
+         datasets.emplace(get_self(), [&](Tables::Datasets& row) {
+            row.id = dataset;
+            row.info = info;
+         });
+      } else {
+         check(it->info.sender_org_id == info.sender_org_id, "401. Access denied");
+         check(it->info.updated_at < info.updated_at, "403. Version too old");
+         datasets.modify(it, get_self(), [&](Tables::Datasets& row) {
+            row.info = info;
+         });
+      }
+      print("Success. Dataset: '", dataset_id, "' sender: '", info.sender_org_id, "' receiver: '", info.receiver_org_id);
+   }
+
+   void Dmpusers::upsdsreq(std::string dsreqs_id, DatasetRequestInfo info) {
+      const auto request = name{dsreqs_id};
+      const auto receiver = name{info.receiver_org_id};
+      require_auth(receiver);
+
+      dsreqs_table_t dsreqs{get_self(), Names::DefaultScope};
+      auto it = dsreqs.find(request.value);
+
+      if (it == dsreqs.end()) {
+         dsreqs.emplace(get_self(), [&](Tables::DsRequests& row) {
+            row.id = request;
+            row.info = info;
+         });
+      } else {
+         check(it->info.receiver_org_id == info.receiver_org_id, "401. Access denied");
+         check(it->info.updated_at < info.updated_at, "403. Version too old");
+         dsreqs.modify(it, get_self(), [&](Tables::DsRequests& row) {
+            row.info = info;
+         });
+      }
+      print("Success. Dataset: '", dsreqs_id, "' receiver: '", info.receiver_org_id);
+   }
 
 }

@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.abi": "json",
         "__hash_table": "cpp",
         "__tree": "cpp",
         "algorithm": "cpp",
@@ -82,6 +83,7 @@
         "csignal": "cpp",
         "regex": "cpp",
         "stack": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "bit": "cpp"
     }
 }
