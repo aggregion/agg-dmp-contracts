@@ -7,6 +7,8 @@ const DmpusersUtility = require('./DmpusersUtility');
 const CatalogsContract = require('./CatalogsContract');
 const CatalogsUtility = require('./CatalogsUtility');
 const TablesUtility = require('./TablesUtility');
+const MessagesContract = require('./MessagesContract');
+const MessagesUtility = require('./MessagesUtility');
 
 module.exports = {
     AggregionBlockchain,
@@ -17,5 +19,7 @@ module.exports = {
     DmpusersUtility,
     CatalogsContract,
     CatalogsUtility,
-    TablesUtility
+    TablesUtility,
+    MessagesContract,
+    MessagesUtility
 }
