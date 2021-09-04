@@ -204,10 +204,10 @@ export declare class DmpusersContract {
     upsertpkey(owner: any, key: any, permission: any): Promise<void>;
     removepkey(owner: any, permission: any): Promise<void>;
 
-    upsertorg2(orgId: string, data: string, publicKey: string, updatedAt: string, bcVersion: string, permission: string): Promise<void>;
-    upsproject(projectId: string, receiverOrgId: string, senderOrgId: string, updatedAt: string, data: string, masterKey: string, permission: string): Promise<void>;
-    upsdataset(datasetId: string, senderOrgId: string, receiverOrgId: string, updatedAt: string, bcVersion: string, data: string, permission: string): Promise<void>;
-    upsdsreq(dsReqId: string, receiverOrgId: string, updatedAt: string, bcVersion: string, data: string, permission: string): Promise<void>;
+    upsertorg2(orgId: string, data: string, publicKey: string, updatedAt: number, bcVersion: number, permission: string): Promise<void>;
+    upsproject(projectId: string, receiverOrgId: string, senderOrgId: string, updatedAt: number, data: string, masterKey: string, permission: string): Promise<void>;
+    upsdataset(datasetId: string, senderOrgId: string, receiverOrgId: string, updatedAt: number, bcVersion: number, data: string, permission: string): Promise<void>;
+    upsdsreq(dsReqId: string, receiverOrgId: string, updatedAt: number, bcVersion: number, data: string, permission: string): Promise<void>;
 
 
 }
