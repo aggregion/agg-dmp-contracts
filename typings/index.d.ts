@@ -167,7 +167,7 @@ export declare class AggregionContract {
      * @param {Boolean} granted
      * @param {permission} permission
      */
-    async enclaveScriptAccess(enclaveOwner: any, script_hash: any, grantee: any, granted: any, permission: any): Promise<void>;
+    enclaveScriptAccess(enclaveOwner: any, script_hash: any, grantee: any, granted: any, permission: any): Promise<void>;
 
     /**
      * Log request.
