@@ -1,3 +1,9 @@
+export class Accounts {
+    public static readonly Dmpusers = 'dmpusers';
+    public static readonly Catalogs = 'catalogs';
+    public static readonly Aggregion = 'aggregion';
+}
+
 export declare class AggregionBlockchain {
     static createKeyPair(): Promise<{
         privateKey: any;
