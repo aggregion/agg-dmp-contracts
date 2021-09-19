@@ -37,30 +37,44 @@ describe('DmpusersV2', function () {
         await node.stop();
     });
 
-    describe('#updateAt', function () {
+    describe('#Version', function () {
         it('dsreqs', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
-            await contract.upsdsreq('dr1', 'alice', 22, 1, 'data1', alice.permission);
+            await contract.upsdsreq('dr1', 'alice', 22, 3, 'data1', alice.permission);
+            await contract.upsdsreq('dr1', 'alice', 11, 3, 'data2', alice.permission)
+                .should.be.rejectedWith('403. Version too old');
             await contract.upsdsreq('dr1', 'alice', 11, 2, 'data2', alice.permission)
                 .should.be.rejectedWith('403. Version too old');
+            await contract.upsdsreq('dr1', 'alice', 11, 4, 'data2', alice.permission)
+                .should.not.be.rejectedWith('403. Version too old');
         });
         it('orgv2', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
-            await contract.upsertorg2('alice', 'aaaa', 'bbbb', 333, 222, alice.permission);
-            await contract.upsertorg2('alice', 'cccc', 'dddd', 222, 444, alice.permission)
+            await contract.upsertorg2('alice', 'aaaa', 'bbbb', 11, 3, alice.permission);
+            await contract.upsertorg2('alice', 'cccc', 'dddd', 22, 3, alice.permission)
                 .should.be.rejectedWith('403. Version too old');
+            await contract.upsertorg2('alice', 'cccc', 'dddd', 22, 2, alice.permission)
+                .should.be.rejectedWith('403. Version too old');
+            await contract.upsertorg2('alice', 'cccc', 'dddd', 22, 4, alice.permission)
+                .should.not.be.rejectedWith('403. Version too old');
         });
-        it('project', async () => {
+        it('should accept any updateAt for project', async () => {
             const john = await tools.makeAccount(bc, 'john');
             await contract.upsproject('p1', 'alice', 'john', 222, 'data1', 'mk1', john.permission);
             await contract.upsproject('p1', 'laura', 'john', 111, 'data2', 'mk2', john.permission)
-                .should.be.rejectedWith('403. Version too old');
+                .should.not.be.rejectedWith('403. Version too old');
+            await contract.upsproject('p1', 'laura', 'john', 333, 'data2', 'mk2', john.permission)
+                .should.not.be.rejectedWith('403. Version too old');
         });
         it('dataset', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
-            await contract.upsdataset('d1', 'alice', 'laura', 333, 1, 'data1', alice.permission);
+            await contract.upsdataset('d1', 'alice', 'laura', 222, 3, 'data1', alice.permission);
             await contract.upsdataset('d1', 'alice', 'laura', 222, 3, 'data3', alice.permission)
                 .should.be.rejectedWith('403. Version too old');
+            await contract.upsdataset('d1', 'alice', 'laura', 222, 2, 'data3', alice.permission)
+                .should.be.rejectedWith('403. Version too old');
+            await contract.upsdataset('d1', 'alice', 'laura', 222, 4, 'data3', alice.permission)
+                .should.not.be.rejectedWith('403. Version too old');
         });
     });
 
@@ -222,6 +236,7 @@ describe('DmpusersV2', function () {
                 assert.equal(d.info.data, 'data');
             }
         });
+
     });
 
     describe('#projects', function () {

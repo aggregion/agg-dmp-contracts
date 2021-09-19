@@ -124,7 +124,7 @@ namespace dmpusers {
             row.bc_version = bc_version;
          });
       } else {
-         check(it->updated_at < updated_at, "403. Version too old");
+         check(it->bc_version < bc_version, "403. Version too old");
          orgs.modify(it, get_self(), [&](Tables::OrgsV2& row) {
             row.data = data;
             row.public_key = public_key;
@@ -153,7 +153,6 @@ namespace dmpusers {
          });
       } else {
          check(it->info.sender_org_id == info.sender_org_id, "401. Access denied");
-         check(it->updated_at < updated_at, "403. Version too old");
          projects.modify(it, get_self(), [&](Tables::Projects& row) {
             row.receiver_org_id = receiver_org_id;
             row.updated_at = updated_at;
@@ -179,7 +178,7 @@ namespace dmpusers {
          });
       } else {
          check(it->info.sender_org_id == info.sender_org_id, "401. Access denied");
-         check(it->info.updated_at < info.updated_at, "403. Version too old");
+         check(it->info.bc_version < info.bc_version, "403. Version too old");
          datasets.modify(it, get_self(), [&](Tables::Datasets& row) {
             row.info = info;
          });
@@ -202,7 +201,7 @@ namespace dmpusers {
          });
       } else {
          check(it->info.receiver_org_id == info.receiver_org_id, "401. Access denied");
-         check(it->info.updated_at < info.updated_at, "403. Version too old");
+         check(it->info.bc_version < info.bc_version, "403. Version too old");
          dsreqs.modify(it, get_self(), [&](Tables::DsRequests& row) {
             row.info = info;
          });
