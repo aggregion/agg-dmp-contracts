@@ -105,3 +105,38 @@ summary: Remove message by id
 icon:
 
 
+<h1 class="contract">insinteract</h1>
+---
+spec-version: 0.0.1
+title: Insert interaction
+summary: Insert interaction
+icon:
+
+<h1 class="contract">updinteract</h1>
+---
+spec-version: 0.0.1
+title: Update interaction
+summary: Update interaction
+icon:
+
+<h1 class="contract">reminteract</h1>
+---
+spec-version: 0.0.1
+title: Remove interaction
+summary: Remove interaction
+icon:
+
+<h1 class="contract">remintrbyid</h1>
+---
+spec-version: 0.0.1
+title: Remove interaction by id
+summary: Remove interaction by id
+icon:
+
+<h1 class="contract">intrctenble</h1>
+---
+spec-version: 0.0.1
+title: Enable/disable interaction
+summary: Enable/disable interaction
+icon:
+

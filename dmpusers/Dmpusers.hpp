@@ -190,8 +190,8 @@ namespace dmpusers {
           indexed_by<Names::ProjectsTableByReceiverAndUpdateAt, const_mem_fun<Tables::Projects, checksum256, &Tables::Projects::by_receiver_an_updated_at>>;
       using projects_table_t = eosio::multi_index<Names::ProjectsTable, Tables::Projects, projects_byreceiver_index_t, projects_byreceiverupat_index_t>;
 
-      using datasets_byupdat_index_t = indexed_by<Names::DatasetsTableByReceiver, const_mem_fun<Tables::Datasets, uint64_t, &Tables::Datasets::by_updated_at>>;
-      using datasets_bysendr_index_t = indexed_by<Names::DatasetsTableByReceiver, const_mem_fun<Tables::Datasets, uint64_t, &Tables::Datasets::by_sender>>;
+      using datasets_byupdat_index_t = indexed_by<Names::DatasetsTableByUpdateAt, const_mem_fun<Tables::Datasets, uint64_t, &Tables::Datasets::by_updated_at>>;
+      using datasets_bysendr_index_t = indexed_by<Names::DatasetsTableBySender, const_mem_fun<Tables::Datasets, uint64_t, &Tables::Datasets::by_sender>>;
       using datasets_byrecvr_index_t = indexed_by<Names::DatasetsTableByReceiver, const_mem_fun<Tables::Datasets, uint64_t, &Tables::Datasets::by_receiver>>;
       using datasets_table_t =
           eosio::multi_index<Names::DatasetsTable, Tables::Datasets, datasets_byupdat_index_t, datasets_bysendr_index_t, datasets_byrecvr_index_t>;

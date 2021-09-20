@@ -11,7 +11,7 @@ export declare class AggregionBlockchain {
     }>;
     constructor(nodeUrl: string, privateKeys: any, maxTransactionAttempt?: number);
     addPrivateKey(privateKey: any): Promise<void>;
-    getAccount(name: any): Promise<void>;
+    getAccount(name: string): Promise<any>;
     getScopes(contractAccount: any, tableName?: any): Promise<any>;
     getTableRows(contractAccount: any, tableName: any, scopeName: any, primaryKeyValue?: any): Promise<{
         rows: any[];
@@ -407,6 +407,32 @@ export declare class CatalogsUtility {
     getRegionsByCountry(countryId: any): Promise<any[]>;
 }
 
+
+
+export declare class InteractionsContract {
+    /**
+     * @param {EosioName} contractName
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractName: string, blockchain: AggregionBlockchain);
+
+    createInteraction(owner: string, partner: string, interactionType: number, params: string, permission: string): Promise<void>;
+    updateInteractionById(owner: string, interactionId: any, partner: string, interactionType: number, params: string, permission: string): Promise<void>;
+    removeInteraction(owner: string, partner: string, interactionType: number, permission: string): Promise<void>;
+    removeInteractionById(owner: string, interactionId: number, permission: string): Promise<void>;
+    enableInteractionById(owner: string, interactionId: number, enabled: Boolean, permission: string): Promise<void>;
+}
+
+export declare class InteractionsUtility {
+    /**
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractAccount: string, blockchain: AggregionBlockchain);
+
+    getInteractionById(id:number): Promise<any>;
+    getInteraction(owner: string, partner: string, interactionType: number): Promise<any>;
+    isInteractionExists(owner: string, partner: string, interactionType: number): Promise<Boolean>;
+}
 
 
 export { }

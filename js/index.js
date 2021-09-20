@@ -1,25 +1,29 @@
 const AggregionBlockchain = require('./AggregionBlockchain');
 const AggregionContract = require('./AggregionContract');
-const AggregionUtility = require('./AggregionUtility');
 const AggregionNode = require('./AggregionNode');
-const DmpusersContract = require('./DmpusersContract');
-const DmpusersUtility = require('./DmpusersUtility');
+const AggregionUtility = require('./AggregionUtility');
 const CatalogsContract = require('./CatalogsContract');
 const CatalogsUtility = require('./CatalogsUtility');
-const TablesUtility = require('./TablesUtility');
+const DmpusersContract = require('./DmpusersContract');
+const DmpusersUtility = require('./DmpusersUtility');
+const InteractionsContract = require('./InteractionsContract');
+const InteractionsUtility = require('./InteractionsUtility');
 const MessagesContract = require('./MessagesContract');
 const MessagesUtility = require('./MessagesUtility');
+const TablesUtility = require('./TablesUtility');
 
 module.exports = {
     AggregionBlockchain,
     AggregionContract,
-    AggregionUtility,
     AggregionNode,
-    DmpusersContract,
-    DmpusersUtility,
+    AggregionUtility,
     CatalogsContract,
     CatalogsUtility,
-    TablesUtility,
+    DmpusersContract,
+    DmpusersUtility,
+    InteractionsContract,
+    InteractionsUtility,
     MessagesContract,
-    MessagesUtility
+    MessagesUtility,
+    TablesUtility,
 }
