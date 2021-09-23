@@ -30,6 +30,7 @@ namespace dmpusers {
       static constexpr const name DsReqsTable{"dsreqs"};
       static constexpr const name DsReqsTableByReceiverAndUpdateAt{"drqsrecupidx"};
       static constexpr const name InteractionsTable{"interactions"};
-      static constexpr const name InteractionsMainIndex{"intermainidx"};
+      static constexpr const name InteractionsTripletIndex{"intertripidx"};
+      static constexpr const name InteractionsOwnerIndex{"interownridx"};
    };
 }

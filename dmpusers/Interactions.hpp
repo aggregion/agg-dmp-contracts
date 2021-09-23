@@ -32,7 +32,7 @@ namespace dmpusers {
             return id;
          }
 
-         static auto makeKey(std::string owner, std::string partner, uint8_t interaction_type) {
+         static auto makeTripletKey(std::string owner, std::string partner, uint8_t interaction_type) {
             std::string value;
             value.append(owner);
             value.append("-");
@@ -42,8 +42,18 @@ namespace dmpusers {
             return sha256(value.data(), value.size());
          }
 
-         auto secondary_key() const {
-            return makeKey(owner, info.partner, info.interaction_type);
+         static auto makeOwnerKey(std::string owner) {
+            std::string value;
+            value.append(owner);
+            return sha256(value.data(), value.size());
+         }
+
+         auto by_triplet() const {
+            return makeTripletKey(owner, info.partner, info.interaction_type);
+         }
+
+         auto by_owner() const {
+            return makeOwnerKey(owner);
          }
       };
    };
@@ -55,9 +65,11 @@ namespace dmpusers {
 
       using contract::contract;
 
-      using interactions_index_t =
-          indexed_by<Names::InteractionsMainIndex, const_mem_fun<Tables::Interactions, checksum256, &Tables::Interactions::secondary_key>>;
-      using interactions_table_t = eosio::multi_index<Names::InteractionsTable, Tables::Interactions, interactions_index_t>;
+      using interactions_by_triplet_t =
+          indexed_by<Names::InteractionsTripletIndex, const_mem_fun<Tables::Interactions, checksum256, &Tables::Interactions::by_triplet>>;
+      using interactions_by_owner_idx_t =
+          indexed_by<Names::InteractionsOwnerIndex, const_mem_fun<Tables::Interactions, checksum256, &Tables::Interactions::by_owner>>;
+      using interactions_table_t = eosio::multi_index<Names::InteractionsTable, Tables::Interactions, interactions_by_triplet_t, interactions_by_owner_idx_t>;
 
       [[eosio::action]] void insinteract(std::string owner, InteractionInfo info, uint64_t nonce);
       [[eosio::action]] void updinteract(std::string owner, uint64_t interaction_id, InteractionInfo info, uint64_t nonce);

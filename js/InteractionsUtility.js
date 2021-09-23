@@ -26,6 +26,12 @@ class InteractionsUtility {
         return result.rows[0];
     }
 
+    async getInteractionsByOwner(owner) {
+        const hash = crypto.createHash('sha256').update(owner).digest('hex');
+        const res = await this.bc.getTableRowsByIndex(this.contractAccount, 'interactions', 'default', 3, 'sha256', hash, hash);
+        return res.rows;
+    }
+
     async isInteractionExists(owner, partner, interactionType) {
         return undefined != await this.getInteraction(owner, partner, interactionType);
     }

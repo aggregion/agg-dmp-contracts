@@ -51,6 +51,27 @@ describe('Interactions', function () {
             expect(c.enabled).eq(1);
             expect(c.info.params).eq('params');
         });
+        it('should find interactions by owner', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.createInteraction('alice', 'laura', InteractionTypeCommunication, 'params1', alice.permission);
+            await contract.createInteraction('alice', 'jamie', InteractionTypeMarketplace, 'params2', alice.permission);
+            const ibo = await util.getInteractionsByOwner('alice');
+            expect(ibo.length).eq(2);
+            {
+                const c = ibo[0];
+                expect(c.info.partner).eq('laura');
+                expect(c.info.interaction_type).eq(InteractionTypeCommunication);
+                expect(c.enabled).eq(1);
+                expect(c.info.params).eq('params1');
+            }
+            {
+                const c = ibo[1];
+                expect(c.info.partner).eq('jamie');
+                expect(c.info.interaction_type).eq(InteractionTypeMarketplace);
+                expect(c.enabled).eq(1);
+                expect(c.info.params).eq('params2');
+            }
+        });
         it('should remove interaction', async () => {
             const alice = await tools.makeAccount(bc, 'alice');
             await contract.createInteraction('alice', 'laura', InteractionTypeCommunication, 'params', alice.permission);

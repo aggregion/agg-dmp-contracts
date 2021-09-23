@@ -430,6 +430,7 @@ export declare class InteractionsUtility {
     constructor(contractAccount: string, blockchain: AggregionBlockchain);
 
     getInteractionById(id:number): Promise<any>;
+    getInteractionsByOwner(owner:string): Promise<any[]>;
     getInteraction(owner: string, partner: string, interactionType: number): Promise<any>;
     isInteractionExists(owner: string, partner: string, interactionType: number): Promise<Boolean>;
 }
