@@ -212,9 +212,16 @@ namespace dmpusers {
       [[eosio::action]] void removepkey(eosio::name owner);
 
       [[eosio::action]] void upsertorgv2(std::string org_id, std::string data, std::string public_key, uint64_t updated_at, uint64_t bc_version);
+      [[eosio::action]] void removeorgv2(std::string org_id);
+
       [[eosio::action]] void upsproject(std::string project_id, std::string receiver_org_id, uint64_t updated_at, ProjectInfo info);
+      [[eosio::action]] void remproject(std::string project_id, std::string sender_org_id);
+
       [[eosio::action]] void upsdataset(std::string dataset_id, DatasetInfo info);
+      [[eosio::action]] void remdataset(std::string dataset_id, std::string sender_org_id);
+
       [[eosio::action]] void upsdsreq(std::string dsreq_id, DatasetRequestInfo info);
+      [[eosio::action]] void remdsreq(std::string dsreq_id, std::string receiver_org_id);
 
    private:
       void upsertuser(UpsertCheck upsertCheck, eosio::name user, const UserInfo& info);

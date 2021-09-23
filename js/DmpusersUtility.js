@@ -20,7 +20,7 @@ class DmpusersUtility {
         return rows[0];
     }
 
-    async isOrganizationExists(name) {
+    async isOrgExistsV1(name) {
         let o = await this.getOrganization(name);
         return typeof o != 'undefined';
     };
@@ -45,15 +45,24 @@ class DmpusersUtility {
         return typeof u != 'undefined';
     };
 
-
     async getOrg2(orgId) {
         const rows = await this.tables.getTableByPrimaryKey('orgsv2', orgId);
         return rows[0];
     }
 
+    async isOrgExistsV2(name) {
+        const o = await this.getOrg2(name);
+        return typeof o != 'undefined';
+    };
+
     async getProjectById(projectId) {
         const rows = await this.tables.getTableByPrimaryKey('projects', projectId);
         return rows[0];
+    }
+
+    async isProjectExists(projectId) {
+        const p = await this.getProjectById(projectId);
+        return typeof p != 'undefined';
     }
 
     async getProjectsByReceiver(receiverOrgId) {
@@ -72,6 +81,11 @@ class DmpusersUtility {
     async getDatasetById(datasetId) {
         const rows = await this.tables.getTableByPrimaryKey('datasets', datasetId);
         return rows[0];
+    }
+
+    async isDatasetExists(datasetId) {
+        const p = await this.getDatasetById(datasetId);
+        return typeof p != 'undefined';
     }
 
     async getDatasetsByUpdateAt(lower, upper) {
@@ -93,6 +107,11 @@ class DmpusersUtility {
     async getDatasetRequestById(dsReqId) {
         const rows = await this.tables.getTableByPrimaryKey('dsreqs', dsReqId);
         return rows[0];
+    }
+
+    async isDatasetRequestExists(dsReqId) {
+        const p = await this.getDatasetRequestById(dsReqId);
+        return typeof p != 'undefined';
     }
 
     async getDatasetRequestsByReceiverAndUpdatedAt(receiverOrgId, updatedAt) {

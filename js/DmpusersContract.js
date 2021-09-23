@@ -147,6 +147,17 @@ class DmpusersContract {
         request.bc_version = bcVersion;
         return await this.bc.pushAction(this.contractName, "upsertorgv2", request, permission);
     }
+    /**
+     * Remove new organization.
+     * @param {permission} permission
+     */
+     async removeorg2(orgId, permission) {
+        check.assert.assigned(orgId, 'orgId is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.org_id = orgId;
+        return await this.bc.pushAction(this.contractName, "removeorgv2", request, permission);
+    }
 
     /**
      * Send/update project
@@ -169,6 +180,19 @@ class DmpusersContract {
         request.info.data = data;
         request.info.master_key = masterKey;
         return await this.bc.pushAction(this.contractName, "upsproject", request, permission);
+    }
+    /**
+     * Remove project
+     * @param {permission} permission
+     */
+     async remproject(projectId, senderOrgId, permission) {
+        check.assert.assigned(projectId, 'projectId is required');
+        check.assert.assigned(senderOrgId, 'senderOrgId is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.project_id = projectId;
+        request.sender_org_id = senderOrgId;
+        return await this.bc.pushAction(this.contractName, "remproject", request, permission);
     }
 
     /**
@@ -193,6 +217,19 @@ class DmpusersContract {
         request.info.data = data;
         return await this.bc.pushAction(this.contractName, "upsdataset", request, permission);
     }
+    /**
+     * Remove dataset
+     * @param {permission} permission
+     */
+     async remdataset(datasetId,  senderOrgId, permission) {
+        check.assert.assigned(datasetId, 'datasetId is required');
+        check.assert.assigned(senderOrgId, 'senderOrgId is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.dataset_id = datasetId;
+        request.sender_org_id = senderOrgId;
+        return await this.bc.pushAction(this.contractName, "remdataset", request, permission);
+    }
 
     /**
      * Send/update dataset request
@@ -213,6 +250,20 @@ class DmpusersContract {
         request.info.updated_at = updatedAt;
         request.info.bc_version = bcVersion;
         return await this.bc.pushAction(this.contractName, "upsdsreq", request, permission);
+    }
+
+    /**
+     * Remove dataset request
+     * @param {permission} permission
+     */
+     async remdsreq(dsReqId, receiverOrgId, permission) {
+        check.assert.assigned(dsReqId, 'dsReqId is required');
+        check.assert.assigned(receiverOrgId, 'receiverOrgId is required');
+        check.assert.assigned(permission, 'permission is required');
+        let request = {};
+        request.dsreq_id = dsReqId;
+        request.receiver_org_id = receiverOrgId;
+        return await this.bc.pushAction(this.contractName, "remdsreq", request, permission);
     }
 };
 

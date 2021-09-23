@@ -86,9 +86,9 @@ describe('Dmpusers', function () {
 
         it('should remove organization', async () => {
             await contract.upsertorg('myorg', 'a@b.c', 'Abc', aggregiondmp.permission);
-            (await util.isOrganizationExists('myorg')).should.be.true;
+            (await util.isOrgExistsV1('myorg')).should.be.true;
             await contract.removeorg('myorg', aggregiondmp.permission);
-            (await util.isOrganizationExists('myorg')).should.be.false;
+            (await util.isOrgExistsV1('myorg')).should.be.false;
         });
 
 

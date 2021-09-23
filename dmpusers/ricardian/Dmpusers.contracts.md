@@ -61,8 +61,15 @@ icon:
 <h1 class="contract">upsertorgv2</h1>
 ---
 spec-version: 0.0.1
-title: Upsert organization public key
-summary: Upsert organization public key
+title: Upsert organization
+summary: Upsert organization
+icon:
+
+<h1 class="contract">removeorgv2</h1>
+---
+spec-version: 0.0.1
+title: Remove organization
+summary: Remove organization
 icon:
 
 <h1 class="contract">upsproject</h1>
@@ -70,6 +77,13 @@ icon:
 spec-version: 0.0.1
 title: Upsert project
 summary: Upsert project
+icon:
+
+<h1 class="contract">remproject</h1>
+---
+spec-version: 0.0.1
+title: Remove project
+summary: Remove project
 icon:
 
 
@@ -80,6 +94,13 @@ title: Upsert dataset
 summary: Upsert dataset
 icon:
 
+<h1 class="contract">remdataset</h1>
+---
+spec-version: 0.0.1
+title: Remove dataset
+summary: Remove dataset
+icon:
+
 
 
 <h1 class="contract">upsdsreq</h1>
@@ -87,6 +108,14 @@ icon:
 spec-version: 0.0.1
 title: Upsert dataset request
 summary: Upsert dataset request
+icon:
+
+
+<h1 class="contract">remdsreq</h1>
+---
+spec-version: 0.0.1
+title: Remove dataset request
+summary: Remove dataset request
 icon:
 
 

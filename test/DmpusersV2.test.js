@@ -8,6 +8,7 @@ const UserInfo = require('../js/DmpusersContract.js');
 const tools = require('./TestTools.js');
 
 const chai = require('chai')
+const { expect } = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 var assert = chai.assert;
@@ -133,6 +134,30 @@ describe('DmpusersV2', function () {
                 assert.equal(r.info.data, 'data');
             }
         });
+
+        it('should not remove unknown request', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await expect(contract.remdsreq('dr1', 'alice', alice.permission))
+                .be.rejectedWith("404. Request not found");
+        });
+
+        it('should not remove foreign request', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            const laura = await tools.makeAccount(bc, 'laura');
+            await contract.upsdsreq('dr1', 'alice', 111, 222, 'data', alice.permission);
+            await expect(contract.remdsreq('dr1', 'alice', laura.permission))
+                .be.rejectedWith("missing authority of alice");
+            await expect(contract.remdsreq('dr1', 'laura', laura.permission))
+                .be.rejectedWith("401. Access denied");
+        });
+
+        it('should remove request', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.upsdsreq('dr1', 'alice', 111, 222, 'data', alice.permission);
+            expect(await util.isDatasetRequestExists('dr1')).be.true;
+            await contract.remdsreq('dr1', 'alice', alice.permission);
+            expect(await util.isDatasetRequestExists('dr1')).be.false;
+        });
     });
 
     describe('#datasets', function () {
@@ -237,6 +262,29 @@ describe('DmpusersV2', function () {
             }
         });
 
+        it('should not remove unknown dataset', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await expect(contract.remdataset('d1', 'alice', alice.permission))
+                .be.rejectedWith("404. Dataset not found");
+        });
+
+        it('should not remove foreign dataset', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            const laura = await tools.makeAccount(bc, 'laura');
+            await contract.upsdataset('d1', 'alice', 'laura', 111, 222, 'data', alice.permission);
+            await expect(contract.remdataset('d1', 'alice', laura.permission))
+                .be.rejectedWith("missing authority of alice");
+            await expect(contract.remdataset('d1', 'laura', laura.permission))
+                .be.rejectedWith("401. Access denied");
+        });
+
+        it('should remove dataset', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.upsdataset('d1', 'alice', 'laura', 111, 222, 'data', alice.permission);
+            expect(await util.isDatasetExists('d1')).be.true;
+            await contract.remdataset('d1', 'alice', alice.permission);
+            expect(await util.isDatasetExists('d1')).be.false;
+        });
     });
 
     describe('#projects', function () {
@@ -327,6 +375,30 @@ describe('DmpusersV2', function () {
             checkProject((await util.getProjectsByReceiver('alice'))[0]);
             checkProject((await util.getProjectsByReceiverAndUpdatedAt('alice', 111))[0]);
         });
+
+        it('should not remove unknown project', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await expect(contract.remproject('p1', 'alice', alice.permission))
+                .be.rejectedWith("404. Project not found");
+        });
+
+        it('should not remove foreign project', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            const laura = await tools.makeAccount(bc, 'laura');
+            await contract.upsproject('p1', 'jamie', 'alice', 111, 'data', 'mk', alice.permission);
+            await expect(contract.remproject('p1', 'alice', laura.permission))
+                .be.rejectedWith("missing authority of alice");
+            await expect(contract.remproject('p1', 'laura', laura.permission))
+                .be.rejectedWith("401. Access denied");
+        });
+
+        it('should remove project', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.upsproject('p1', 'jamie', 'alice', 111, 'data', 'mk', alice.permission);
+            expect(await util.isProjectExists('p1')).be.true;
+            await contract.remproject('p1', 'alice', alice.permission);
+            expect(await util.isProjectExists('p1')).be.false;
+        });
     });
 
     describe('#orgsv2', function () {
@@ -348,6 +420,30 @@ describe('DmpusersV2', function () {
             assert.equal(o.public_key, 'key');
             assert.equal(o.updated_at, 111);
             assert.equal(o.bc_version, 222);
+        });
+
+        it('should not remove unknown organization', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await expect(contract.removeorg2('alice', alice.permission))
+                .be.rejectedWith("404. Organization not found");
+        });
+
+        it('should not remove foreign organization', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            const laura = await tools.makeAccount(bc, 'laura');
+            await contract.upsertorg2('alice', 'data', 'key', 111, 222, alice.permission);
+            await expect(contract.removeorg2('alice', laura.permission))
+                .be.rejectedWith("missing authority of alice");
+        });
+
+        it('should remove organization', async () => {
+            const alice = await tools.makeAccount(bc, 'alice');
+            await contract.upsertorg2('alice', 'data', 'key', 111, 222, alice.permission);
+            expect(await util.isOrgExistsV2('alice')).be.true;
+            await contract.removeorg2('alice', alice.permission);
+            expect(await util.isOrgExistsV2('alice')).be.false;
+            const o = await util.getOrg2('alice');
+            assert.notOk(o);
         });
 
         it('should update organization', async () => {

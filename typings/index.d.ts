@@ -261,7 +261,7 @@ export declare class DmpusersUtility {
     */
     constructor(contractAccount: any, blockchain: AggregionBlockchain);
     getOrganization(name: any): Promise<any>;
-    isOrganizationExists(name: any): Promise<boolean>;
+    isOrgExistsV1(name: any): Promise<boolean>;
     getUser(name: any): Promise<any>;
     isUserExists(name: any): Promise<boolean>;
     getPublicKey(owner: any): Promise<any>;

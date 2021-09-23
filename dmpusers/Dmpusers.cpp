@@ -135,6 +135,15 @@ namespace dmpusers {
       print("Success. Org: '", org, "' data: '", data, "' pk: '", public_key);
    }
 
+   void Dmpusers::removeorgv2(std::string org_id) {
+      const auto org = name{org_id};
+      require_auth(org);
+      orgsv2_table_t orgs{get_self(), Names::DefaultScope};
+      auto it = orgs.require_find(org.value, "404. Organization not found");
+      orgs.erase(it);
+      print("Success. Removed org: '", org);
+   }
+
 
    void Dmpusers::upsproject(std::string project_id, std::string receiver_org_id, uint64_t updated_at, ProjectInfo info) {
       const auto project = name{project_id};
@@ -162,9 +171,20 @@ namespace dmpusers {
       print("Success. Project: '", project_id, "' receiver: '", receiver_org_id, "' sender: '", info.sender_org_id);
    }
 
+   void Dmpusers::remproject(std::string project_id, std::string sender_org_id) {
+      const auto project = name{project_id};
+      const auto sender = name{sender_org_id};
+      require_auth(sender);
+      projects_table_t projects{get_self(), Names::DefaultScope};
+      auto it = projects.require_find(project.value, "404. Project not found");
+      check(name{it->info.sender_org_id} == sender, "401. Access denied");
+      projects.erase(it);
+      print("Success. Removed project: '", project);
+   }
+
+
    void Dmpusers::upsdataset(std::string dataset_id, DatasetInfo info) {
       const auto dataset = name{dataset_id};
-      // const auto receiver = name{receiver_org_id};
       const auto sender = name{info.sender_org_id};
       require_auth(sender);
 
@@ -184,6 +204,17 @@ namespace dmpusers {
          });
       }
       print("Success. Dataset: '", dataset_id, "' sender: '", info.sender_org_id, "' receiver: '", info.receiver_org_id);
+   }
+
+   void Dmpusers::remdataset(std::string dataset_id, std::string sender_org_id) {
+      const auto dataset = name{dataset_id};
+      const auto sender = name{sender_org_id};
+      require_auth(sender);
+      datasets_table_t datasets{get_self(), Names::DefaultScope};
+      auto it = datasets.require_find(dataset.value, "404. Dataset not found");
+      check(name{it->info.sender_org_id} == sender, "401. Access denied");
+      datasets.erase(it);
+      print("Success. Removed dataset: '", dataset);
    }
 
    void Dmpusers::upsdsreq(std::string dsreqs_id, DatasetRequestInfo info) {
@@ -209,4 +240,15 @@ namespace dmpusers {
       print("Success. Dataset: '", dsreqs_id, "' receiver: '", info.receiver_org_id);
    }
 
+
+   void Dmpusers::remdsreq(std::string dsreq_id, std::string receiver_org_id) {
+      const auto dsreq = name{dsreq_id};
+      const auto receiver = name{receiver_org_id};
+      require_auth(receiver);
+      dsreqs_table_t dsreqs{get_self(), Names::DefaultScope};
+      auto it = dsreqs.require_find(dsreq.value, "404. Request not found");
+      check(name{it->info.receiver_org_id} == receiver, "401. Access denied");
+      dsreqs.erase(it);
+      print("Success. Removed dataset request: '", dsreq);
+   }
 }
