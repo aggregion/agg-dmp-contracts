@@ -8,6 +8,7 @@ include_directories($ENV{EOS_CONTRACTS_ROOT}/contracts/eosio.system/include/)
 
 add_contract(Dmpusers Dmpusers
     Dmpusers.cpp
+    Glossaries.cpp
     Interactions.cpp
     Messages.cpp)
 

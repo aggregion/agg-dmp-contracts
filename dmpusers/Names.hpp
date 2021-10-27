@@ -20,15 +20,24 @@ namespace dmpusers {
       static constexpr const name PublicKeysTable{"pkeys"};
       static constexpr const name MessagesTable{"msgs"};
       static constexpr const name OrganizationsTableV2{"orgsv2"};
+
       static constexpr const name ProjectsTable{"projects"};
       static constexpr const name ProjectsTableByReceiver{"projbyrecidx"};
       static constexpr const name ProjectsTableByReceiverAndUpdateAt{"projbrupdidx"};
+
       static constexpr const name DatasetsTable{"datasets"};
       static constexpr const name DatasetsTableByUpdateAt{"dsupdatidx"};
       static constexpr const name DatasetsTableByReceiver{"dsrecidx"};
       static constexpr const name DatasetsTableBySender{"dssendidx"};
+
+      static constexpr const name GlossariesTable{"glossaries"};
+      static constexpr const name GlossariesTableByUpdateAt{"glupdatidx"};
+      static constexpr const name GlossariesTableByReceiver{"glrecidx"};
+      static constexpr const name GlossariesTableBySender{"glsendidx"};
+
       static constexpr const name DsReqsTable{"dsreqs"};
       static constexpr const name DsReqsTableByReceiverAndUpdateAt{"drqsrecupidx"};
+
       static constexpr const name InteractionsTable{"interactions"};
       static constexpr const name InteractionsTripletIndex{"intertripidx"};
       static constexpr const name InteractionsOwnerIndex{"interownridx"};

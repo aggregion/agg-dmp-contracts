@@ -169,3 +169,17 @@ title: Enable/disable interaction
 summary: Enable/disable interaction
 icon:
 
+
+<h1 class="contract">upsglossary</h1>
+---
+spec-version: 0.0.1
+title: Upsert glossary
+summary: Upsert glossary
+icon:
+
+<h1 class="contract">remglossary</h1>
+---
+spec-version: 0.0.1
+title: Remove glossary
+summary: Remove glossary
+icon:
