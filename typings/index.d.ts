@@ -213,9 +213,9 @@ export declare class DmpusersContract {
     upsertorg2(orgId: string, data: string, publicKey: string, updatedAt: number, bcVersion: number, permission: string): Promise<void>;
     upsproject(projectId: string, receiverOrgId: string, senderOrgId: string, updatedAt: number, data: string, masterKey: string, permission: string): Promise<void>;
     upsdataset(datasetId: string, senderOrgId: string, receiverOrgId: string, updatedAt: number, bcVersion: number, data: string, permission: string): Promise<void>;
+    remdataset(datasetId: string, permission: string): Promise<void>;
     upsdsreq(dsReqId: string, receiverOrgId: string, updatedAt: number, bcVersion: number, data: string, permission: string): Promise<void>;
-
-
+    remdsreq(dsReqId: string, receiverOrgId: string, permission: string): Promise<void>;
 }
 
 /// <reference types="node" />
@@ -429,10 +429,59 @@ export declare class InteractionsUtility {
     */
     constructor(contractAccount: string, blockchain: AggregionBlockchain);
 
-    getInteractionById(id:number): Promise<any>;
-    getInteractionsByOwner(owner:string): Promise<any[]>;
+    getInteractionById(id: number): Promise<any>;
+    getInteractionsByOwner(owner: string): Promise<any[]>;
     getInteraction(owner: string, partner: string, interactionType: number): Promise<any>;
     isInteractionExists(owner: string, partner: string, interactionType: number): Promise<Boolean>;
+}
+
+
+export declare class GlossariesContract {
+    /**
+     * @param {EosioName} contractName
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractName: string, blockchain: AggregionBlockchain);
+
+    upsertGlossary(glossaryId: string, senderOrgId: string, receiverOrgId: string, updatedAt: number, bcVersion: number, data: string, permission: string): Promise<void>;
+    upsertGlossary(glossaryId: string, permission: string): Promise<void>;
+}
+
+export declare class GlossariesUtility {
+    /**
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractAccount: string, blockchain: AggregionBlockchain);
+
+    getGlossaryById(glossaryId: string): Promise<any>;
+    isGlossaryExists(glossaryId: string): Promise<Boolean>;
+    getGlossariesByUpdateAt(lower: string, upper: string): Promise<any[]>;
+    getGlossariesBySender(senderOrgId: string): Promise<any[]>;
+    getGlossariesByReceiver(receiverOrgId: string): Promise<any[]>;
+}
+
+export declare class GlossaryTermsContract {
+    /**
+     * @param {EosioName} contractName
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractName: string, blockchain: AggregionBlockchain);
+
+    upsertGlossary(glossaryId: string, senderOrgId: string, receiverOrgId: string, updatedAt: number, bcVersion: number, data: string, permission: string): Promise<void>;
+    upsertGlossary(glossaryId: string, permission: string): Promise<void>;
+}
+
+export declare class GlossaryTermsUtility {
+    /**
+     * @param {AggregionBlockchain} blockchain
+    */
+    constructor(contractAccount: string, blockchain: AggregionBlockchain);
+
+    getGlossaryTermById(glossaryId): Promise<any>;
+    isGlossaryTermExists(glossaryId: string): Promise<Boolean>;
+    getGlossaryTermsByUpdateAt(lower: string, upper: string): Promise<any[]>;
+    getGlossaryTermsBySender(senderOrgId: string): Promise<any[]>;
+    getGlossaryTermsByReceiver(receiverOrgId: string): Promise<any[]>;
 }
 
 
