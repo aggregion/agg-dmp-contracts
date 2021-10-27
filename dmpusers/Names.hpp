@@ -35,6 +35,11 @@ namespace dmpusers {
       static constexpr const name GlossariesTableByReceiver{"glrecidx"};
       static constexpr const name GlossariesTableBySender{"glsendidx"};
 
+      static constexpr const name GlossaryTermsTable{"glterms"};
+      static constexpr const name GlossaryTermsTableByUpdateAt{"gltrupdatidx"};
+      static constexpr const name GlossaryTermsTableByReceiver{"gltrrecidx"};
+      static constexpr const name GlossaryTermsTableBySender{"gltrsendidx"};
+
       static constexpr const name DsReqsTable{"dsreqs"};
       static constexpr const name DsReqsTableByReceiverAndUpdateAt{"drqsrecupidx"};
 

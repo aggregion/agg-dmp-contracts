@@ -183,3 +183,17 @@ spec-version: 0.0.1
 title: Remove glossary
 summary: Remove glossary
 icon:
+
+<h1 class="contract">upsglterm</h1>
+---
+spec-version: 0.0.1
+title: Upsert glossary term
+summary: Upsert glossary term
+icon:
+
+<h1 class="contract">remglterm</h1>
+---
+spec-version: 0.0.1
+title: Remove glossary term
+summary: Remove glossary term
+icon:
