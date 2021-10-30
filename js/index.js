@@ -8,6 +8,8 @@ const DmpusersContract = require('./DmpusersContract');
 const DmpusersUtility = require('./DmpusersUtility');
 const InteractionsContract = require('./InteractionsContract');
 const InteractionsUtility = require('./InteractionsUtility');
+const GlossariesContract = require('./GlossariesContract');
+const GlossariesUtility = require('./GlossariesUtility');
 const MessagesContract = require('./MessagesContract');
 const MessagesUtility = require('./MessagesUtility');
 const TablesUtility = require('./TablesUtility');
@@ -23,6 +25,8 @@ module.exports = {
     DmpusersUtility,
     InteractionsContract,
     InteractionsUtility,
+    GlossariesContract,
+    GlossariesUtility,
     MessagesContract,
     MessagesUtility,
     TablesUtility,
