@@ -10,6 +10,8 @@ const InteractionsContract = require('./InteractionsContract');
 const InteractionsUtility = require('./InteractionsUtility');
 const GlossariesContract = require('./GlossariesContract');
 const GlossariesUtility = require('./GlossariesUtility');
+const GlossaryTermsContract = require('./GlossaryTermsContract');
+const GlossaryTermsUtility = require('./GlossaryTermsUtility');
 const MessagesContract = require('./MessagesContract');
 const MessagesUtility = require('./MessagesUtility');
 const TablesUtility = require('./TablesUtility');
@@ -27,6 +29,8 @@ module.exports = {
     InteractionsUtility,
     GlossariesContract,
     GlossariesUtility,
+    GlossaryTermsContract,
+    GlossaryTermsUtility,
     MessagesContract,
     MessagesUtility,
     TablesUtility,
