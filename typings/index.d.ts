@@ -444,7 +444,7 @@ export declare class GlossariesContract {
     constructor(contractName: string, blockchain: AggregionBlockchain);
 
     upsertGlossary(glossaryId: string, senderOrgId: string, receiverOrgId: string, updatedAt: number, bcVersion: number, data: string, permission: string): Promise<void>;
-    upsertGlossary(glossaryId: string, permission: string): Promise<void>;
+    removeGlossary(glossaryId: string, permission: string): Promise<void>;
 }
 
 export declare class GlossariesUtility {
@@ -467,8 +467,8 @@ export declare class GlossaryTermsContract {
     */
     constructor(contractName: string, blockchain: AggregionBlockchain);
 
-    upsertGlossary(glossaryId: string, senderOrgId: string, receiverOrgId: string, updatedAt: number, bcVersion: number, data: string, permission: string): Promise<void>;
-    upsertGlossary(glossaryId: string, permission: string): Promise<void>;
+    upsertGlossaryTerm(glossaryId: string, senderOrgId: string, receiverOrgId: string, updatedAt: number, bcVersion: number, data: string, permission: string): Promise<void>;
+    removeGlossaryTerm(glossaryId: string, permission: string): Promise<void>;
 }
 
 export declare class GlossaryTermsUtility {
